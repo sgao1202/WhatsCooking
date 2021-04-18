@@ -1,0 +1,29 @@
+{
+  "name": "whatscooking",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "node tasks/test.js",
+    "seed": "node tasks/seed/seed.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sgao1202/WhatsCooking.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sgao1202/WhatsCooking/issues"
+  },
+  "homepage": "https://github.com/sgao1202/WhatsCooking#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "bluebird": "^3.7.2",
+    "elasticsearch": "^16.7.2",
+    "express": "^4.17.1",
+    "mongodb": "^3.6.6",
+    "redis": "^3.1.1"
+  }
+}
