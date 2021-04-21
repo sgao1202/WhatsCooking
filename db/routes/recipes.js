@@ -1,9 +1,14 @@
-const e = require('express');
 const express = require('express');
 const router = express.Router();
+const bluebird = require('bluebird');
+const redis = require('redis');
 const data = require('../data');
 const userData = data.users;
 const recipeData = data.recipes;
+
+const client = redis.createClient();
+bluebird.promisifyAll(redis.RedisClient.prototype);
+bluebird.promisifyAll(redis.Multi.prototype);
 
 function arraysEqual(a, b) {
     if (a === b) return true;
@@ -55,6 +60,25 @@ router.get('/:id', async (req, res) => {
     return;
 });
 
+router.get('/popular', async (req, res) => {
+    try {
+      await client.zrevrange('recipeHits',0,19, 'WITHSCORES',function(err,result){
+        if (err != null) {
+          res.status(500).render('error', {error: String(err)} );
+        }
+        var searches = [];
+        i = 0;
+        n = result.length;
+        while (i < n) {
+          searches.push(result.slice(i, i += 2));
+        }
+        res.render('popularsearches', {searches: searches})
+      });		
+    } catch (e) {
+      res.status(404).render('error', {error: String(e)} );
+    }
+});
+
 router.post('/', async (req, res) => {
     let recipeInfo = req.body;
 
@@ -84,7 +108,7 @@ router.post('/', async (req, res) => {
         }
     }
 
-    if (!recipeInfo.title || typeof recipeInfo.title != "string") {
+    if (!recipeInfo.title || typeof recipeInfo.title != "string" || recipeInfo.title == "popular") {
         res.status(400).json({
             error: 'You must provide a valid title'
         });

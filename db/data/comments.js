@@ -1,12 +1,8 @@
 const mongoDB = require('mongodb');
 const mongoCollections = require('../config/mongoCollections');
 const comments = mongoCollections.comments;
-
-// const elasticsearchClient = new elasticsearch.Client({
-//     host:'localhost:9200', // process.env.elasticsearchAddress
-//     log: 'trace',
-//     apiVersion: '7.2', // use the same version of your Elasticsearch instance
-// });
+const userData = require('./users');
+const recipeData = require('./recipes');
 
 const exportedMethods = {
   
@@ -26,35 +22,29 @@ const exportedMethods = {
   },
 
   async getCommentsByRecipe(recipeId) {
-	  if (!recipe || typeof recipe !== 'object') throw 'must provide valid recipe';
+	  if (!recipeId || typeof recipeId !== 'string') throw 'must provide valid recipeId';
     const commentCollection = await comments();
-    const comments = await commentCollection.find({recipeId: recipeId}).toArray();
-    return comments;
+    const commentsList = await commentCollection.find({recipeId: recipeId}).toArray();
+    return commentsList;
   },
   
-  async addComment(comment, user, recipe) {
+  async addComment(comment, userId, recipeId) {
     if (!comment || typeof comment !== 'string') throw 'must provide valid content';
-    if (!user || typeof user !== 'object') throw 'must provide valid user';
-    if (!recipe || typeof recipe !== 'object') throw 'must provide valid recipe';
+    if (!userId || typeof userId !== 'string') throw 'must provide valid userId';
+    if (!recipeId || typeof recipeId !== 'string') throw 'must provide valid recipeId';
+
+    let u = await userData.getUserById(userId);
+    let r = await recipeData.getRecipeById(recipeId);
 
     const commentCollection = await comments();
 
     const newComment = {
       comment: comment,
-      userId: user._id,
-      recipeId: recipe._id    
+      userId: userId,
+      recipeId: recipeId    
     };
 
     const newInsertInformation = await commentCollection.insertOne(newComment);
-
-    // elasticsearchClient.index({
-    //     index: 'WhatsCooking',
-    //     id: String(newInsertInformation._id),
-    //     type: 'comment',
-    //     body: {"comment": comment,}
-    // }, function(err, resp, status) {
-    //     throw err;
-    // });
 
     return await this.getCommentById(String(newInsertInformation.insertedId));
   },
@@ -81,7 +71,7 @@ const exportedMethods = {
     if (!updateInfo.matchedCount && !updateInfo.modifiedCount)
       throw 'Update failed';
 
-    return await this.getRecipeById(id);
+    return await this.getCommentById(id);
   },
   
   async deleteComment(commentId) {

@@ -1,7 +1,14 @@
 const mongoDB = require('mongodb');
 const mongoCollections = require('../config/mongoCollections');
+const elasticsearch = require('elasticsearch');
 const users = mongoCollections.users;
 const recipeData = require('./recipes');
+
+const elasticsearchClient = new elasticsearch.Client({
+    host:'localhost:9200', // process.env.elasticsearchAddress
+    log: 'trace',
+    apiVersion: '7.2', // use the same version of your Elasticsearch instance
+});
 
 let exportedMethods = {
 
@@ -17,9 +24,7 @@ let exportedMethods = {
         if (!id || typeof id !== 'string') throw 'must provide valid id';
 
         const userCollection = await users();
-        let user = await userCollection.findOne({
-            _id: mongoDB.ObjectID(String(id))
-        });
+        let user = await userCollection.findOne({_id: mongoDB.ObjectID(String(id))});
         if (!user) throw 'User not found';
         return user;
     },
@@ -28,9 +33,7 @@ let exportedMethods = {
         if (!username || typeof username !== 'string') throw 'must provide valid username';
 
         const userCollection = await users();
-        let user = await userCollection.findOne({
-            username: username
-        });
+        let user = await userCollection.findOne({username: username});
         if (!user) throw 'User not found';
         return user;
     },
@@ -89,7 +92,7 @@ let exportedMethods = {
         } else {
             let userNameTaken = await userCollection.findOne({
                 username: updatedUser.username
-            }).toArray();
+            });
             if (userNameTaken) {
                 throw 'username is taken'
             }
@@ -169,7 +172,7 @@ let exportedMethods = {
 
         let recipeFound = false;
         user.bookmarks.forEach(bookmark => {
-            if (String(recipe._id).localeCompare(bookmark)) {
+            if (recipeId == bookmark) {
                 recipeFound = true;
             }
         })
@@ -224,11 +227,12 @@ let exportedMethods = {
         if (!followUserId || typeof followUserId !== 'string') throw 'must provide valid follow userId';
 
         let user = await this.getUserById(userId);
-        let followUser = await recipeData.getRecipeById(followUserId);
+        let followUser = await this.getUserById(followUserId);
 
         let userFound = false;
         user.following.forEach(follow => {
-            if (String(followUser._id).localeCompare(follow)) {
+            console.log(follow)
+            if (followUserId == follow) {
                 userFound = true;
             }
         })

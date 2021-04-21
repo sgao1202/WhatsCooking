@@ -110,7 +110,7 @@ router.post('/', async (req, res) => {
         }
     }
 
-    if (!ratingInfo.rating || typeof ratingInfo.title != "number" || 1 < rating || rating > 5) {
+    if (!ratingInfo.rating || typeof ratingInfo.rating != "number" || 1 < rating || rating > 5) {
         res.status(400).json({
             error: 'You must provide a valid rating'
         });
@@ -190,7 +190,7 @@ router.put('/:id', async (req, res) => {
         }
     }
 
-    if (!ratingInfo.rating || typeof ratingInfo.title != "number" || 1 < rating || rating > 5) {
+    if (!ratingInfo.rating || typeof ratingInfo.title != "number" || rating < 1 || rating > 5) {
         res.status(400).json({
             error: 'You must provide a valid rating'
         });
