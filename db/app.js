@@ -2,32 +2,17 @@ const express = require('express');
 const app = express();
 // const static = express.static(__dirname + '/public');
 const configRoutes = require('./routes');
-const elasticsearch = require('elasticsearch');
 const bluebird = require('bluebird');
 const redis = require('redis');
+const path = require('path')
 const static = express.static(__dirname + '/public');
 
 const redisClient = redis.createClient();
-redisClient.flushdb( async function (err, succeeded) {
-  console.log(err, succeeded)
-});
-
-const elasticsearchClient = new elasticsearch.Client({
-  host:'localhost:9200', // process.env.elasticsearchAddress
-  log: 'trace',
-  apiVersion: '7.2', // use the same version of your Elasticsearch instance
-});
-
-elasticsearchClient.indices.delete({
-  index: '_all'
-}, function(err, res) {
-
-  if (err) {
-      console.error(err.message);
-  } else {
-      console.log('Indexes have been deleted!');
-  }
-});
+// redisClient.flushdb( async function (err, succeeded) {
+//   if (err) {
+//     console.log('Redis flush err:', err)
+//   }
+// });
 
 bluebird.promisifyAll(redis.RedisClient.prototype);
 bluebird.promisifyAll(redis.Multi.prototype);
@@ -38,18 +23,13 @@ app.use(express.urlencoded({ extended: true }));
 
 // INCREMENT SEARCHES IN REDIS SORTED SET
 app.use(async (req, res, next) => {
-  if (req._parsedUrl.pathname == '/recipes') {
-    // if (req.query.SEARCH_TERM) {
-    //   if (req.query.SEARCH_TERM.replace(/ /g,'') != '') {
-    //     await redisClient.zincrbyAsync('searchCnt', 1, String(req.query.SEARCH_TERM));
-    //   }
-    // }
-  
-    if (req.body.id) {
-      if (req.body.id.replace(/ /g,'') != '') {
-        await redisClient.zincrbyAsync('recipeHits', 1, String(req.body.id));
-      } 
-    }
+  let parse = path.parse(req._parsedUrl.pathname);
+
+  if (parse.dir == '/recipes' && parse.base != 'popular') {  
+    if (parse.base && parse.base.replace(/ /g,'') != '') {
+      let res = await redisClient.zincrbyAsync('recipeHits', 1, String(parse.base));
+      console.log(res);
+    } 
   }
   next();
 });

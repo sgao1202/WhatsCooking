@@ -92,7 +92,7 @@ async function main() {
 
                         // let deletedRecipe = await recipes.deleteRecipe(String(r._id));
                         // let allRecipes = await recipes.getAllrecipes();
-                        console.log(removeBookmarkUser);
+                        // console.log(removeBookmarkUser);
                     }
 
                     for (const rating of user.ratings) {
@@ -152,5 +152,5 @@ async function main() {
     await db.serverConfig.close();
     console.log('Seed task completed');
 }
-
+ 
 main();

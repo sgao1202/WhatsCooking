@@ -16,6 +16,12 @@ let exportedMethods = {
     async getAllusers() {
         const userCollection = await users();
         const userList = await userCollection.find({}).toArray();
+
+        // remove passwords
+        userList.forEach(user => {
+            delete user.password;
+        })
+
         if (!userList) throw 'No users in system!';
         return userList;
     },
@@ -23,6 +29,18 @@ let exportedMethods = {
     async getUserById(id) {
         if (!id || typeof id !== 'string') throw 'must provide valid id';
 
+        const userCollection = await users();
+        let user = await userCollection.findOne({_id: mongoDB.ObjectID(String(id))});
+        if (!user) {
+            throw 'User not found';
+        } else {
+            delete user.password;
+        }
+        return user;
+    },
+
+    async getUserByIdWithPword(id) {
+        if (!id || typeof id !== 'string') throw 'must provide valid id';
         const userCollection = await users();
         let user = await userCollection.findOne({_id: mongoDB.ObjectID(String(id))});
         if (!user) throw 'User not found';
@@ -34,7 +52,11 @@ let exportedMethods = {
 
         const userCollection = await users();
         let user = await userCollection.findOne({username: username});
-        if (!user) throw 'User not found';
+        if (!user) {
+            throw 'User not found'
+        } else {
+            delete user.password;
+        };
         return user;
     },
 
@@ -88,7 +110,7 @@ let exportedMethods = {
         // CHECK IF USERNAME IS UNIQUE
         const userCollection = await users();
         if (!updatedUser.username || typeof updatedUser.username != "string") {
-            throw 'You must provide a valid description'
+            throw 'You must provide a valid username'
         } else {
             let userNameTaken = await userCollection.findOne({
                 username: updatedUser.username

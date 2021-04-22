@@ -38,6 +38,39 @@ router.get('/', async (req, res) => {
     return;
 });
 
+router.get('/popular', async (req, res) => {
+    try {
+        
+        await client.zrevrange('recipeHits',0,19,'WITHSCORES',async function(err,results){ // 'recipeHits',0,19,'WITHSCORES'
+            if (err != null) {
+                res.status(404).json({
+                    error: 'error occured while getting popular recipes'
+                });
+            } else {
+                let recipes = [];
+
+                i = 0;
+                n = results.length;
+                while (i < n) {
+                    try {
+                        let result = results.slice(i, i+=2);
+                        var recipe = await recipeData.getRecipeById(result[0]);
+                        recipe['hits'] = result[1];              
+                        recipes.push(recipe);
+                    } catch (error) {
+                        // do nothing, no recipe found for id
+                    }
+                }
+                res.status(200).json(recipes)
+            }
+        });
+
+        return;
+    } catch (e) {
+        res.status(404).json({error: String(e)});
+    }
+});
+
 router.get('/:id', async (req, res) => {
     if (!req.params.id) {
         res.status(400).json({
@@ -58,25 +91,6 @@ router.get('/:id', async (req, res) => {
         });
     }
     return;
-});
-
-router.get('/popular', async (req, res) => {
-    try {
-      await client.zrevrange('recipeHits',0,19, 'WITHSCORES',function(err,result){
-        if (err != null) {
-          res.status(500).render('error', {error: String(err)} );
-        }
-        var searches = [];
-        i = 0;
-        n = result.length;
-        while (i < n) {
-          searches.push(result.slice(i, i += 2));
-        }
-        res.render('popularsearches', {searches: searches})
-      });		
-    } catch (e) {
-      res.status(404).render('error', {error: String(e)} );
-    }
 });
 
 router.post('/', async (req, res) => {
@@ -251,13 +265,6 @@ router.put('/:id', async (req, res) => {
         return;
     }
 
-    if (!recipeInfo.profilePicture || typeof recipeInfo.profilePicture != "string") {
-        res.status(400).json({
-            error: 'You must provide a valid profile picture'
-        });
-        return;
-    }
-
     if (!recipeInfo.ingredients || !Array.isArray(recipeInfo.ingredients)) {
         res.status(400).json({
             error: 'You must provide a valid array of ingredients'
@@ -315,7 +322,7 @@ router.put('/:id', async (req, res) => {
 
     try {
         await recipeData.updateRecipe(req.params.id, recipeInfo);
-        let updatedRecipe = await recipeData.getFormattedRecipeById(req.params.id);
+        let updatedRecipe = await recipeData.getRecipeById(req.params.id);
         res.status(200).json(updatedRecipe);
         return;
     } catch (e) {
