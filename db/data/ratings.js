@@ -4,12 +4,6 @@ const ratings = mongoCollections.ratings;
 const userData = require('./users');
 const recipeData = require('./recipes');
 
-// const elasticsearchClient = new elasticsearch.Client({
-//     host:'localhost:9200', // process.env.elasticsearchAddress
-//     log: 'trace',
-//     apiVersion: '7.2', // use the same version of your Elasticsearch instance
-// });
-
 const exportedMethods = {
   
   async getAllRatings() {
@@ -28,35 +22,29 @@ const exportedMethods = {
   },
 
   async getRatingsByRecipe(recipeId) {
-	  if (!recipe || typeof recipeId !== 'string') throw 'must provide valid recipeId';
+	  if (!recipeId || typeof recipeId !== 'string') throw 'must provide valid recipeId';
     const ratingCollection = await ratings();
-    const ratings = await ratingCollection.find({recipeId: recipeId}).toArray();
-    return ratings;
+    const ratingsList = await ratingCollection.find({recipeId: recipeId}).toArray();
+    return ratingsList;
   },
   
-  async addRating(rating, user, recipe) {
+  async addRating(rating, userId, recipeId) {
     if (!rating || typeof rating != "number" || rating < 1 || rating > 5) throw 'You must provide a valid rating'
-    if (!user || typeof user !== 'object') throw 'must provide valid user';
-    if (!recipe || typeof recipe !== 'object') throw 'must provide valid recipe';
+    if (!userId || typeof userId !== 'string') throw 'must provide valid userId';
+    if (!recipeId || typeof recipeId !== 'string') throw 'must provide valid recipeId';
+
+    let u = await userData.getUserById(userId);
+    let r = await recipeData.getRecipeById(recipeId);
 
     const ratingCollection = await ratings();
 
     const newRating = {
       rating: rating,
-      userId: user._id,
-      recipeId: recipe._id    
+      userId: userId,
+      recipeId: recipeId
 	  };
 
     const newInsertInformation = await ratingCollection.insertOne(newRating);
-
-    // elasticsearchClient.index({
-    //     index: 'WhatsCooking',
-    //     id: String(newInsertInformation._id),
-    //     type: 'rating',
-    //     body: {"rating": rating,}
-    // }, function(err, resp, status) {
-    //     throw err;
-    // });
 
     return await this.getRatingById(String(newInsertInformation.insertedId));
   },
@@ -65,7 +53,7 @@ const exportedMethods = {
   // PATCH /recipes/{id}
   async updateRating(id, updatedRating) {
     if (!id || typeof id != "string") throw 'You must provide a valid id'
-    if (!updatedRating.rating || typeof updatedRating.rating != "number" || 1 < updatedRating.rating || updatedRating.rating > 5) throw 'You must provide a valid rating'
+    if (!updatedRating.rating || typeof updatedRating.rating != "number" || updatedRating.rating < 1 || updatedRating.rating > 5) throw 'You must provide a valid rating'
 
     const rating = await this.getRatingById(id);
 
@@ -83,7 +71,7 @@ const exportedMethods = {
     if (!updateInfo.matchedCount && !updateInfo.modifiedCount)
       throw 'Update failed';
 
-    return await this.getRecipeById(id);
+    return await this.getRatingById(id);
   },
   
   async deleteRating(ratingId) {
