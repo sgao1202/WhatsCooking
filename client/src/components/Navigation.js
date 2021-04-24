@@ -17,6 +17,9 @@ const Navigation = () => {
                 </Link>
             </Navbar.Brand>
             <Navbar.Toggle/>
+            <Navbar.Collapse>
+                
+            </Navbar.Collapse>
         </Navbar>
     );
 };
