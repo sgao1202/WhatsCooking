@@ -4,12 +4,14 @@ const app = express();
 const configRoutes = require('./routes');
 const bluebird = require('bluebird');
 const redis = require('redis');
-const client = redis.createClient();
-
+const path = require('path')
 const static = express.static(__dirname + '/public');
 
-// client.flushdb( async function (err, succeeded) {
-//   console.log(err, succeeded)
+const redisClient = redis.createClient();
+// redisClient.flushdb( async function (err, succeeded) {
+//   if (err) {
+//     console.log('Redis flush err:', err)
+//   }
 // });
 
 bluebird.promisifyAll(redis.RedisClient.prototype);
@@ -21,18 +23,13 @@ app.use(express.urlencoded({ extended: true }));
 
 // INCREMENT SEARCHES IN REDIS SORTED SET
 app.use(async (req, res, next) => {
-  if (req._parsedUrl.pathname == '/search') {
-    if (req.query.SEARCH_TERM) {
-      if (req.query.SEARCH_TERM.replace(/ /g,'') != '') {
-        await client.zincrbyAsync('searchCnt', 1, String(req.query.SEARCH_TERM));
-      }
-    }
-  
-    if (req.body.SEARCH_TERM) {
-      if (req.body.SEARCH_TERM.replace(/ /g,'') != '') {
-        await client.zincrbyAsync('searchCnt', 1, String(req.body.SEARCH_TERM));
-      } 
-    }
+  let parse = path.parse(req._parsedUrl.pathname);
+
+  if (parse.dir == '/recipes' && parse.base != 'popular') {  
+    if (parse.base && parse.base.replace(/ /g,'') != '') {
+      let res = await redisClient.zincrbyAsync('recipeHits', 1, String(parse.base));
+      console.log(res);
+    } 
   }
   next();
 });

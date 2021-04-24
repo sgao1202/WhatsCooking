@@ -8,7 +8,7 @@ const commentData = data.comments;
 
 router.get('/', async (req, res) => {
     try {
-        let commentList = await commentData.getAllcomments();
+        let commentList = await commentData.getAllComments();
         res.status(200).json(commentList);
     } catch (e) {
         res.status(500).json({
@@ -40,8 +40,8 @@ router.get('/:id', async (req, res) => {
     return;
 });
 
-router.get('/:recipeId', async (req, res) => {
-    if (!req.params.commentId) {
+router.get('/recipe/:recipeId', async (req, res) => {
+    if (!req.params.recipeId) {
         res.status(400).json({
             error: 'You must supply recipeId'
         });
@@ -49,12 +49,12 @@ router.get('/:recipeId', async (req, res) => {
     }
 
     try {
-        let comments = await commentsData.getCommentsByRecipe(req.params.recipeId);
+        let comments = await commentData.getCommentsByRecipe(req.params.recipeId);
 
         res.status(200).json(comments);
     } catch (e) {
         res.status(404).json({
-            error: 'comments not found'
+            error: String(e)
         });
     }
     return;
@@ -110,7 +110,7 @@ router.post('/', async (req, res) => {
         }
     }
 
-    if (!commentInfo.comment || typeof commentInfo.title != "string") {
+    if (!commentInfo.comment || typeof commentInfo.comment != "string") {
         res.status(400).json({
             error: 'You must provide a valid comment'
         });
@@ -120,8 +120,8 @@ router.post('/', async (req, res) => {
     try {
         const newComment = await commentData.addComment(
             commentInfo.comment,
-            user,
-            recipe
+            commentInfo.userId,
+            commentInfo.recipeId
         );
         res.status(200).json(newComment);
     } catch (e) {
@@ -190,7 +190,7 @@ router.put('/:id', async (req, res) => {
         }
     }
 
-    if (!commentInfo.comment || typeof commentInfo.title != "number" || 1 < comment || comment > 5) {
+    if (!commentInfo.comment || typeof commentInfo.comment != "string") {
         res.status(400).json({
             error: 'You must provide a valid comment'
         });
@@ -241,7 +241,7 @@ router.patch('/:id', async (req, res) => {
     }
 
     if (commentInfo.comment && commentInfo.comment  !== oldComment.comment) {
-        if (typeof commentInfo.comment != "number" || 1 < commentInfo.comment || commentInfo.comment > 5) {
+        if (typeof commentInfo.comment != "string") {
             res.status(400).json({
                 error: 'You must provide a valid comment'
             });

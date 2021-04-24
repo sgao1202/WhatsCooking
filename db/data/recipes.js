@@ -1,7 +1,14 @@
 const mongoDB = require('mongodb');
 const mongoCollections = require('../config/mongoCollections');
+const elasticsearch = require('elasticsearch');
 const recipes = mongoCollections.recipes;
 const users = mongoCollections.users;
+
+const elasticsearchClient = new elasticsearch.Client({
+    host:'localhost:9200', // process.env.elasticsearchAddress
+    log: 'trace',
+    apiVersion: '7.2', // use the same version of your Elasticsearch instance
+});
 
 let exportedMethods = {
 
@@ -19,6 +26,13 @@ let exportedMethods = {
     let recipe = await recipeCollection.findOne({ _id: mongoDB.ObjectID(String(id)) });
     if (!recipe) throw 'Recipe not found';
     return recipe;
+  },
+
+  async getRecipesByUser(userId) {
+	  if (!userId || typeof userId !== 'string') throw 'must provide valid recipeId';
+    const recipeCollection = await recipes();
+    let recipeList = await recipeCollection.find({userId: userId}).toArray();
+    return recipeList;
   },
 
   async getUserById(id) {
@@ -70,7 +84,7 @@ let exportedMethods = {
     const recipeCollection = await recipes();
 
     let newRecipe = {
-      userId: userId,
+      userId: String(userId),
       title: title,
       picture: picture,
       description: description,
@@ -81,7 +95,23 @@ let exportedMethods = {
     const newInsertInformation = await recipeCollection.insertOne(newRecipe);
     if (newInsertInformation.insertedCount === 0) throw 'Insert failed!';
 
-    return await this.getRecipeById(String(newInsertInformation.insertedId));
+    newRecipe = await this.getRecipeById(String(newInsertInformation.insertedId));
+
+    // elasticsearchClient.index({
+    //     index: 'whatscooking',
+    //     id: String(newInsertInformation._id),
+    //     type: 'recipe',
+    //     body: {
+    //       "recipe": {
+    //         id: newRecipe._id,
+    //         title: newRecipe.title
+    //       }
+    //    }
+    // }, function(err, resp, status) {
+    //     throw err;
+    // });
+
+    return newRecipe;
   },
 
   // PUT /recipes/{id}
@@ -104,7 +134,7 @@ let exportedMethods = {
           throw 'You must provide valid ingredient names'
         } else if (!ingredient.portion || typeof ingredient.portion != "number") {
           throw 'You must provide valid ingredient portions'
-        } else if (!ingredient.units || typeof castMember.units != "string") {
+        } else if (!ingredient.units || typeof ingredient.units != "string") {
                   throw 'You must provide valid ingredient units'
               }
       });
@@ -141,7 +171,7 @@ let exportedMethods = {
   },
 
   // DELETE /recipes/{id}
-  async removeRecipe(id) {
+  async deleteRecipe(id) {
 	  if (!id || typeof id !== 'string') throw 'must provide valid id';
 
     const recipeCollection = await recipes();
