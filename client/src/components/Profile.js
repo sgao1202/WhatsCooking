@@ -1,5 +1,5 @@
 import React, {useContext, useState, useEffect} from 'react';
-// import { AuthContext } from '../firebase/Auth';
+import { AuthContext } from '../firebase/Auth';
 import '../App.css';
 
 const Profile = () => {
@@ -10,10 +10,10 @@ const Profile = () => {
         useContext to propogate user down to all child components
     */
 
-    // const { currentUser } = useContext(AuthContext);
-    // if (!currentUser) {
-    //     //redirect to signin form
-    // }
+    const { currentUser } = useContext(AuthContext);
+    if (!currentUser) {
+        //redirect to signin form
+    }
 
     /* fields to display 
         First Name
