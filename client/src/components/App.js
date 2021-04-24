@@ -1,17 +1,32 @@
-import logo from '../logo.svg';
 import '../App.css';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
+import { Navbar, Container, Row, Col } from 'react-bootstrap';
+import { AuthProvider } from '../firebase/Auth';
+import Navigation from './Navigation';
 import Landing from './Landing';
-import SignIn from './SignIn';
+import Login from './Login';
 import SignUp from './SignUp';
 
 function App() {
   return (
-    <Router>
-      <Route exact path="/" component={Landing}></Route>
-      <Route exact path="/signin" component={SignIn}></Route>
-      <Route exact path="/singup" component={SignUp}></Route>
-    </Router>
+    <AuthProvider>
+      <Router>
+            {/* <Navbar className="top-bar border-bottom rounded-bottom rounded-lg pt-4" bg="gray">
+                <Navbar.Brand>
+                    <Link to="/">
+                        <img src={logo} className="App-logo d-inline-block align-top" alt="whats-cooking-logo"></img>
+                    </Link>
+                </Navbar.Brand>
+            </Navbar> */}
+            <Navigation></Navigation>
+            <Container className="mt-5">
+                <Route exact path="/" component={Landing}></Route>
+                <Route exact path="/login" component={Login}></Route>
+                {/* <Route exact path="/signup" component={SignUp}></Route> */}
+            </Container>
+      </Router> 
+    </AuthProvider>
   );
 }
 
