@@ -7,6 +7,7 @@ import Navigation from './Navigation';
 import Landing from './Landing';
 import Login from './Login';
 import SignUp from './SignUp';
+import Home from './Home';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
                 <Route exact path="/" component={Landing}></Route>
                 <Route exact path="/login" component={Login}></Route>
                 <Route exact path="/signup" component={SignUp}></Route>
+                <Route exact path="/home" component={Home}></Route>
             </Container>
       </Router> 
     </AuthProvider>
