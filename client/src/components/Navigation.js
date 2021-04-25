@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { Navbar } from 'react-bootstrap';
+import { Button, Container, Form, FormControl, Navbar } from 'react-bootstrap';
 import { AuthContext } from '../firebase/Auth';
 import logo from '../img/whats-cooking-logo.png';
 
@@ -16,9 +16,22 @@ const Navigation = () => {
                     <img src={logo} className="App-logo d-inline-block align-top" alt="whats-cooking-logo"></img>
                 </Link>
             </Navbar.Brand>
-            <Navbar.Toggle/>
-            <Navbar.Collapse>
-                
+            <Navbar.Toggle aria-controls="basic-navbar-brand"/>
+            <Navbar.Collapse className="">
+                    <Container>
+                        {/* <Form inline>
+                            <FormControl className="mr-3" type="text"/>
+                            <Button variant="outline-primary">Search</Button>
+                        </Form> */}
+                    </Container>
+                    <div className="row">
+                            <Link className="mr-3" to="/login">
+                                <Button variant="outline-primary">Log In</Button>
+                            </Link>
+                            <Link className="mr-3" to="/signup">
+                                <Button variant="outline-primary">Sign Up</Button>
+                            </Link>
+                    </div>
             </Navbar.Collapse>
         </Navbar>
     );

@@ -9,18 +9,12 @@ import Login from './Login';
 import Profile from './Profile';
 import Recipe from './Recipe';
 import SignUp from './SignUp';
+import Home from './Home';
 
 function App() {
   return (
     <AuthProvider>
       <Router>
-            {/* <Navbar className="top-bar border-bottom rounded-bottom rounded-lg pt-4" bg="gray">
-                <Navbar.Brand>
-                    <Link to="/">
-                        <img src={logo} className="App-logo d-inline-block align-top" alt="whats-cooking-logo"></img>
-                    </Link>
-                </Navbar.Brand>
-            </Navbar> */}
             <Navigation></Navigation>
             <Container className="mt-5">
                 <Route exact path="/" component={Landing}></Route>
@@ -29,6 +23,8 @@ function App() {
                 {/* <Route exact path="/signup" component={SignUp}></Route> */}
                 <Route exact path="/profile" component={Profile}></Route>
                 <Route exact path="/recipe/:id" component={Recipe}></Route>
+                <Route exact path="/signup" component={SignUp}></Route>
+                <Route exact path="/home" component={Home}></Route>
             </Container>
       </Router> 
     </AuthProvider>

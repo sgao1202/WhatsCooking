@@ -22,6 +22,8 @@ const Recipe = (props) =>{
     /* Ideas:
     add optional photo field for each ingredient/step?
     clicking on chef name will bring you to his/her profile page?
+    AJAX Refresh?
+    
     */
     const url = 'http://localhost:3001/';
     const [loading, setLoading] = useState(true);

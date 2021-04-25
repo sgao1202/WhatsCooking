@@ -1,3 +1,12 @@
+body {
+  /* background: #1C8EF9 !important; */
+  font-weight: 400;
+}
+
+.forgot-password {
+    text-align: right;
+}
+
 .App-logo {
     width: 250px;
 }
