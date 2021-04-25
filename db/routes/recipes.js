@@ -90,7 +90,7 @@ router.get('/:id', async (req, res) => {
             error: 'recipe not found'
         });
     }
-    return recipe;
+    return;
 });
 
 router.post('/', async (req, res) => {
