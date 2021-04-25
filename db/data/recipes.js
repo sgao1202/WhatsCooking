@@ -1,14 +1,9 @@
 const mongoDB = require('mongodb');
 const mongoCollections = require('../config/mongoCollections');
-const elasticsearch = require('elasticsearch');
+const elasticData = require('../elasticdata');
+const elasticRecipes = elasticData.recipes;
 const recipes = mongoCollections.recipes;
 const users = mongoCollections.users;
-
-const elasticsearchClient = new elasticsearch.Client({
-    host:'localhost:9200', // process.env.elasticsearchAddress
-    log: 'trace',
-    apiVersion: '7.2', // use the same version of your Elasticsearch instance
-});
 
 let exportedMethods = {
 
@@ -97,19 +92,7 @@ let exportedMethods = {
 
     newRecipe = await this.getRecipeById(String(newInsertInformation.insertedId));
 
-    // elasticsearchClient.index({
-    //     index: 'whatscooking',
-    //     id: String(newInsertInformation._id),
-    //     type: 'recipe',
-    //     body: {
-    //       "recipe": {
-    //         id: newRecipe._id,
-    //         title: newRecipe.title
-    //       }
-    //    }
-    // }, function(err, resp, status) {
-    //     throw err;
-    // });
+    elasticRecipes.addRecipe(newRecipe);
 
     return newRecipe;
   },
@@ -167,7 +150,9 @@ let exportedMethods = {
     if (!updateInfo.matchedCount && !updateInfo.modifiedCount)
       throw 'Update failed';
 
-    return await this.getRecipeById(id);
+    let returnRecipe = await this.getRecipeById(id);
+    elasticRecipes.updateRecipe(returnRecipe);
+    return returnRecipe;
   },
 
   // DELETE /recipes/{id}
@@ -179,6 +164,7 @@ let exportedMethods = {
     if (deletionInfo.deletedCount === 0) {
       throw `Could not delete recipe with id of ${id}`;
     }
+    elasticRecipes.deleteRecipe(id);
     return {"recipeId":String(id), "deleted":true};
   },
 

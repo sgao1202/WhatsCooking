@@ -9,7 +9,7 @@ module.exports = [
         recipes: [
             {
                 title: 'Blueberry Scones',
-                recipePicture: './img/blueberryScone.jpg',
+                picture: './img/blueberryScone.jpg',
                 description: 'These better-than-the-bakery blueberry scones are bursting with juicy blueberries',
                 ingredients: [
                     {
@@ -97,7 +97,7 @@ module.exports = [
         recipes: [
             {
                 title: 'Blueberry Pies',
-                recipePicture: './img/blueberryPie.jpg',
+                picture: './img/blueberryPie.jpg',
                 description: 'These better-than-the-bakery blueberry scones are bursting with juicy blueberries',
                 ingredients: [
                     {
