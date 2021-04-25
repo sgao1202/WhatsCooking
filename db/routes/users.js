@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const data = require('../data');
 const userData = data.users;
+const elasticData = require('../elasticdata');
+const elasticUsers = elasticData.users;
 const recipeData = data.recipes;
 
 router.get('/', async (req, res) => {
@@ -342,7 +344,6 @@ router.patch('/:id', async (req, res) => {
     return;
 });
 
-
 router.post('/:id/bookmarks', async (req, res) => {
     if (!req.params.id) {
         res.status(400).json({
@@ -542,6 +543,12 @@ router.delete('/:id/following/:followUserId', async (req, res) => {
         return;
     }
 
+    return;
+});
+
+router.get('/search/:searchTerm', async (req, res) => {
+    let matchedUsers = await elasticUsers.search(req.params.searchTerm);
+    res.json(matchedUsers);
     return;
 });
 

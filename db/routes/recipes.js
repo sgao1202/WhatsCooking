@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const bluebird = require('bluebird');
 const redis = require('redis');
+const elasticData = require('../elasticdata');
+const elasticRecipes = elasticData.recipes;
 const data = require('../data');
 const userData = data.users;
 const recipeData = data.recipes;
@@ -442,6 +444,12 @@ router.patch('/:id', async (req, res) => {
         return;
     }
 
+    return;
+});
+
+router.get('/search/:searchTerm', async (req, res) => {
+    let matchedRecipes = await elasticRecipes.search(req.params.searchTerm);
+    res.json(matchedRecipes);
     return;
 });
 
