@@ -231,7 +231,7 @@ router.patch('/:id', async (req, res) => {
     }
 
     try {
-        oldUser = await userData.getUserById(req.params.id);
+        oldUser = await userData.getUserByIdWithPword(req.params.id);
     } catch (e) {
         res.status(404).json({
             error: 'user not found'
@@ -320,7 +320,7 @@ router.patch('/:id', async (req, res) => {
 					return;
 				}
 			} catch (error) {
-				updatedObject.aboutMe = userInfo.username;
+				updatedObject.username = userInfo.username;
 			}
         }
     } else {
@@ -460,7 +460,7 @@ router.post('/:id/following', async (req, res) => {
         });
         return;
     }
-    if (!followInfo.followUserId || typeof bookmarkInfo.followUserId != "string") {
+    if (!followInfo.followUserId || typeof followInfo.followUserId != "string") {
         res.status(400).json({
             error: 'You must provide follow user id'
         });
@@ -479,7 +479,7 @@ router.post('/:id/following', async (req, res) => {
 
 	let followUser = null;
 	try {
-        followUser = await userData.getUserById(bookmarkInfo.followUserId);
+        followUser = await userData.getUserById(followInfo.followUserId);
     } catch (e) {
         res.status(404).json({
             error: 'follow user not found'
@@ -488,7 +488,7 @@ router.post('/:id/following', async (req, res) => {
     }
 
     try {
-        const newUser = await userData.addFollowToUser(req.params.id, bookmarkInfo.followUserId);
+        const newUser = await userData.addFollowToUser(req.params.id, followInfo.followUserId);
         res.status(200).json(newUser);
         return;
     } catch (e) {

@@ -8,7 +8,7 @@ const ratingData = data.ratings;
 
 router.get('/', async (req, res) => {
     try {
-        let ratingList = await ratingData.getAllratings();
+        let ratingList = await ratingData.getAllRatings();
         res.status(200).json(ratingList);
     } catch (e) {
         res.status(500).json({
@@ -40,8 +40,8 @@ router.get('/:id', async (req, res) => {
     return;
 });
 
-router.get('/:recipeId', async (req, res) => {
-    if (!req.params.ratingId) {
+router.get('/recipe/:recipeId', async (req, res) => {
+    if (!req.params.recipeId) {
         res.status(400).json({
             error: 'You must supply recipeId'
         });
@@ -110,7 +110,7 @@ router.post('/', async (req, res) => {
         }
     }
 
-    if (!ratingInfo.rating || typeof ratingInfo.title != "number" || 1 < rating || rating > 5) {
+    if (!ratingInfo.rating || typeof ratingInfo.rating != "number" || ratingInfo.rating < 1 || ratingInfo.rating > 5) {
         res.status(400).json({
             error: 'You must provide a valid rating'
         });
@@ -120,8 +120,8 @@ router.post('/', async (req, res) => {
     try {
         const newRating = await ratingData.addRating(
             ratingInfo.rating,
-            user,
-            recipe
+            ratingInfo.userId,
+            ratingInfo.recipeId
         );
         res.status(200).json(newRating);
     } catch (e) {
@@ -190,7 +190,7 @@ router.put('/:id', async (req, res) => {
         }
     }
 
-    if (!ratingInfo.rating || typeof ratingInfo.title != "number" || 1 < rating || rating > 5) {
+    if (!ratingInfo.rating || typeof ratingInfo.rating != "number" || ratingInfo.rating < 1 || ratingInfo.rating > 5) {
         res.status(400).json({
             error: 'You must provide a valid rating'
         });
@@ -241,7 +241,7 @@ router.patch('/:id', async (req, res) => {
     }
 
     if (ratingInfo.rating && ratingInfo.rating  !== oldRating.rating) {
-        if (typeof ratingInfo.rating != "number" || 1 < ratingInfo.rating || ratingInfo.rating > 5) {
+        if (typeof ratingInfo.rating != "number" || ratingInfo.rating < 1 || ratingInfo.rating > 5) {
             res.status(400).json({
                 error: 'You must provide a valid rating'
             });
