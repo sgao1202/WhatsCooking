@@ -29,3 +29,16 @@ body {
     max-width: 320px;
   }
 }
+
+.prof-heading{
+  font-weight: bold;
+}
+
+.App-body{
+  text-align: left;
+  margin: 6px;
+}
+
+#recipe-desc, #recipe-chef{
+  font-style: italic;
+}
