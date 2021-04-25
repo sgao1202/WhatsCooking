@@ -12,18 +12,11 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-            {/* <Navbar className="top-bar border-bottom rounded-bottom rounded-lg pt-4" bg="gray">
-                <Navbar.Brand>
-                    <Link to="/">
-                        <img src={logo} className="App-logo d-inline-block align-top" alt="whats-cooking-logo"></img>
-                    </Link>
-                </Navbar.Brand>
-            </Navbar> */}
             <Navigation></Navigation>
             <Container className="mt-5">
                 <Route exact path="/" component={Landing}></Route>
                 <Route exact path="/login" component={Login}></Route>
-                {/* <Route exact path="/signup" component={SignUp}></Route> */}
+                <Route exact path="/signup" component={SignUp}></Route>
             </Container>
       </Router> 
     </AuthProvider>
