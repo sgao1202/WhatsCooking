@@ -26,10 +26,13 @@ async function main() {
       });
 
     await elasticsearchClient.indices.create({
-        index: 'whatscooking'
-    }, function(err, resp, status) {
-        if (err) {
-            console.log("create err:", err);
+        index: 'recipes',
+        body: {
+            "mappings": {
+                "properties": {
+                    "ingredients.portion": {"type":"float"}
+                }
+            }
         }
     });
 
@@ -42,6 +45,7 @@ async function main() {
             // ADD USER
             try {
                 // (firstName, lastName, username, password, profilePicture, aboutMe) 
+                
                 u = await users.addUser(
                     user.firstName,
                     user.lastName,
@@ -76,7 +80,7 @@ async function main() {
                         r = await recipes.addRecipe(
                             u._id.toString(),
                             recipe.title,
-                            recipe.recipePicture,
+                            recipe.picture,
                             recipe.description,
                             recipe.ingredients,
                             recipe.procedure
@@ -96,7 +100,7 @@ async function main() {
                     }
 
                     for (const rating of user.ratings) {
-                        let rat = await ratings.addRating(rating.rating, String(u._id), String(r._id));
+                        let rat = await ratings.addRating(rating.rating, u._id.toString(), r._id.toString());
                         // let allRatings = await ratings.getAllRatings();
                         // let idRating = await ratings.getRatingById(String(rec._id))
                         // let recipeRating = await ratings.getRatingsByRecipe(String(r._id));
@@ -112,7 +116,7 @@ async function main() {
 
                     for (const comment of user.comments) {
                         //(comment, user, recipe)
-                        let c = await comments.addComment(comment.comment, String(u._id), String(r._id));
+                        let c = await comments.addComment(comment.comment, u._id.toString(), r._id.toString());
                         // let allComments = await comments.getAllComments();
                         // let idComment = await comments.getCommentById(String(c._id));
                         // let recipeComment = await comments.getCommentsByRecipe(String(r._id))
@@ -138,16 +142,6 @@ async function main() {
         db.serverConfig.close();
         return;
     }
-
-    await elasticsearchClient.indices.delete({
-        index:  '_all'
-      }, function(err, res) {
-        if (err) {
-            console.error(err.message);
-        } else {
-            console.log('Indexes have been deleted!');
-        }
-    });
 
     await db.serverConfig.close();
     console.log('Seed task completed');
