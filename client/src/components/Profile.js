@@ -1,19 +1,22 @@
 import React, {useContext, useState, useEffect} from 'react';
 import { AuthContext } from '../firebase/Auth';
+import { Redirect } from 'react-router-dom';
 import '../App.css';
 
 const Profile = () => {
+    const { currentUser } = useContext(AuthContext);
     const [userData, setUserData] = useState(undefined);
+
+    useEffect(() => {
+        document.title = "My Profile";
+    }, []);
 
     /*
         must check for authorized account via firebase, then render.
         useContext to propogate user down to all child components
     */
-
-    const { currentUser } = useContext(AuthContext);
-    if (!currentUser) {
-        //redirect to signin form
-    }
+    // Redirect to login page if the user tries to access this route without being authenticated
+    if (!currentUser) return <Redirect to='/login'></Redirect>
 
     /* fields to display 
         First Name

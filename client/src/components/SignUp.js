@@ -1,7 +1,9 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { Redirect } from 'react-router-dom';
 import { Button, Form } from 'react-bootstrap';
 import { AuthContext } from '../firebase/Auth';
 import { doCreateUserWithEmailAndPassword } from '../firebase/FirebaseFunctions';
+import utils from '../lib/Utility';
 
 const SignUp = () => {
     const { currentUser } = useContext(AuthContext);
@@ -12,15 +14,24 @@ const SignUp = () => {
     const [loading, setLoading] = useState(false);
     const [validated, setValidated] = useState(false);
 
+    useEffect(() => {
+        document.title = "Sign Up";
+    }, []);
+
     // Custom validation for fields
     const validateForm = (form) => {
+        if (!utils.validString(firstName) || !utils.validString(lastName) || !utils.validString(email) || !utils.validString(password)) return false;
+        // Make sure that an email contains the @ symbol
+        if (!email.includes('@')) return false;
         return true;
     };
 
     const handleSignUp = async (event) => {
         event.preventDefault();
-        const form = event.currentTarget;
+        // const form = event.currentTarget;
+        console.log(currentUser);
         setValidated(true);
+        setLoading(true);
         if (validateForm()) {
             try {
                 doCreateUserWithEmailAndPassword(email, password, `${firstName} ${lastName}`);
@@ -28,13 +39,12 @@ const SignUp = () => {
                 alert(e);
             }
         }
+        setLoading(false);
     };
 
-    const validForm = () => {
-        // return email.length > 0 && password.length > 0 && firstName.length > 0 && lastName.length > 0;
-        return true;
-    };
+    const validForm = () => {return email.length > 0 && password.length > 0 && firstName.length > 0 && lastName.length > 0;};
     
+    if (currentUser) return <Redirect to='/home'></Redirect>
     return (
         <div className="Login">
             <Form noValidate validated={validated} onSubmit={handleSignUp}>
@@ -84,7 +94,7 @@ const SignUp = () => {
                     </Form.Control.Feedback>
                 </Form.Group>
                 <Button block size="lg" variant="primary" type="submit" disabled={!validForm()}>
-                    Sign Up
+                    {loading ? 'Loading...' : 'Sign Up'}
                 </Button>
             </Form>
         </div>
