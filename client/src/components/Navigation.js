@@ -29,10 +29,7 @@ const Navigation = () => {
                     <Container></Container>
                     {/* Fix with a 3 column layout for the navigation bar */}
                     {currentUser ? 
-                        // <div className="row mr-3">
-                        //     <Link to="/home"><Button onClick={logout} variant="outline-primary mr-5">Log Out</Button></Link>
-                        // </div>
-                        <DropdownButton id="nav-dropdown" variant="outline-primary" className="mr-5" title={currentUser.displayName}>
+                        <DropdownButton id="nav-dropdown" variant="outline-primary" className="mr-5 pb-2" title={currentUser.displayName} menuAlign="right">
                             <Dropdown.Item href="/profile">My Profile</Dropdown.Item>
                             <Dropdown.Divider/>
                             <Dropdown.Item href="/home" onClick={logout}>Log Out</Dropdown.Item>
