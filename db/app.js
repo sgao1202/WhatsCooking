@@ -1,5 +1,7 @@
 const express = require('express');
+var cors = require('cors')
 const app = express();
+app.use(cors())
 // const static = express.static(__dirname + '/public');
 const configRoutes = require('./routes');
 const bluebird = require('bluebird');
