@@ -1,7 +1,9 @@
 import React, { useState, useContext } from 'react';
+import { Redirect } from 'react-router-dom';
 import { Button, Form } from 'react-bootstrap';
 import { AuthContext } from '../firebase/Auth';
 import { doCreateUserWithEmailAndPassword } from '../firebase/FirebaseFunctions';
+import utils from '../lib/Utility';
 
 const SignUp = () => {
     const { currentUser } = useContext(AuthContext);
@@ -14,12 +16,16 @@ const SignUp = () => {
 
     // Custom validation for fields
     const validateForm = (form) => {
+        if (!utils.validString(firstName) || !utils.validString(lastName) || !utils.validString(email) || !utils.validString(password)) return false;
+        // Make sure that an email contains the @ symbol
+        if (!email.includes('@')) return false;
         return true;
     };
 
     const handleSignUp = async (event) => {
         event.preventDefault();
-        const form = event.currentTarget;
+        // const form = event.currentTarget;
+        console.log(currentUser);
         setValidated(true);
         if (validateForm()) {
             try {
@@ -35,6 +41,7 @@ const SignUp = () => {
         return true;
     };
     
+    if (currentUser) return <Redirect to='/home'></Redirect>
     return (
         <div className="Login">
             <Form noValidate validated={validated} onSubmit={handleSignUp}>

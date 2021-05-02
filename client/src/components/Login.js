@@ -4,6 +4,7 @@ import { Redirect, Link } from 'react-router-dom';
 import { Button, Form } from 'react-bootstrap';
 import { AuthContext } from '../firebase/Auth';
 import { doSignInWithEmailAndPassword, doPasswordReset } from '../firebase/FirebaseFunctions';
+import utils from '../lib/Utility';
 
 const Login = () => {
     const { currentUser } = useContext(AuthContext);
@@ -11,18 +12,21 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const [validated, setValidated] = useState(false);
 
-    const validateForm = (form) => {
+    const validateForm = () => {
+        if (!utils.validString(email) || !utils.validString(password)) return false;
         return true;
     };
 
     const handleLogin = async (event) => {
         event.preventDefault();
         setValidated(true);
-        // try {
-        //     await doSignInWithEmailAndPassword(email, password);
-        // } catch(e) {
-        //     alert(e);
-        // }
+        if (validateForm()){ 
+            try {
+                await doSignInWithEmailAndPassword(email, password);
+            } catch(e) {
+                alert(e);
+            }
+        }
     };
 
     // const passwordReset = (event) => {
