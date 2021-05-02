@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Container, Col, Row } from 'react-bootstrap';
+import { Col, Row } from 'react-bootstrap';
 import { AuthContext } from '../firebase/Auth';
+import axios from 'axios';
 
 const UserProfile = () => {
     const { currentUser } = useContext(AuthContext);

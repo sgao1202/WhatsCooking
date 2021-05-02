@@ -9,7 +9,6 @@ import Profile from './Profile';
 import Recipe from './Recipe';
 import SignUp from './SignUp';
 import Home from './Home';
-import UserProfile from './UserProfile'
 import '../App.css';
 
 function App() {
@@ -20,13 +19,10 @@ function App() {
             <Container className="mt-5">
                 <Route exact path="/" component={Landing}></Route>
                 <Route exact path="/login" component={Login}></Route>
-                
-                {/* <Route exact path="/signup" component={SignUp}></Route> */}
+                <Route exact path="/signup" component={SignUp}></Route>
                 <Route exact path="/profile" component={Profile}></Route>
                 <Route exact path="/recipe/:id" component={Recipe}></Route>
-                <Route exact path="/signup" component={SignUp}></Route>
                 <Route exact path="/home" component={Home}></Route>
-                <Route exact path="/profile" component={UserProfile}></Route>
             </Container>
       </Router> 
     </AuthProvider>
