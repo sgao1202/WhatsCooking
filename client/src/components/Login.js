@@ -44,6 +44,8 @@ const Login = () => {
     if (currentUser) return <Redirect to="/home"></Redirect>
     return (
         <div className="Login">
+            {/* <SocialSignIn/>
+            <hr/> */}
             <Form noValidate validated = {validated} onSubmit={handleLogin}>
                 <Form.Group size="lg" controlId="email">
                     <Form.Label>Email</Form.Label>

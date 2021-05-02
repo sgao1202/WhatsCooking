@@ -11,7 +11,7 @@ const Navigation = () => {
     // otherwise replace those buttons with their name and dropdown
     const { currentUser } = useContext(AuthContext);
     console.log(currentUser);
-
+    
     // Logout function
     const logout = async () => {
         await doSignOut();

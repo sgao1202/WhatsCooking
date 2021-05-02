@@ -31,6 +31,7 @@ const SignUp = () => {
         // const form = event.currentTarget;
         console.log(currentUser);
         setValidated(true);
+        setLoading(true);
         if (validateForm()) {
             try {
                 doCreateUserWithEmailAndPassword(email, password, `${firstName} ${lastName}`);
@@ -38,12 +39,10 @@ const SignUp = () => {
                 alert(e);
             }
         }
+        setLoading(false);
     };
 
-    const validForm = () => {
-        // return email.length > 0 && password.length > 0 && firstName.length > 0 && lastName.length > 0;
-        return true;
-    };
+    const validForm = () => {return email.length > 0 && password.length > 0 && firstName.length > 0 && lastName.length > 0;};
     
     if (currentUser) return <Redirect to='/home'></Redirect>
     return (
@@ -95,7 +94,7 @@ const SignUp = () => {
                     </Form.Control.Feedback>
                 </Form.Group>
                 <Button block size="lg" variant="primary" type="submit" disabled={!validForm()}>
-                    Sign Up
+                    {loading ? 'Loading...' : 'Sign Up'}
                 </Button>
             </Form>
         </div>

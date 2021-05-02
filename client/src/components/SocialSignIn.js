@@ -11,16 +11,9 @@ const SocialSignIn = () => {
         }
     }
     return (
-        // <div>
-        //     <img
-        //         onClick={() => socialSignOn()}
-        //         alt="google signin"
-        //         src="/"
-        //     />
-        // </div>
         <ul>
             <li>
-                <Button variant="outline-light" onClick={socialSignOn}>Continue with Google</Button>
+                <Button variant="light" onClick={socialSignOn}>Continue with Google</Button>
             </li>
         </ul>
     );
