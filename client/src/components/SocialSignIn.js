@@ -1,4 +1,5 @@
 import React from 'react';
+import { Button } from 'react-bootstrap';
 import { doGoogleSignIn } from '../firebase/FirebaseFunctions';
 
 const SocialSignIn = () => {
@@ -10,13 +11,11 @@ const SocialSignIn = () => {
         }
     }
     return (
-        <div>
-            <img
-                onClick={() => socialSignOn()}
-                alt="google signin"
-                src="/"
-            />
-        </div>
+        <ul>
+            <li>
+                <Button variant="light" onClick={socialSignOn}>Continue with Google</Button>
+            </li>
+        </ul>
     );
 };
 

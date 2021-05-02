@@ -1,9 +1,10 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import SocialSignIn from './SocialSignIn'
 import { Redirect, Link } from 'react-router-dom';
 import { Button, Form } from 'react-bootstrap';
 import { AuthContext } from '../firebase/Auth';
 import { doSignInWithEmailAndPassword, doPasswordReset } from '../firebase/FirebaseFunctions';
+import utils from '../lib/Utility';
 
 const Login = () => {
     const { currentUser } = useContext(AuthContext);
@@ -11,18 +12,25 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const [validated, setValidated] = useState(false);
 
-    const validateForm = (form) => {
+    useEffect(() => {
+        document.title = "Login";
+    }, []);
+
+    const validateForm = () => {
+        if (!utils.validString(email) || !utils.validString(password)) return false;
         return true;
     };
 
     const handleLogin = async (event) => {
         event.preventDefault();
         setValidated(true);
-        // try {
-        //     await doSignInWithEmailAndPassword(email, password);
-        // } catch(e) {
-        //     alert(e);
-        // }
+        if (validateForm()){ 
+            try {
+                await doSignInWithEmailAndPassword(email, password);
+            } catch(e) {
+                alert(e);
+            }
+        }
     };
 
     // const passwordReset = (event) => {
@@ -33,9 +41,11 @@ const Login = () => {
         return email.length > 0 && password.length > 0;
     };
 
-    if (currentUser) return <Redirect to="/"></Redirect>
+    if (currentUser) return <Redirect to="/home"></Redirect>
     return (
         <div className="Login">
+            {/* <SocialSignIn/>
+            <hr/> */}
             <Form noValidate validated = {validated} onSubmit={handleLogin}>
                 <Form.Group size="lg" controlId="email">
                     <Form.Label>Email</Form.Label>

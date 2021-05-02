@@ -1,8 +1,12 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom'
 import {Container, Button, Row, Col, Jumbotron} from 'react-bootstrap';
 
 const Landing = (props) => {
+    useEffect(() => {
+        document.title = 'Welcome!';
+    }, []);
+    
     return (
         <Container>
             <Jumbotron>
