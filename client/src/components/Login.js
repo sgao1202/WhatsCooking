@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import SocialSignIn from './SocialSignIn'
 import { Redirect, Link } from 'react-router-dom';
 import { Button, Form } from 'react-bootstrap';
@@ -11,6 +11,10 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [validated, setValidated] = useState(false);
+
+    useEffect(() => {
+        document.title = "Login";
+    }, []);
 
     const validateForm = () => {
         if (!utils.validString(email) || !utils.validString(password)) return false;
@@ -37,7 +41,7 @@ const Login = () => {
         return email.length > 0 && password.length > 0;
     };
 
-    if (currentUser) return <Redirect to="/"></Redirect>
+    if (currentUser) return <Redirect to="/home"></Redirect>
     return (
         <div className="Login">
             <Form noValidate validated = {validated} onSubmit={handleLogin}>

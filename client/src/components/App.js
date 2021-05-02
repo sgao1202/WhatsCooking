@@ -1,4 +1,3 @@
-import '../App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import { Container } from 'react-bootstrap';
@@ -9,6 +8,8 @@ import Login from './Login';
 import SignUp from './SignUp';
 import Home from './Home';
 import UserProfile from './UserProfile'
+import '../App.css';
+
 function App() {
   return (
     <AuthProvider>

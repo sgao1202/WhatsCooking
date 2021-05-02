@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Redirect } from 'react-router-dom';
 import { Button, Form } from 'react-bootstrap';
 import { AuthContext } from '../firebase/Auth';
@@ -13,6 +13,10 @@ const SignUp = () => {
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [validated, setValidated] = useState(false);
+
+    useEffect(() => {
+        document.title = "Sign Up";
+    }, []);
 
     // Custom validation for fields
     const validateForm = (form) => {

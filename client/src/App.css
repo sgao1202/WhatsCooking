@@ -19,6 +19,14 @@ body {
   color: #61dafb;
 }
 
+#nav-dropdown::after {
+  content: none;
+}
+
+.middle-container {
+  max-width: 1000px;
+}
+
 @media all and (min-width: 480px) {
   .Login {
     padding: 60px 0;
