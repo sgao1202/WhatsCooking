@@ -1,14 +1,9 @@
 const mongoDB = require('mongodb');
 const mongoCollections = require('../config/mongoCollections');
-const elasticsearch = require('elasticsearch');
+const elasticData = require('../elasticdata');
+const elasticUsers = elasticData.users;
 const users = mongoCollections.users;
 const recipeData = require('./recipes');
-
-const elasticsearchClient = new elasticsearch.Client({
-    host:'localhost:9200', // process.env.elasticsearchAddress
-    log: 'trace',
-    apiVersion: '7.2', // use the same version of your Elasticsearch instance
-});
 
 let exportedMethods = {
 
@@ -95,7 +90,9 @@ let exportedMethods = {
         const newInsertInformation = await userCollection.insertOne(newUser);
         if (newInsertInformation.insertedCount === 0) throw 'Insert failed!';
 
-        return await this.getUserById(String(newInsertInformation.insertedId));
+        let returnUser = await this.getUserById(String(newInsertInformation.insertedId));
+        elasticUsers.addUser(returnUser);
+        return returnUser;
     },
 
     // PUT /users/{id}
@@ -141,7 +138,9 @@ let exportedMethods = {
         if (!updateInfo.matchedCount && !updateInfo.modifiedCount)
             throw 'Update failed';
 
-        return await this.getUserById(id);
+        let returnUser = await this.getUserById(id);
+        elasticUsers.updateUser(user);
+        return returnUser;
     },
 
     // DELETE /users/{id}
@@ -153,7 +152,7 @@ let exportedMethods = {
             _id: mongoDB.ObjectID(String(id))
         });
         if (deletionInfo.deletedCount === 0) throw `Could not delete user with id of ${id}`;
-
+        elasticUsers.removeUser(id);
         return {
             "userId": String(id),
             "deleted": true

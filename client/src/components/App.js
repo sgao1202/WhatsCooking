@@ -5,6 +5,8 @@ import { AuthProvider } from '../firebase/Auth';
 import Navigation from './Navigation';
 import Landing from './Landing';
 import Login from './Login';
+import Profile from './Profile';
+import Recipe from './Recipe';
 import SignUp from './SignUp';
 import Home from './Home';
 import UserProfile from './UserProfile'
@@ -18,6 +20,10 @@ function App() {
             <Container className="mt-5">
                 <Route exact path="/" component={Landing}></Route>
                 <Route exact path="/login" component={Login}></Route>
+                
+                {/* <Route exact path="/signup" component={SignUp}></Route> */}
+                <Route exact path="/profile" component={Profile}></Route>
+                <Route exact path="/recipe/:id" component={Recipe}></Route>
                 <Route exact path="/signup" component={SignUp}></Route>
                 <Route exact path="/home" component={Home}></Route>
                 <Route exact path="/profile" component={UserProfile}></Route>

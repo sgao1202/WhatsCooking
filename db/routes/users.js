@@ -342,7 +342,6 @@ router.patch('/:id', async (req, res) => {
     return;
 });
 
-
 router.post('/:id/bookmarks', async (req, res) => {
     if (!req.params.id) {
         res.status(400).json({
