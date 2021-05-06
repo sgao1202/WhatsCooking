@@ -20,7 +20,7 @@ function App() {
                 <Route exact path="/" component={Landing}></Route>
                 <Route exact path="/login" component={Login}></Route>
                 <Route exact path="/signup" component={SignUp}></Route>
-                <Route exact path="/profile" component={Profile}></Route>
+                <Route exact path="/my-profile" component={Profile}></Route>
                 <Route exact path="/recipe/:id" component={Recipe}></Route>
                 <Route exact path="/home" component={Home}></Route>
             </Container>

@@ -1,10 +1,9 @@
-import React, { useContext, useState} from 'react';
+import React, { useContext, useEffect, useState} from 'react';
 import { Link, Redirect } from 'react-router-dom';
 import { Button, Col, Container, Dropdown, DropdownButton, Navbar, Row} from 'react-bootstrap';
 import { AuthContext } from '../firebase/Auth';
 import { doSignOut } from '../firebase/FirebaseFunctions';
 import logo from '../img/whats-cooking-logo.png';
-import genericProfile from '../img/generic-user-profile.jpeg';
 
 const Navigation = () => {
     // If the user is not logged in then show Log In and Sign Up button in top right,
@@ -29,8 +28,8 @@ const Navigation = () => {
                     <Container></Container>
                     {/* Fix with a 3 column layout for the navigation bar */}
                     {currentUser ? 
-                        <DropdownButton id="nav-dropdown" variant="outline-primary" className="mr-5 pb-2" title={currentUser.displayName} menuAlign="right">
-                            <Dropdown.Item href="/profile">My Profile</Dropdown.Item>
+                        <DropdownButton id="nav-dropdown" variant="outline-dark" className="mr-5 pb-2" title={currentUser.displayName} menuAlign="right">
+                            <Dropdown.Item href="/my-profile">My Profile</Dropdown.Item>
                             <Dropdown.Divider/>
                             <Dropdown.Item href="/home" onClick={logout}>Log Out</Dropdown.Item>
                         </DropdownButton> 

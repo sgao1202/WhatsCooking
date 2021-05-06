@@ -1,14 +1,24 @@
 import React, {useContext, useState, useEffect} from 'react';
 import { AuthContext } from '../firebase/Auth';
 import { Redirect } from 'react-router-dom';
-import '../App.css';
+import { Container, Row, Col, Nav, Tab } from 'react-bootstrap';
+import { FaBookmark, FaUser, FaUserFriends } from 'react-icons/fa';
+import axios from 'axios';
 
 const Profile = () => {
     const { currentUser } = useContext(AuthContext);
     const [userData, setUserData] = useState(undefined);
+    const [loading, setLoading] = useState(true);
 
+    // Fetch user data from server
     useEffect(() => {
         document.title = "My Profile";
+        async function fetchUser() {
+            setLoading(true);
+            // axios call to server
+            setLoading(false);
+        }
+        fetchUser();
     }, []);
 
     /*
@@ -27,31 +37,86 @@ const Profile = () => {
         About Me
         My Recipes
     */
-
+    if (loading) return <div>Loading...</div>
     return (
-        <div className="Profile">
-            <h1>Profile Details:</h1>
-            <p className="prof-heading">First Name:</p>
-            <p className="prof-info">Insert First Name here</p>
-            <p className="prof-heading">Last Name:</p>
-            <p className="prof-info">Insert Last Name here</p>
-            <p className="prof-heading">About Me:</p>
-            <p className="prof-info">Insert Description about yourself.</p>
-            <br></br>
-            <p className="prof-heading">Bookmarks:</p>
-            <ul className="prof-info">
-                <li>Bookmarked Recipes here</li>
-            </ul>
-            <p className="prof-heading">Following:</p>
-            <ul className="prof-info">
-                <li>List Followed Users here</li>
-            </ul>
-            
-            <p className="prof-heading">My Recipes:</p>
-            <ul className="prof-info">
-                <li>List your recipes here.</li>
-            </ul>
-        </div>
+        <Container>
+            <Row>
+                <p>1st Row</p>
+            </Row>
+            <Tab.Container defaultActiveKey="aboutMe">
+                <Row>
+                    <Col sm={3} className="pl-0">
+                        <h5>{currentUser.displayName}'s Profile</h5>
+                        <Nav variant="pills" className="flex-column">
+                            <Nav.Item>
+                                <Nav.Link eventKey="aboutMe">
+                                    <Row>
+                                        <div className="col-2 pr-0">
+                                            <span><FaUser></FaUser></span> 
+                                        </div>
+                                        <div className="col-10 pl-0">
+                                            <span>About Me</span>
+                                        </div>
+                                    </Row>
+                                </Nav.Link>
+                            </Nav.Item>
+                            <Nav.Item>
+                                <Nav.Link eventKey="myRecipes">
+                                    <Row>
+                                        <div className="col-2 pr-0">
+                                            <span><FaBookmark></FaBookmark></span> 
+                                        </div>
+                                        <div className="col-10 pl-0">
+                                            <span>Recipes</span>
+                                        </div>
+                                    </Row>
+                                </Nav.Link>
+                            </Nav.Item>
+                            <Nav.Item>
+                                <Nav.Link eventKey="following">
+                                    <Row>
+                                        <div className="col-2 pr-0">
+                                            <span><FaUserFriends></FaUserFriends></span> 
+                                        </div>
+                                        <div className="col-10 pl-0">
+                                            <span>Following</span>
+                                        </div>
+                                    </Row>
+                                </Nav.Link>
+                            </Nav.Item>
+                            <Nav.Item>
+                                <Nav.Link eventKey="bookmarks">
+                                    <Row>
+                                        <div className="col-2 pr-0">
+                                            <span><FaBookmark></FaBookmark></span> 
+                                        </div>
+                                        <div className="col-10 pl-0">
+                                            <span>Bookmarks</span>
+                                        </div>
+                                    </Row>
+                                </Nav.Link>
+                            </Nav.Item>
+                        </Nav>
+                    </Col>
+                    <Col sm={9}>
+                        <Tab.Content>
+                            <Tab.Pane eventKey="aboutMe">
+                                <p>This is the about me section</p>
+                            </Tab.Pane>
+                            <Tab.Pane eventKey="myRecipes">
+                                <p>This is the my recipes section</p>
+                            </Tab.Pane>
+                            <Tab.Pane eventKey="following">
+                                <p>This is the following section</p>
+                            </Tab.Pane>
+                            <Tab.Pane eventKey="bookmarks">
+                                <p>This is the bookmarks section</p>
+                            </Tab.Pane>
+                        </Tab.Content>
+                    </Col>
+                </Row>
+            </Tab.Container>
+        </Container>
     )
 
 }
