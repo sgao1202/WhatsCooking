@@ -38,6 +38,11 @@ body {
   }
 }
 
+.login-error {
+    margin: 0 auto;
+    max-width: 320px;
+}
+
 .prof-heading{
   font-weight: bold;
 }

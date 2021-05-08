@@ -9,7 +9,6 @@ const Profile = () => {
     const { currentUser } = useContext(AuthContext);
     const [userData, setUserData] = useState(undefined);
     const [loading, setLoading] = useState(true);
-
     // Fetch user data from server
     useEffect(() => {
         document.title = "My Profile";

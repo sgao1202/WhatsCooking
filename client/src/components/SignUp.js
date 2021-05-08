@@ -27,7 +27,7 @@ const SignUp = () => {
     };
 
     const handleSignUp = async (event) => {
-        event.preventDefault();
+        // event.preventDefault();
         // const form = event.currentTarget;
         console.log(currentUser);
         setValidated(true);

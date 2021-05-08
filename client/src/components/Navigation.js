@@ -17,7 +17,7 @@ const Navigation = () => {
     };
     
     return (
-        <Navbar className="top-bar border-bottom rounded-bottom rounded-lg pt-4" bg="gray">
+        <Navbar className="top-bar border-bottom rounded-bottom rounded-lg pt-4 px-0" bg="gray">
             <Navbar.Brand>
                 <Link to="/">
                     <img src={logo} className="App-logo d-inline-block align-top" alt="whats-cooking-logo"></img>
