@@ -56,7 +56,8 @@ let exportedMethods = {
     },
 
     // POST /users
-    async addUser(firstName, lastName, username, password, profilePicture, aboutMe) {
+    async addUser(uid, firstName, lastName, username, password, profilePicture, aboutMe) {
+        if (!uid || typeof uid != "string") throw 'You must provide a valid uid'
         if (!firstName || typeof firstName != "string") throw 'You must provide a valid first name'
         if (!lastName || typeof lastName != "string") throw 'You must provide a valid last name'
         if (!password || typeof password != "string") throw 'You must provide a valid password'
@@ -77,6 +78,7 @@ let exportedMethods = {
         }
 
         let newUser = {
+            uid: uid,
             firstName: firstName,
             lastName: lastName,
             username: username,
@@ -120,6 +122,7 @@ let exportedMethods = {
         const user = await this.getUserById(id);
 
         let newUser = {
+            uid: user.uid,
             firstName: updatedUser.firstName,
             lastName: updatedUser.lastName,
             username: updatedUser.username,
