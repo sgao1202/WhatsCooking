@@ -47,6 +47,7 @@ async function main() {
                 // (firstName, lastName, username, password, profilePicture, aboutMe) 
                 
                 u = await users.addUser(
+                    '0',
                     user.firstName,
                     user.lastName,
                     user.username,
