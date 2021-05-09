@@ -104,31 +104,31 @@ let exportedMethods = {
         elasticUsers.addUser(returnUser);
         return returnUser;
     },
-
+     
     // PUT /users/{id}
     // PATCH /users/{id}
     async updateUser(id, updatedUser) {
-        if (!updatedUser.firstName || typeof updatedUser.firstName != "string") throw 'You must provide a valid first name'
-        if (!updatedUser.lastName || typeof updatedUser.lastName != "string") throw 'You must provide a valid last name'
-        if (!updatedUser.password || typeof updatedUser.password != "string") throw 'You must provide a valid password'
-        if (!updatedUser.profilePicture || typeof updatedUser.profilePicture != "string") throw 'You must provide a valid profile picture'
-        if (!updatedUser.aboutMe || typeof updatedUser.aboutMe != "string") throw 'You must provide a valid about me'
+        if (!verify.validString(updatedUser.firstName)) throw 'You must provide a valid first name'
+        if (!verify.validString(updatedUser.lastName)) throw 'You must provide a valid last name'
+        if (!verify.validString(updatedUser.password)) throw 'You must provide a valid password'
+        if (!verify.validString(updatedUser.profilePicture)) throw 'You must provide a valid profile picture'
+        if (!verify.validString(updatedUser.aboutMe)) throw 'You must provide a valid about me'
 
+        // Not sure if we need username
         // CHECK IF USERNAME IS UNIQUE
-        const userCollection = await users();
-        if (!updatedUser.username || typeof updatedUser.username != "string") {
-            throw 'You must provide a valid username'
-        } else {
-            let userNameTaken = await userCollection.findOne({
-                username: updatedUser.username
-            });
-            if (userNameTaken) {
-                throw 'username is taken'
-            }
-        }
+        // const userCollection = await users();
+        // if (!updatedUser.username || typeof updatedUser.username != "string") {
+        //     throw 'You must provide a valid username'
+        // } else {
+        //     let userNameTaken = await userCollection.findOne({
+        //         username: updatedUser.username
+        //     });
+        //     if (userNameTaken) {
+        //         throw 'username is taken'
+        //     }
+        // }
 
         const user = await this.getUserById(id);
-
         let newUser = {
             uid: user.uid,
             firstName: updatedUser.firstName,
@@ -156,7 +156,7 @@ let exportedMethods = {
 
     // DELETE /users/{id}
     async removeUser(id) {
-        if (!id || typeof id !== 'string') throw 'must provide valid id';
+        if (!verify.validString(id)) throw 'must provide valid id';
 
         const userCollection = await users();
         const deletionInfo = await userCollection.removeOne({
@@ -172,8 +172,8 @@ let exportedMethods = {
 
     // POST /users/{userId}/bookmarks/
     async addBookmarkToUser(userId, recipeId) {
-        if (!userId || typeof userId !== 'string') throw 'must provide valid userId';
-        if (!recipeId || typeof recipeId != "string") throw 'You must provide valid recipeId';
+        if (!verify.validString(userId)) throw 'must provide valid userId';
+        if (!verify.validString(recipeId)) throw 'You must provide valid recipeId';
 
         let user = await this.getUserById(userId);
         let recipe = await recipeData.getRecipeById(recipeId);
@@ -196,8 +196,8 @@ let exportedMethods = {
 
     // DELETE /users/{userId}/bookmarks/{recipeId}
     async removeBookmarkFromUser(userId, recipeId) {
-        if (!userId || typeof userId !== 'string') throw 'must provide valid userId';
-        if (!recipeId || typeof recipeId !== 'string') throw 'must provide valid recipeId';
+        if (!verify.validString(userId)) throw 'must provide valid userId';
+        if (!verify.validString(recipeId)) throw 'must provide valid recipeId';
 
         let user = await this.getUserById(userId);
         let recipe = await recipeData.getRecipeById(recipeId);
@@ -231,8 +231,8 @@ let exportedMethods = {
 
     // POST /users/{userId}/following/
     async addFollowToUser(userId, followUserId) {
-        if (!userId || typeof userId !== 'string') throw 'must provide valid userId';
-        if (!followUserId || typeof followUserId != "string") throw 'You must provide valid followUserId';
+        if (!verify.validString(userId)) throw 'must provide valid userId';
+        if (!verify.validString(followUserId)) throw 'You must provide valid followUserId';
 
         let user = await this.getUserById(userId);
         let followUser = await this.getUserById(followUserId);
@@ -255,8 +255,8 @@ let exportedMethods = {
 
     // DELETE /users/{userId}/following/{followUserId}
     async removeFollowFromUser(userId, followUserId) {
-        if (!userId || typeof userId !== 'string') throw 'must provide valid userId';
-        if (!followUserId || typeof followUserId !== 'string') throw 'must provide valid follow userId';
+        if (!verify.validString(userId)) throw 'must provide valid userId';
+        if (!verify.validString(followUserId)) throw 'must provide valid follow userId';
 
         let user = await this.getUserById(userId);
         let followUser = await this.getUserById(followUserId);
