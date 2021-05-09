@@ -4,6 +4,7 @@ const elasticData = require('../elasticdata');
 const elasticUsers = elasticData.users;
 const users = mongoCollections.users;
 const recipeData = require('./recipes');
+const verify = require('../utils/verify');
 
 let exportedMethods = {
 
@@ -22,7 +23,7 @@ let exportedMethods = {
     },
 
     async getUserById(id) {
-        if (!id || typeof id !== 'string') throw 'must provide valid id';
+        if (!verify.validString(id)) throw 'must provide valid id';
 
         const userCollection = await users();
         let user = await userCollection.findOne({_id: mongoDB.ObjectID(String(id))});
@@ -34,16 +35,25 @@ let exportedMethods = {
         return user;
     },
 
+    async getUserByUid(uid) {
+        if (!verify.validString(uid)) throw 'User uid must be valid';
+        const userCollection = await users();
+        let user = await userCollection.findOne({ uid: uid });
+        if (!user) throw `User with uid=${uid} was not found`;
+    },
+
+    // What is this for?
     async getUserByIdWithPword(id) {
-        if (!id || typeof id !== 'string') throw 'must provide valid id';
+        if (!verify.validString(id)) throw 'must provide valid id';
         const userCollection = await users();
         let user = await userCollection.findOne({_id: mongoDB.ObjectID(String(id))});
         if (!user) throw 'User not found';
         return user;
     },
 
+    // When will we use this?
     async getUserByUsername(username) {
-        if (!username || typeof username !== 'string') throw 'must provide valid username';
+        if (!verify.validString(username)) throw 'must provide valid username';
 
         const userCollection = await users();
         let user = await userCollection.findOne({username: username});
@@ -55,38 +65,36 @@ let exportedMethods = {
         return user;
     },
 
+    // We don't need to store password in the database
     // POST /users
-    async addUser(uid, firstName, lastName, username, password, profilePicture, aboutMe) {
-        if (!uid || typeof uid != "string") throw 'You must provide a valid uid'
-        if (!firstName || typeof firstName != "string") throw 'You must provide a valid first name'
-        if (!lastName || typeof lastName != "string") throw 'You must provide a valid last name'
-        if (!password || typeof password != "string") throw 'You must provide a valid password'
-        if (!profilePicture || typeof profilePicture != "string") throw 'You must provide a valid profile picture'
-        if (!aboutMe || typeof aboutMe != "string") throw 'You must provide a valid about me'
+    async addUser(uid, firstName, lastName, username, profilePicture, aboutMe) {
+        if (!verify.validString(uid)) throw 'You must provide a valid uid'
+        if (!verify.validString(firstName)) throw 'You must provide a valid first name'
+        if (!verify.validString(lastName)) throw 'You must provide a valid last name'
+        // if (!verify.validString(username)) throw 'You must provide a username'
+        // if (!verify.validString(password)) throw 'You must provide a valid password'
+        if (!verify.validString(profilePicture)) throw 'You must provide a valid profile picture'
+        if (!verify.validString(aboutMe)) throw 'You must provide a valid about me'
 
+        // I don't think we're going to use username 
         // CHECK IF USERNAME IS UNIQUE
-        const userCollection = await users();
-        if (!username || typeof username != "string") {
-            throw 'You must provide a username'
-        } else {
-            let userNameTaken = await userCollection.findOne({
-                username: username
-            });
-            if (userNameTaken) {
-                throw 'username is taken'
-            }
-        }
+        // const userCollection = await users();
+        // let userNameTaken = await userCollection.findOne({
+        //     username: username
+        // });
+        // if (userNameTaken) throw `Username '${username}' is taken`;
 
         let newUser = {
             uid: uid,
             firstName: firstName,
             lastName: lastName,
-            username: username,
-            password: password,
+            // username: username,
+            // password: password,  I do not think we need password as a field in the document (handeld by Firebase)
             profilePicture: profilePicture,
+            aboutMe: aboutMe,
             bookmarks: [],
             following: [],
-            aboutMe: aboutMe
+            recipes: []
         };
 
         const newInsertInformation = await userCollection.insertOne(newUser);
