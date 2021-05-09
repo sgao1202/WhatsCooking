@@ -3,7 +3,7 @@ const mongoCollections = require('../config/mongoCollections');
 const comments = mongoCollections.comments;
 const userData = require('./users');
 const recipeData = require('./recipes');
-const verify = require('../utils/verify');
+const utils = require('../utils/utils');
 
 const exportedMethods = {
   
@@ -16,7 +16,7 @@ const exportedMethods = {
   },
 
   async getCommentById(id) {
-	  if (!verify.validString(id)) throw 'must provide valid id';
+	  if (!utils.validString(id)) throw 'must provide valid id';
     const commentCollection = await comments();
     const comment = await commentCollection.findOne({ _id: mongoDB.ObjectId(String(id)) });
     if (!comment) throw 'comment not found';
@@ -24,16 +24,16 @@ const exportedMethods = {
   },
 
   async getCommentsByRecipe(recipeId) {
-	  if (!verify.validString(recipeId)) throw 'must provide valid recipeId';
+	  if (!utils.validString(recipeId)) throw 'must provide valid recipeId';
     const commentCollection = await comments();
     const commentsList = await commentCollection.find({recipeId: recipeId}).toArray();
     return commentsList;
   },
   
   async addComment(comment, userId, recipeId) {
-    if (!verify.validString(comment)) throw 'must provide valid content';
-    if (!verify.validString(userId)) throw 'must provide valid userId';
-    if (!verify.validString(recipeId)) throw 'must provide valid recipeId';
+    if (!utils.validString(comment)) throw 'must provide valid content';
+    if (!utils.validString(userId)) throw 'must provide valid userId';
+    if (!utils.validString(recipeId)) throw 'must provide valid recipeId';
 
     let u = await userData.getUserById(userId);
     let r = await recipeData.getRecipeById(recipeId);
@@ -54,8 +54,8 @@ const exportedMethods = {
   // PUT /recipes/{id}
   // PATCH /recipes/{id}
   async updateComment(id, updatedComment) {
-    if (!verify.validString(id)) throw 'You must provide a valid id'
-    if (!verify.validString(updatedComment.comment)) throw 'You must provide a valid comment'
+    if (!utils.validString(id)) throw 'You must provide a valid id'
+    if (!utils.validString(updatedComment.comment)) throw 'You must provide a valid comment'
 
     const comment = await this.getCommentById(id);
 
@@ -77,7 +77,7 @@ const exportedMethods = {
   },
   
   async deleteComment(commentId) {
-    if (!verify.validString(commentId)) throw 'must provide valid commentId';
+    if (!utils.validString(commentId)) throw 'must provide valid commentId';
 
     const commentCollection = await comments();
     const comment = await this.getCommentById(commentId);

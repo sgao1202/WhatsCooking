@@ -3,6 +3,7 @@ const router = express.Router();
 const data = require('../data');
 const userData = data.users;
 const recipeData = data.recipes;
+const utils = require('../utils/utils');
 
 router.get('/', async (req, res) => {
     try {
@@ -36,6 +37,18 @@ router.get('/:id', async (req, res) => {
         });
     }
     return;
+});
+
+// Custom route to get user by Firebase's uid
+router.get('/uid/:uid', async (req, res) => {
+    let uid = req.params.uid.trim();
+    if (!utils.validString(uid)) return res.status(400).json({error: 'Uid is not valid'});
+    try {
+        let user = await userData.getUserByUid(uid);
+        res.json(user);
+    } catch (e) {
+        res.status(404).json({ error: e });
+    }
 });
 
 router.post('/', async (req, res) => {

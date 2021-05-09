@@ -4,7 +4,7 @@ const elasticData = require('../elasticdata');
 const elasticUsers = elasticData.users;
 const users = mongoCollections.users;
 const recipeData = require('./recipes');
-const verify = require('../utils/verify');
+const utils = require('../utils/utils');
 
 let exportedMethods = {
 
@@ -23,7 +23,7 @@ let exportedMethods = {
     },
 
     async getUserById(id) {
-        if (!verify.validString(id)) throw 'must provide valid id';
+        if (!utils.validString(id)) throw 'must provide valid id';
 
         const userCollection = await users();
         let user = await userCollection.findOne({_id: mongoDB.ObjectID(String(id))});
@@ -36,15 +36,16 @@ let exportedMethods = {
     },
 
     async getUserByUid(uid) {
-        if (!verify.validString(uid)) throw 'User uid must be valid';
+        if (!utils.validString(uid)) throw 'User uid must be valid';
         const userCollection = await users();
         let user = await userCollection.findOne({ uid: uid });
         if (!user) throw `User with uid=${uid} was not found`;
+        return utils.convertId(user);
     },
 
     // What is this for?
     async getUserByIdWithPword(id) {
-        if (!verify.validString(id)) throw 'must provide valid id';
+        if (!utils.validString(id)) throw 'must provide valid id';
         const userCollection = await users();
         let user = await userCollection.findOne({_id: mongoDB.ObjectID(String(id))});
         if (!user) throw 'User not found';
@@ -53,7 +54,7 @@ let exportedMethods = {
 
     // When will we use this?
     async getUserByUsername(username) {
-        if (!verify.validString(username)) throw 'must provide valid username';
+        if (!utils.validString(username)) throw 'must provide valid username';
 
         const userCollection = await users();
         let user = await userCollection.findOne({username: username});
@@ -68,13 +69,13 @@ let exportedMethods = {
     // We don't need to store password in the database
     // POST /users
     async addUser(uid, firstName, lastName, username, profilePicture, aboutMe) {
-        if (!verify.validString(uid)) throw 'You must provide a valid uid'
-        if (!verify.validString(firstName)) throw 'You must provide a valid first name'
-        if (!verify.validString(lastName)) throw 'You must provide a valid last name'
-        // if (!verify.validString(username)) throw 'You must provide a username'
-        // if (!verify.validString(password)) throw 'You must provide a valid password'
-        if (!verify.validString(profilePicture)) throw 'You must provide a valid profile picture'
-        if (!verify.validString(aboutMe)) throw 'You must provide a valid about me'
+        if (!utils.validString(uid)) throw 'You must provide a valid uid'
+        if (!utils.validString(firstName)) throw 'You must provide a valid first name'
+        if (!utils.validString(lastName)) throw 'You must provide a valid last name'
+        // if (!utils.validString(username)) throw 'You must provide a username'
+        // if (!utils.validString(password)) throw 'You must provide a valid password'
+        if (!utils.validString(profilePicture)) throw 'You must provide a valid profile picture'
+        if (!utils.validString(aboutMe)) throw 'You must provide a valid about me'
 
         // I don't think we're going to use username 
         // CHECK IF USERNAME IS UNIQUE
@@ -93,8 +94,8 @@ let exportedMethods = {
             profilePicture: profilePicture,
             aboutMe: aboutMe,
             bookmarks: [],
-            following: [],
-            recipes: []
+            following: []
+            // recipes: []
         };
 
         const newInsertInformation = await userCollection.insertOne(newUser);
@@ -108,11 +109,11 @@ let exportedMethods = {
     // PUT /users/{id}
     // PATCH /users/{id}
     async updateUser(id, updatedUser) {
-        if (!verify.validString(updatedUser.firstName)) throw 'You must provide a valid first name'
-        if (!verify.validString(updatedUser.lastName)) throw 'You must provide a valid last name'
-        if (!verify.validString(updatedUser.password)) throw 'You must provide a valid password'
-        if (!verify.validString(updatedUser.profilePicture)) throw 'You must provide a valid profile picture'
-        if (!verify.validString(updatedUser.aboutMe)) throw 'You must provide a valid about me'
+        if (!utils.validString(updatedUser.firstName)) throw 'You must provide a valid first name'
+        if (!utils.validString(updatedUser.lastName)) throw 'You must provide a valid last name'
+        if (!utils.validString(updatedUser.password)) throw 'You must provide a valid password'
+        if (!utils.validString(updatedUser.profilePicture)) throw 'You must provide a valid profile picture'
+        if (!utils.validString(updatedUser.aboutMe)) throw 'You must provide a valid about me'
 
         // Not sure if we need username
         // CHECK IF USERNAME IS UNIQUE
@@ -156,7 +157,7 @@ let exportedMethods = {
 
     // DELETE /users/{id}
     async removeUser(id) {
-        if (!verify.validString(id)) throw 'must provide valid id';
+        if (!utils.validString(id)) throw 'must provide valid id';
 
         const userCollection = await users();
         const deletionInfo = await userCollection.removeOne({
@@ -172,8 +173,8 @@ let exportedMethods = {
 
     // POST /users/{userId}/bookmarks/
     async addBookmarkToUser(userId, recipeId) {
-        if (!verify.validString(userId)) throw 'must provide valid userId';
-        if (!verify.validString(recipeId)) throw 'You must provide valid recipeId';
+        if (!utils.validString(userId)) throw 'must provide valid userId';
+        if (!utils.validString(recipeId)) throw 'You must provide valid recipeId';
 
         let user = await this.getUserById(userId);
         let recipe = await recipeData.getRecipeById(recipeId);
@@ -196,8 +197,8 @@ let exportedMethods = {
 
     // DELETE /users/{userId}/bookmarks/{recipeId}
     async removeBookmarkFromUser(userId, recipeId) {
-        if (!verify.validString(userId)) throw 'must provide valid userId';
-        if (!verify.validString(recipeId)) throw 'must provide valid recipeId';
+        if (!utils.validString(userId)) throw 'must provide valid userId';
+        if (!utils.validString(recipeId)) throw 'must provide valid recipeId';
 
         let user = await this.getUserById(userId);
         let recipe = await recipeData.getRecipeById(recipeId);
@@ -231,8 +232,8 @@ let exportedMethods = {
 
     // POST /users/{userId}/following/
     async addFollowToUser(userId, followUserId) {
-        if (!verify.validString(userId)) throw 'must provide valid userId';
-        if (!verify.validString(followUserId)) throw 'You must provide valid followUserId';
+        if (!utils.validString(userId)) throw 'must provide valid userId';
+        if (!utils.validString(followUserId)) throw 'You must provide valid followUserId';
 
         let user = await this.getUserById(userId);
         let followUser = await this.getUserById(followUserId);
@@ -255,8 +256,8 @@ let exportedMethods = {
 
     // DELETE /users/{userId}/following/{followUserId}
     async removeFollowFromUser(userId, followUserId) {
-        if (!verify.validString(userId)) throw 'must provide valid userId';
-        if (!verify.validString(followUserId)) throw 'must provide valid follow userId';
+        if (!utils.validString(userId)) throw 'must provide valid userId';
+        if (!utils.validString(followUserId)) throw 'must provide valid follow userId';
 
         let user = await this.getUserById(userId);
         let followUser = await this.getUserById(followUserId);
