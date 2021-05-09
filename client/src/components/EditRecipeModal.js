@@ -165,8 +165,6 @@ function EditRecipeModal(props) {
             </Modal.Footer>
         </Modal>
     )
-    
-    
 }
 
 export default EditRecipeModal;

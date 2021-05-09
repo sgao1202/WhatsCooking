@@ -42,8 +42,7 @@ const Recipe = (props) =>{
     });
     const [comment, submitComment] = useState(initialCommentData);
     const updateRecipe = () => setShowEditModal(true);
-    const updateModal = (data) => {
-        setRecipeData(data);}
+    const updateModal = (data) => setRecipeData(data);
     const closeModal = () => setShowEditModal(false);
     const handleChange = (e) =>{
         submitComment({
@@ -84,7 +83,6 @@ const Recipe = (props) =>{
                 setUserData(user.data);
                 //get all comments associated with recipe
                 let comments = await axios.get(`${url}comments/recipe/${props.match.params.id}`);
-                console.log(comments)
                 //get user name for the comment data
                 let recipeComments = comments.data;
                 recipeComments.forEach(async(comment)=>{
