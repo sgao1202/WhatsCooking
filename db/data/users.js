@@ -79,7 +79,7 @@ let exportedMethods = {
 
         // I don't think we're going to use username 
         // CHECK IF USERNAME IS UNIQUE
-        // const userCollection = await users();
+        const userCollection = await users();
         // let userNameTaken = await userCollection.findOne({
         //     username: username
         // });
