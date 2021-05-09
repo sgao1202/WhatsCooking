@@ -7,6 +7,7 @@ import Landing from './Landing';
 import Login from './Login';
 import Profile from './Profile';
 import Recipe from './Recipe';
+import NewRecipe from './NewRecipe';
 import SignUp from './SignUp';
 import Home from './Home';
 import '../App.css';
@@ -22,6 +23,7 @@ function App() {
                 <Route exact path="/signup" component={SignUp}></Route>
                 <Route exact path="/profile" component={Profile}></Route>
                 <Route exact path="/recipe/:id" component={Recipe}></Route>
+                <Route exact path="/newrecipe" component={NewRecipe}></Route>
                 <Route exact path="/home" component={Home}></Route>
             </Container>
       </Router> 
