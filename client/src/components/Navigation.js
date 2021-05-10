@@ -9,8 +9,7 @@ const Navigation = () => {
     // If the user is not logged in then show Log In and Sign Up button in top right,
     // otherwise replace those buttons with their name and dropdown
     const { currentUser } = useContext(AuthContext);
-    console.log(currentUser);
-    
+
     // Logout function
     const logout = async () => {
         await doSignOut();

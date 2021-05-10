@@ -2,11 +2,12 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Redirect } from 'react-router-dom';
 import { Button, Form } from 'react-bootstrap';
 import { AuthContext } from '../firebase/Auth';
-import { doCreateUserWithEmailAndPassword } from '../firebase/FirebaseFunctions';
+import { doCreateUserWithEmailAndPassword, doSignInWithEmailAndPassword } from '../firebase/FirebaseFunctions';
+import axios from 'axios';
 import utils from '../lib/Utility';
 
 const SignUp = () => {
-    const { currentUser } = useContext(AuthContext);
+    const { currentUser, mongoUser, url } = useContext(AuthContext);
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
@@ -18,6 +19,40 @@ const SignUp = () => {
         document.title = "Sign Up";
     }, []);
 
+    // Will post multiple times, not a good solution
+    // useEffect(() => {
+    //     // Create the user in our database
+    //     async function postUser() {
+    //         try {
+    //             const { data } = await axios.post(`${url}/users`, {
+    //                 uid: currentUser.uid,
+    //                 firstName: firstName,
+    //                 lastName: lastName,
+    //             });
+    //             console.log(data);
+    //             setUser(data);
+    //         } catch (e) {
+    //             console.log(e);
+    //             alert(e);
+    //         }
+    //     }
+    //     if (currentUser) postUser();
+    // }, [currentUser])
+
+    const postUser = async () => {
+        try {
+            const { data } = await axios.post(`${url}/users`, {
+                uid: currentUser.uid,
+                firstName: firstName,
+                lastName: lastName,
+            });
+            console.log(data);
+        } catch (e) {
+            console.log(e);
+            alert(e);
+        }
+    };
+    
     // Custom validation for fields
     const validateForm = (form) => {
         if (!utils.validString(firstName) || !utils.validString(lastName) || !utils.validString(email) || !utils.validString(password)) return false;
@@ -27,14 +62,13 @@ const SignUp = () => {
     };
 
     const handleSignUp = async (event) => {
-        // event.preventDefault();
-        // const form = event.currentTarget;
-        console.log(currentUser);
+        event.preventDefault();
         setValidated(true);
         setLoading(true);
         if (validateForm()) {
             try {
-                doCreateUserWithEmailAndPassword(email, password, `${firstName} ${lastName}`);
+                await doCreateUserWithEmailAndPassword(email, password, `${firstName} ${lastName}`);
+                await postUser();
             } catch(e) {
                 alert(e);
             }
@@ -43,8 +77,8 @@ const SignUp = () => {
     };
 
     const validForm = () => {return email.length > 0 && password.length > 0 && firstName.length > 0 && lastName.length > 0;};
-    
-    if (currentUser) return <Redirect to='/home'></Redirect>
+
+    if (currentUser && mongoUser) return <Redirect to='/home'></Redirect>
     return (
         <div className="Login">
             <Form noValidate validated={validated} onSubmit={handleSignUp}>
@@ -79,7 +113,7 @@ const SignUp = () => {
                         onChange={(e) => setEmail(e.target.value)}
                     />
                     <Form.Control.Feedback type="invalid">
-                        Please enter a valid first name.
+                        Please enter a valid email.
                     </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group size="lg" controlId="password">

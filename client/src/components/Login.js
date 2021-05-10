@@ -25,7 +25,6 @@ const Login = () => {
 
     const handleLogin = async (event) => {
         event.preventDefault();
-        console.log(event);
         setValidated(true);
         if (validateForm()){ 
             try {
