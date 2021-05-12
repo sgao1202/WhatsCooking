@@ -6,7 +6,7 @@ import Navigation from './Navigation';
 // import Landing from './Landing';
 import Login from './Login';
 import MyProfile from './MyProfile';
-import ProfileEdit from './ProfileEdit';
+import EditProfile from './EditProfile';
 import UploadImage from './UploadImage';
 import Recipe from './Recipe';
 import SignUp from './SignUp';
@@ -30,7 +30,7 @@ function App() {
                 <Route exact path="/home" component={Home}></Route>
                 <Route exact path="/users/:id" component={UserProfile}></Route>
                 <PrivateRoute exact path="/my-profile" component={MyProfile}></PrivateRoute>
-                <PrivateRoute exact path="/my-profile/edit" component={ProfileEdit}></PrivateRoute>
+                <PrivateRoute exact path="/my-profile/edit" component={EditProfile}></PrivateRoute>
                 <PrivateRoute exact path="/my-profile/upload-image" component={UploadImage}></PrivateRoute>
             </Container>
       </Router> 

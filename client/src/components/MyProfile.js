@@ -67,12 +67,12 @@ const MyProfile = () => {
                                 <ListGroup horizontal>
                                     <ListGroup.Item>
                                         <span className="mr-2"><FaUtensils></FaUtensils></span>
-                                        <span className="font-weight-bold mr-1">{userProfile.bookmarks.length}</span>
+                                        <span className="font-weight-bold mr-1">{myRecipes.length}</span>
                                         <span>Recipes</span>
                                     </ListGroup.Item>
                                     <ListGroup.Item>
                                         <span className="mr-2"><FaBookmark></FaBookmark></span>
-                                        <span className="font-weight-bold mr-1">{userProfile.bookmarks.length}</span> 
+                                        <span className="font-weight-bold mr-1">{bookmarkedRecipes.length}</span> 
                                         <span>Bookmarks</span>
                                     </ListGroup.Item>
                                 </ListGroup>
@@ -163,16 +163,23 @@ const MyProfile = () => {
                     <Col sm={9}>
                         <Tab.Content>
                             <Tab.Pane eventKey="aboutMe">
-                                <p>This is the about me section</p>
+                                {userProfile.aboutMe ? userProfile.aboutMe : <h2>Nothing to display</h2>}
                             </Tab.Pane>
                             <Tab.Pane eventKey="myRecipes">
-                                <p>This is the my recipes section</p>
+                                { myRecipes.length === 0 ? <h2>You have not created any recipes yet</h2> :
+                                    (<div></div>)
+                                }
                             </Tab.Pane>
                             <Tab.Pane eventKey="following">
-                                <p>This is the following section</p>
+                                {userProfile.following.length === 0 ? <h2>No followers available</h2> : 
+                                    (<div></div>)
+                                }
                             </Tab.Pane>
                             <Tab.Pane eventKey="bookmarks">
-                                <p>This is the bookmarks section</p>
+                                { bookmarkedRecipes.length === 0 ? <h2>No bookmarks available</h2> : (
+                                    <div></div>   
+                                )
+                                }
                             </Tab.Pane>
                         </Tab.Content>
                     </Col>
