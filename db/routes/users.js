@@ -371,13 +371,12 @@ router.post('/:id/bookmarks', async (req, res) => {
         });
         return;
     }
-    if (!bookmarkInfo.recipeId || typeof bookmarkInfo.recipeId != "string") {
+    if (!bookmarkInfo._id || typeof bookmarkInfo._id != "string") {
         res.status(400).json({
             error: 'You must provide recipeId'
         });
         return;
     }
-
     let user = null;
     try {
         user = await userData.getUserById(req.params.id);
@@ -390,16 +389,15 @@ router.post('/:id/bookmarks', async (req, res) => {
 
 	let recipe = null;
 	try {
-        recipe = await recipeData.getRecipeById(bookmarkInfo.recipeId);
+        recipe = await recipeData.getRecipeById(bookmarkInfo._id);
     } catch (e) {
         res.status(404).json({
             error: 'recipe not found'
         });
         return;
     }
-
     try {
-        const newUser = await userData.addBookmarkToUser(req.params.id, bookmarkInfo.recipeId);
+        const newUser = await userData.addBookmarkToUser(req.params.id, bookmarkInfo._id);
         res.status(200).json(newUser);
         return;
     } catch (e) {

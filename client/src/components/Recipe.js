@@ -44,12 +44,35 @@ const Recipe = (props) =>{
     const updateRecipe = () => setShowEditModal(true);
     const updateModal = (data) => setRecipeData(data);
     const closeModal = () => setShowEditModal(false);
+    const redirectToLogin = () =>{ setRedirect(true) }
+
+    const [bookmarked, setBookmarked] = useState();
+
+    const toggleBookmarks = async(e) => {
+        e.preventDefault();
+        if(!bookmarked){
+            try{
+                let user = await axios.post(`${url}users/6097fefe6c8b900517fec8d6/bookmarks`, recipeData);
+                setBookmarked(true);
+            }catch(e){
+                console.log(e.error)
+            }
+        }else{
+            try{
+                let user = await axios.delete(`${url}users/6097fefe6c8b900517fec8d6/bookmarks/${recipeData._id}`)
+                setBookmarked(false);
+            }catch(e){
+                console.log(e);
+            }
+        }
+    }
+
     const handleChange = (e) =>{
         submitComment({
             ...comment, [e.target.name]: e.target.value.trim()
         });
     }
-    const redirectToLogin = (e) =>{ setRedirect(true) }
+    
     async function handleSubmit(e){
         if (comment.comment.trim().length === 0) {
             e.preventDefault();
@@ -60,7 +83,7 @@ const Recipe = (props) =>{
             let newComment = await axios.post(`${url}comments`, {
                 comment: comment.comment,
                 recipeId: recipeData._id,
-                userId: "609705b47f772731c31ed661"
+                userId: "6097fefe6c8b900517fec8d6"
             });
             //add new comment to commentList and re-render
             let comments = commentData;
@@ -75,6 +98,7 @@ const Recipe = (props) =>{
     useEffect(() =>{
         async function fetchData(){
             try{
+                console.log(currentUser)
                 //get recipe data
                 let { data } = await axios.get(`${url}recipes/${props.match.params.id}`); //getRecipeById
                 setRecipeData(data);
@@ -83,6 +107,11 @@ const Recipe = (props) =>{
                 setUserData(user.data);
                 //get all comments associated with recipe
                 let comments = await axios.get(`${url}comments/recipe/${props.match.params.id}`);
+                //check if user has this page bookmarked
+
+                console.log(user.data.bookmarks.includes(data._id))
+                user.data.bookmarks.includes(data._id)? setBookmarked(true) : setBookmarked(false);
+
                 //get user name for the comment data
                 let recipeComments = comments.data;
                 recipeComments.forEach(async(comment)=>{
@@ -92,7 +121,7 @@ const Recipe = (props) =>{
                 setCommentData(recipeComments);
                 setLoading(false);
             }catch(e){
-                console.log(e);
+                return (<p>{e.message}</p>)
             }
         }
         fetchData();
@@ -130,6 +159,7 @@ const Recipe = (props) =>{
                     {currentUser && <Col xs={2}>
                         <Button onClick={updateRecipe}>Update Recipe</Button>
                         <EditRecipeModal isOpen={showEditModal} data={recipeData} user={userData} closeModal={closeModal} updateModal={updateModal}></EditRecipeModal>
+                        <Button onClick={toggleBookmarks}>{bookmarked? "Unbookmark" : "Bookmark"}</Button>
                     </Col>}
                     <Col xs={6} md={4}>
                         <Image src={logo} alt = "noimg" thumbnail="true"></Image>
