@@ -5,18 +5,6 @@ const userData = data.users;
 const recipeData = data.recipes;
 const utils = require('../utils/utils');
 
-router.get('/', async (req, res) => {
-    try {
-        let userList = await userData.getAllusers();
-        res.status(200).json(userList);
-    } catch (e) {
-        res.status(500).json({
-            error: String(e)
-        })
-    }
-    return;
-});
-
 router.get('/:id', async (req, res) => {
     if (!req.params.id) {
         res.status(400).json({
@@ -51,15 +39,53 @@ router.get('/uid/:uid', async (req, res) => {
     }
 });
 
+// Get all the data needed to display on my-profile page 
+
+/*
+    {
+        uid: <current user's uid from firebase>
+    }
+*/
+// Includes getting all bookmarked recipes and recipes created by the current user
+router.get('/my-profile/:uid', async (req, res) => {
+    let uid = req.params.uid.trim();
+    if (!utils.validString(uid)) return res.status(400).json({ error: "uid is required in request body for '/users/my-profile' route" });
+
+    try {
+        // Get the user
+        let user = await userData.getUserByUid(uid);
+        let bookmarkedRecipes = [];
+        for (let recipeId of user.bookmarks) {
+            if (!utils.validString(recipeId)) return res.status(400).json({error: 'bookmarkList contains invalid ids'});
+            let recipe = await recipeData.getRecipeById(recipeId);
+            bookmarkedRecipes.push({
+                id: recipeId,
+                title: recipe.title,
+                picture: recipe.picture
+            });
+        }
+        let myRecipes = await recipeData.getRecipesByUser(user._id.toString());
+        res.json({
+            user: user,
+            bookmarkedRecipes: bookmarkedRecipes,
+            myRecipes: myRecipes
+        });
+    } catch (e) {
+        res.status(404).json({error: e});
+    }
+});
+
 router.post('/', async (req, res) => {
     let userInfo = req.body;
-
+    
     if (!userInfo) {
         res.status(400).json({
             error: 'You must provide data to create a user'
         });
         return;
     }
+
+    if (!utils.validString(userInfo.uid)) return res.status(400).json({ error: 'Uid must be provided'});
 
     if (!userInfo.firstName || typeof userInfo.firstName != "string") {
         res.status(400).json({
@@ -73,48 +99,52 @@ router.post('/', async (req, res) => {
         });
         return;
     }
-    if (!userInfo.password || typeof userInfo.password != "string") {
-        res.status(400).json({
-            error: 'You must provide a valid password'
-        });
-        return;
-    }
-    if (!userInfo.profilePicture || typeof userInfo.profilePicture != "string") {
-        res.status(400).json({
-            error: 'You must provide a valid profile picture'
-        });
-        return;
-    }
+    // if (!userInfo.password || typeof userInfo.password != "string") {
+    //     res.status(400).json({
+    //         error: 'You must provide a valid password'
+    //     });
+    //     return;
+    // }
 
-    if (!userInfo.aboutMe || typeof userInfo.aboutMe != "string") {
-        res.status(400).json({
-            error: 'You must provide a valid about me'
-        });
-        return;
-    }
+    // if (!userInfo.profilePicture || typeof userInfo.profilePicture != "string") {
+    //     res.status(400).json({
+    //         error: 'You must provide a valid profile picture'
+    //     });
+    //     return;
+    // }
+
+    // About me should be optional and only used when the user edits their profile, same with profile picture
+
+    // if (!userInfo.aboutMe || typeof userInfo.aboutMe != "string") {
+    //     res.status(400).json({
+    //         error: 'You must provide a valid about me'
+    //     });
+    //     return;
+    // }
 
     // CHECK IF USERNAME IS UNIQUE
-    if (!userInfo.username || typeof userInfo.username != "string") {
-        res.status(400).json({
-            error: 'You must provide a valid username'
-        });
-        return;
-    } else {
-		try {
-			let user = await userData.getUserByUsername(userInfo.username);
-			if (user) {
-				res.status(400).json({
-					error: 'username is taken'
-				});
-				return;
-			}
-		} catch (error) {
-			// do nothing
-		}
-    }
+    // if (!userInfo.username || typeof userInfo.username != "string") {
+    //     res.status(400).json({
+    //         error: 'You must provide a valid username'
+    //     });
+    //     return;
+    // } else {
+	// 	try {
+	// 		let user = await userData.getUserByUsername(userInfo.username);
+	// 		if (user) {
+	// 			res.status(400).json({
+	// 				error: 'username is taken'
+	// 			});
+	// 			return;
+	// 		}
+	// 	} catch (error) {
+	// 		// do nothing
+	// 	}
+    // }
 
     try {
         const newUser = await userData.addUser(
+            userInfo.uid,
             userInfo.firstName,
             userInfo.lastName,
             userInfo.username,
