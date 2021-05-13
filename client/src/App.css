@@ -50,3 +50,20 @@ body {
 #recipe-desc, #recipe-chef{
   font-style: italic;
 }
+
+.user-comment-name{
+  font-weight: bold;
+}
+
+.error{
+  font-style: italic;
+  color: red;
+}
+
+.modal-subtitle{
+  font-weight: bold;
+}
+
+.ingredient-del-btn{
+  margin:5px;
+}
