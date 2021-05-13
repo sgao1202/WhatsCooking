@@ -12,7 +12,13 @@ function convertId(obj) {
     return obj;
 }
 
+function validArray(arr) {
+    if (!arr || !Array.isArray(arr)) return false;
+    return true;
+}
+
 module.exports = {
-    validString,
-    convertId
+    convertId,
+    validArray,
+    validString
 };

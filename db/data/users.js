@@ -74,8 +74,8 @@ let exportedMethods = {
         if (!utils.validString(lastName)) throw 'You must provide a valid last name'
         // if (!utils.validString(username)) throw 'You must provide a username'
         // if (!utils.validString(password)) throw 'You must provide a valid password'
-        if (!utils.validString(profilePicture)) throw 'You must provide a valid profile picture'
-        if (!utils.validString(aboutMe)) throw 'You must provide a valid about me'
+        // if (!utils.validString(profilePicture)) throw 'You must provide a valid profile picture'
+        // if (!utils.validString(aboutMe)) throw 'You must provide a valid about me'
 
         // I don't think we're going to use username 
         // CHECK IF USERNAME IS UNIQUE
@@ -92,10 +92,10 @@ let exportedMethods = {
             // username: username,
             // password: password,  I do not think we need password as a field in the document (handeld by Firebase)
             profilePicture: profilePicture,
-            aboutMe: aboutMe,
+            aboutMe: '',
             bookmarks: [],
-            following: []
-            // recipes: []
+            following: [],
+            recipes: []
         };
 
         const newInsertInformation = await userCollection.insertOne(newUser);
