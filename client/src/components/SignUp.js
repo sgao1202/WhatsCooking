@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Redirect } from 'react-router-dom';
-import { Button, Form } from 'react-bootstrap';
+import { Button, Container, Form, Spinner } from 'react-bootstrap';
 import { AuthContext } from '../firebase/Auth';
-import { doCreateUserWithEmailAndPassword, doSignInWithEmailAndPassword } from '../firebase/FirebaseFunctions';
+import { doCreateUserWithEmailAndPassword } from '../firebase/FirebaseFunctions';
 import axios from 'axios';
 import utils from '../lib/Utility';
 
 const SignUp = () => {
-    const { currentUser, mongoUser, url } = useContext(AuthContext);
+    const { currentUser, baseUrl } = useContext(AuthContext);
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
@@ -18,40 +18,6 @@ const SignUp = () => {
     useEffect(() => {
         document.title = "Sign Up";
     }, []);
-
-    // Will post multiple times, not a good solution
-    // useEffect(() => {
-    //     // Create the user in our database
-    //     async function postUser() {
-    //         try {
-    //             const { data } = await axios.post(`${url}/users`, {
-    //                 uid: currentUser.uid,
-    //                 firstName: firstName,
-    //                 lastName: lastName,
-    //             });
-    //             console.log(data);
-    //             setUser(data);
-    //         } catch (e) {
-    //             console.log(e);
-    //             alert(e);
-    //         }
-    //     }
-    //     if (currentUser) postUser();
-    // }, [currentUser])
-
-    const postUser = async () => {
-        try {
-            const { data } = await axios.post(`${url}/users`, {
-                uid: currentUser.uid,
-                firstName: firstName,
-                lastName: lastName,
-            });
-            console.log(data);
-        } catch (e) {
-            console.log(e);
-            alert(e);
-        }
-    };
     
     // Custom validation for fields
     const validateForm = (form) => {
@@ -60,25 +26,42 @@ const SignUp = () => {
         if (!email.includes('@')) return false;
         return true;
     };
+    
+    const createUser = async () => {
+        try {
+            const user = await doCreateUserWithEmailAndPassword(email, password, `${firstName} ${lastName}`);
+            console.log(user);
+            const { data } = await axios.post(`${baseUrl}/users`, {
+               uid: user.uid,
+               firstName: firstName,
+               lastName: lastName
+            });
+            console.log(data);
+            setLoading(false);
+        } catch (e) {
+            console.log(e);
+            alert(e);
+            setLoading(false);
+        }
+    }
 
-    const handleSignUp = async (event) => {
+    const handleSignUp = (event) => {
         event.preventDefault();
         setValidated(true);
         setLoading(true);
-        if (validateForm()) {
-            try {
-                await doCreateUserWithEmailAndPassword(email, password, `${firstName} ${lastName}`);
-                await postUser();
-            } catch(e) {
-                alert(e);
-            }
-        }
-        setLoading(false);
+        if (validateForm()) createUser();
+        else setLoading(false);
     };
 
     const validForm = () => {return email.length > 0 && password.length > 0 && firstName.length > 0 && lastName.length > 0;};
+    
+    if (loading) return (
+        <Container className="text-center">
+            <Spinner animation="border"></Spinner>
+        </Container>
+    );
 
-    if (currentUser && mongoUser) return <Redirect to='/home'></Redirect>
+    if (currentUser && !loading) return <Redirect to='/home'></Redirect>
     return (
         <div className="Login">
             <Form noValidate validated={validated} onSubmit={handleSignUp}>

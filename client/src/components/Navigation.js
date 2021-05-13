@@ -26,7 +26,7 @@ const Navigation = () => {
             <Navbar.Collapse>
                     <Container></Container>
                     {/* Fix with a 3 column layout for the navigation bar */}
-                    {currentUser ? 
+                    {!!currentUser ? 
                         <DropdownButton id="nav-dropdown" variant="outline-dark" className="mr-5 pb-2" title={currentUser.displayName} menuAlign="right">
                             <Dropdown.Item href="/my-profile">My Profile</Dropdown.Item>
                             <Dropdown.Divider/>
