@@ -86,10 +86,10 @@ const Home = () => {
 
   const buildCard = (s) => {
     return (
-      <Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={s.id}>
+      <Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={s._id}>
             <Card className={classes.card} variant="outlined">
               <CardActionArea>
-                <Link to={`/recipe/${s.id}`}>
+                <Link to={`/recipe/${s._id}`}>
                   <CardMedia
                     className={classes.media}
                     component="img"
