@@ -8,10 +8,11 @@ const baseUrl = 'http://localhost:3001'
 const AuthProvider = ({ children }) => {
     const [currentUser, setCurrentUser] = useState(null);
     const [loadingUser, setLoadingUser] = useState(true);
-
+    
     useEffect(() => {
         firebaseApp.auth().onAuthStateChanged(async (user) => {
             // User signs in 
+            setLoadingUser(true);
             setCurrentUser(user);
             setLoadingUser(false);
         });

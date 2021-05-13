@@ -25,8 +25,6 @@ const MyProfile = () => {
                 setUserProfile(data.user);
                 setBookmarkedRecipes(data.bookmarkedRecipes);
                 setMyRecipes(data.myRecipes);
-                // Get recipes that they have created
-                // Get users that they are following
             } catch (e) {
                 console.log(e);
                 alert(e);
@@ -57,7 +55,7 @@ const MyProfile = () => {
                 <Col className="py-3">
                     <Row>
                         <Col>
-                            <Image src={genericProfile} alt="profile-picture" roundedCircle/>
+                            <Image src={userProfile.profilePicture ? userProfile.profilePicture : genericProfile} alt="profile-picture" roundedCircle/>
                         </Col>    
                         <Col>
                             <Row>
