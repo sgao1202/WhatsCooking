@@ -1,12 +1,15 @@
 import { Form, Button, Col, InputGroup } from 'react-bootstrap';
 import React, { useState } from 'react';
 import axios from 'axios';
-
+import Formik from 'formik'
+import { useContext } from 'react'
+import { AuthContext } from '../firebase/Auth'
 
 function NewRecipe(){
+    const { currentUser } = useContext(AuthContext);
     const initialFormData = {
         title: "",
-        userId: "609705b47f772731c31ed661",
+        userId: "6097fefe6c8b900517fec8da",
         picture: "noimg.jpg",
         description: "",
         ingredients: [{name: "", portion: 0, units: ""}],
@@ -15,6 +18,7 @@ function NewRecipe(){
     const url = 'http://localhost:3001/';
     const [validated, setValidated] = useState(false);
     const [formData, setFormData] = useState(initialFormData);
+    const [errors, setErrors] = useState();
     
     const handleChange = (e) =>{
         setFormData({
@@ -23,19 +27,35 @@ function NewRecipe(){
     }
     const handleSubmit = async(e) =>{
         e.preventDefault();
-        const form = e.target;
-        if (form.checkValidity() === false){
-            e.preventDefault();
-            e.stopPropagation();
-        }
+        // const formErrors = findFormErrors();
+        // console.log(formErrors)
+        // setErrors(formErrors);
         setValidated(true);
-        try{
-            await axios.post(`${url}recipes`, formData)
-        }catch(e){
-            console.log(e)
+        if (validateForm()){
+            try{
+                await axios.post(`${url}recipes`, formData)
+            }catch(e){
+                console.log(e)
+            }
         }
-
+        
     }
+    const validateForm = () =>{
+        if (formData.title){
+
+        }
+    }
+    const findFormErrors = () => {
+        const newErrors = {ingredients: []}
+        console.log("validPortionTesting")
+        formData.ingredients.forEach((ingredient, index) => {
+            if(ingredient.portion < 0){
+                newErrors.ingredients.push(index);
+            }
+        })
+        return newErrors;
+    }
+
 
     const handleIngredientChange = (e, index) => {
         if (e.target.name !== "portion") formData.ingredients[index][e.target.name] = e.target.value.trim();
@@ -79,7 +99,7 @@ function NewRecipe(){
     return (
         <div>
             <h1>Create a Recipe</h1>
-                <Form noValidate validated={validated} onSubmit={handleSubmit}>
+            <Form noValidate validated={validated} onSubmit={handleSubmit}>
                 <Form.Row>
                     <Form.Group controlId="recipeName">
                     <Form.Label>Recipe Name:</Form.Label>
@@ -92,7 +112,7 @@ function NewRecipe(){
                     </Form.Group>
                     </Form.Row>
                 <Form.Row>
-                    <Form.Group controlId="description">
+                    <Form.Group size='lg' controlId="description">
                     <Form.Label>Description:</Form.Label>
                     <Form.Control
                         required
@@ -103,10 +123,16 @@ function NewRecipe(){
                     />
                     </Form.Group>
                 </Form.Row>
+                <Form.Row>
+                    <Form.Group controlId='updateImage'>
+                        <Form.Label>Image:</Form.Label>
+                        <Form.File type='file' onClick={handleChange}></Form.File>
+                    </Form.Group>
+                </Form.Row>
+                            
                 <label>Ingredients:</label>
                 {formData.ingredients.map((ingredient, index) => (
                     <Form.Row key={index}>
-                    {/* <Form.Label>Ingredients:</Form.Label> */}
                     
                     <InputGroup as={Col}>
                         <InputGroup.Prepend>
@@ -119,7 +145,7 @@ function NewRecipe(){
                         <InputGroup.Prepend>
                             <InputGroup.Text>Portion:</InputGroup.Text>
                         </InputGroup.Prepend>
-                        <Form.Control required type="number" name="portion" isValid={console.log(formData.ingredients[index].portion > 0)} onChange={(e) => handleIngredientChange(e, index)}></Form.Control>
+                        <Form.Control required type="number" name="portion" onChange={(e) => handleIngredientChange(e, index)}></Form.Control>
                         <Form.Control.Feedback type="invalid">Must provide a non-negative portion amount!</Form.Control.Feedback>
                     </InputGroup>
                     <InputGroup as={Col}>
@@ -139,7 +165,7 @@ function NewRecipe(){
                 <label>Procedure:</label>
                 {formData.procedure.map((step, index)=>(
                     <Form.Row key={index}>
-                        {/* <Form.Label>Procedure:</Form.Label> */}
+
                         <InputGroup as={Col}>
                             <InputGroup.Prepend>
                                 <InputGroup.Text>{index+1}.</InputGroup.Text>
@@ -147,7 +173,7 @@ function NewRecipe(){
                             <Form.Control required as="textarea" onChange={(e) => handleProcedureChange(e, index)}></Form.Control>
                             <Form.Control.Feedback type="invalid">Step cannot be empty!</Form.Control.Feedback>
                         </InputGroup>
-                        <Button variant="danger" as={Col} xs={1} onClick={() => deleteStep(index)}>X</Button>
+                        <Button className='del-btn' variant="danger" as={Col} xs={1} onClick={() => deleteStep(index)}>X</Button>
                     </Form.Row>
                     
                 ))}
@@ -155,7 +181,7 @@ function NewRecipe(){
                 <Button onClick={() => addStep()}>Add Step+</Button>
                 <br></br>
                 <br></br>
-                <Button type="submit">Submit</Button>
+                <Button type="submit" onClick={handleSubmit}>Submit</Button>
             </Form>
         </div>
     )

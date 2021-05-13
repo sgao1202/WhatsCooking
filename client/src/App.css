@@ -70,7 +70,7 @@ body {
   font-style: italic;
 }
 
-.user-comment-name{
+.user-comment-name, .modal-subtitle{
   font-weight: bold;
 }
 
@@ -79,10 +79,16 @@ body {
   color: red;
 }
 
-.modal-subtitle{
-  font-weight: bold;
+
+.ingredient-del-btn, .del-btn{
+  margin:6px;
 }
 
-.ingredient-del-btn{
-  margin:5px;
+.filled{
+  color: blue;
+}
+
+.success{
+  color: green;
+  font-style: italic;
 }

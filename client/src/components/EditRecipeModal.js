@@ -3,12 +3,10 @@ import React, { useEffect, useState } from 'react';
 import { Col, Image, Button, Form, Modal } from 'react-bootstrap'
 function EditRecipeModal(props) {
     const url = 'http://localhost:3001/';
-    // const [modalData, setModalData] = useState();
     const [loading, setLoading] = useState(true);
     const [showEditModal, setShowEditModal] = useState(props.isOpen);
     const [validated, setValidated] = useState(false);
     useEffect(()=>{
-        // setModalData(props.data);
         setShowEditModal(props.isOpen);
         setLoading(false);
     },[props.data, props.isOpen])
@@ -26,6 +24,8 @@ function EditRecipeModal(props) {
     
     const [formData, setFormData] = useState(initialFormData);
     const handleCloseModal = () =>{
+        //reset form data when closed
+        setFormData(initialFormData);
         setShowEditModal(false);
         props.closeModal();
     }
@@ -35,10 +35,9 @@ function EditRecipeModal(props) {
         })
     }
     const handleModalIngredientChange = (e, index) => {
-        console.log(formData.ingredients[index])
+        // console.log(formData.ingredients[index])
         if (e.target.name !== "portion") formData.ingredients[index][e.target.name] = e.target.value.trim();
         else formData.ingredients[index][e.target.name] = parseFloat(e.target.value.trim());
-        console.log(formData)
         setFormData(formData);
     }
     const handleModalProcedureChange = (e, index) => {
@@ -49,21 +48,23 @@ function EditRecipeModal(props) {
         e.preventDefault();
         const form = e.target;
         if (form.checkValidity() === false){
+            console.log("invalid form")
             e.preventDefault();
             e.stopPropagation();
         }
         setValidated(true);
+        console.log(formData)
         try{
             let updatedRecipe = await axios.put(`${url}recipes/${formData.recipeid}`, formData);
             setFormData(updatedRecipe.data);
             props.updateModal(formData);
-           
-            /*FIX LATER*/
+        
             handleCloseModal();
         }catch(e){
             console.log(e);
         }
         setShowEditModal(false);
+        
         return;
     }
     const addIngredient = () => {
@@ -91,13 +92,22 @@ function EditRecipeModal(props) {
         fields.procedure.splice(index,1);
         setFormData(fields);
     }
+
+    const handleFileInput = () => { 
+        
+    }
     return(!loading &&
         <Modal show={showEditModal} onHide={handleCloseModal}>
             <Modal.Header closeButton>
-            <Modal.Title>Update {formData.title}</Modal.Title>
+            <Modal.Title>Update Your Recipe</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form noValidate validated={validated} onSubmit={(e) => handleModalSubmit(e)}>
+                    <Form.Group controlId='updateImage'>
+                        <Form.Label className='modal-subtitle'>Image:</Form.Label>
+                        <Form.Control type='image' src={formData.picture} alt='noimg'></Form.Control>
+                        <Form.File type='file' onClick={handleModalChange}></Form.File>
+                    </Form.Group>
                     <Form.Group controlId="updateTitle">
                         <Form.Label className='modal-subtitle'>Name:</Form.Label>
                         <Form.Control required type="text" name='title' defaultValue={formData.title} onChange={handleModalChange}></Form.Control>
@@ -121,7 +131,7 @@ function EditRecipeModal(props) {
                                     <Form.Control.Feedback type="invalid">Must provide an ingredient name!</Form.Control.Feedback>
                                 </Col>
                                 <Col>
-                                    <Form.Control required type="number" name="portion" defaultValue={ingredient.portion} onChange={(e) => handleModalIngredientChange(e,index)}></Form.Control>
+                                    <Form.Control required type="number" name="portion" min="0" step=".1" onInput={() => "validity.valid||(value='')"} defaultValue={ingredient.portion} onChange={(e) => handleModalIngredientChange(e,index)}></Form.Control>
                                     <Form.Control.Feedback type="invalid">Must provide a non-negative portion amount!</Form.Control.Feedback>
                                 </Col>
                                 <Col>
@@ -139,7 +149,6 @@ function EditRecipeModal(props) {
                         <Form.Label className='modal-subtitle'>Procedure:</Form.Label>
                         <br></br>
                         {formData.procedure.map((step, index)=>(
-                            // <Form.Control type="text" defaultValue={step}></Form.Control>
                             <Form.Row key={index}>
                                 <Col>
                                     <Form.Control required as='textarea' defaultValue={step} rows={4} onChange={(e)=>handleModalProcedureChange(e, index)}></Form.Control>

@@ -4,6 +4,7 @@ import { Redirect } from 'react-router-dom'
 import '../App.css';
 import axios from 'axios'
 import { Container, Row, Col, Image, Button, Form, ListGroup } from 'react-bootstrap'
+import { BsFillBookmarkFill, BsBookmark} from 'react-icons/bs'
 import logo from '../img/whats-cooking-logo.png';
 import EditRecipeModal from './EditRecipeModal';
 const Recipe = (props) =>{
@@ -40,17 +41,44 @@ const Recipe = (props) =>{
     const initialCommentData = Object.freeze({
         comment: ""
     });
-    const [comment, submitComment] = useState(initialCommentData);
+    const [comment, setComment] = useState(initialCommentData);
     const updateRecipe = () => setShowEditModal(true);
     const updateModal = (data) => setRecipeData(data);
     const closeModal = () => setShowEditModal(false);
+    const redirectToLogin = () =>{ setRedirect(true) }
+
+    const [bookmarked, setBookmarked] = useState();
+    const [submitted, setSubmitted] = useState(false);
+
+    const toggleBookmarks = async(e) => {
+        //REPLACE WITH USER UID WHEN IMPLEMENTED
+        e.preventDefault();
+        if(!bookmarked){
+            try{
+                await axios.post(`${url}users/6097fefe6c8b900517fec8d6/bookmarks`, recipeData);
+                setBookmarked(true);
+            }catch(e){
+                console.log(e.error)
+            }
+        }else{
+            try{
+                await axios.delete(`${url}users/6097fefe6c8b900517fec8d6/bookmarks/${recipeData._id}`)
+                setBookmarked(false);
+            }catch(e){
+                console.log(e);
+            }
+        }
+    }
+
     const handleChange = (e) =>{
-        submitComment({
-            ...comment, [e.target.name]: e.target.value.trim()
+        setComment({
+            ...comment, [e.target.name]: e.target.value
         });
     }
-    const redirectToLogin = (e) =>{ setRedirect(true) }
+    
     async function handleSubmit(e){
+        e.preventDefault();
+        //REPLACE WITH USER UID WHEN IMPLEMENTED
         if (comment.comment.trim().length === 0) {
             e.preventDefault();
             setErrors("Comment cannot be empty!");
@@ -60,12 +88,20 @@ const Recipe = (props) =>{
             let newComment = await axios.post(`${url}comments`, {
                 comment: comment.comment,
                 recipeId: recipeData._id,
-                userId: "609705b47f772731c31ed661"
+                userId: "6097fefe6c8b900517fec8d6"
             });
-            //add new comment to commentList and re-render
-            let comments = commentData;
-            comments.push(newComment.data);
-            setCommentData(comments);
+            await axios.get(`${url}users/${newComment.data.userId}`).then((user)=>{
+                newComment.data.userId = user.data.firstName + " " + user.data.lastName;
+                //add new comment to commentList and re-render
+                let comments = [...commentData];
+                // comments.push(newComment.data);
+                comments.push(newComment.data)
+                setCommentData(comments);
+                
+                setComment(initialCommentData);
+                setSubmitted(true);
+            });
+            
         }catch(e){
             console.log(e);
         }
@@ -75,7 +111,6 @@ const Recipe = (props) =>{
     useEffect(() =>{
         async function fetchData(){
             try{
-                //get recipe data
                 let { data } = await axios.get(`${url}recipes/${props.match.params.id}`); //getRecipeById
                 setRecipeData(data);
                 //get user data associated with recipe
@@ -83,19 +118,29 @@ const Recipe = (props) =>{
                 setUserData(user.data);
                 //get all comments associated with recipe
                 let comments = await axios.get(`${url}comments/recipe/${props.match.params.id}`);
+                //check if user has this page bookmarked
+                user.data.bookmarks.includes(data._id)? setBookmarked(true) : setBookmarked(false);
+
                 //get user name for the comment data
                 let recipeComments = comments.data;
-                recipeComments.forEach(async(comment)=>{
-                    let userName = await axios.get(`${url}users/${comment.userId}`);
-                    comment.userId = userName.data.firstName + " " + userName.data.lastName;
+                Promise.all(recipeComments.map(async(comment)=>{
+                    try{
+                        let userName = await axios.get(`${url}users/${comment.userId}`);
+                        comment.userId = userName.data.firstName + " " + userName.data.lastName;
+                    }catch(e){
+                        console.log(e)
+                    }
+                    
+                })).then((data)=>{
+                    setCommentData(recipeComments);
+                    setLoading(false);
                 })
-                setCommentData(recipeComments);
-                setLoading(false);
             }catch(e){
-                console.log(e);
+                return (<p>{e.message}</p>)
             }
         }
         fetchData();
+        
     }, [props.match.params.id]);
 
     if (redirect){
@@ -122,11 +167,15 @@ const Recipe = (props) =>{
             <Container>
                 <Row>
                     <Col>
-                        <h1 id='recipe-title'>{recipeData.title}</h1>
+                        <span>
+                        <h1 id='recipe-title'>{recipeData.title}
+                        {!bookmarked || !currentUser?<BsBookmark onClick={currentUser? (e)=>toggleBookmarks(e): ()=>redirectToLogin()}></BsBookmark> : <BsFillBookmarkFill className='filled' onClick={currentUser? (e)=>toggleBookmarks(e): ()=>redirectToLogin()}></BsFillBookmarkFill>}</h1>
+                        </span>
                         <h2 id='recipe-chef'>Posted By: {userData.firstName} {userData.lastName}</h2>
                         <br></br>
                         <p id='recipe-desc'>{recipeData.description}</p>
                     </Col>
+                    {/* check if current user is owner of recipe (ONCE UID IS IMPLEMENTED) */}
                     {currentUser && <Col xs={2}>
                         <Button onClick={updateRecipe}>Update Recipe</Button>
                         <EditRecipeModal isOpen={showEditModal} data={recipeData} user={userData} closeModal={closeModal} updateModal={updateModal}></EditRecipeModal>
@@ -148,10 +197,11 @@ const Recipe = (props) =>{
                 <br></br>
                 <Form>
                     <Form.Group controlId="addComment" onSubmit={handleSubmit}>
-                        <Form.Control name='comment' type="text" placeholder="Add a public comment..." onChange={handleChange}/>
+                        <Form.Control name='comment' type="text" value={comment.comment} placeholder="Add a public comment..." onChange={handleChange}/>
+                        {submitted && <p className='success'>Your comment has been submitted!</p>}
                     </Form.Group>
                     {errors && <p className='error'>{errors}</p>}
-                    <Button type='submit' onClick={currentUser? (e)=>handleSubmit(e): (e)=>redirectToLogin(e)}>Comment</Button>
+                    <Button type='submit' onClick={currentUser? (e)=>handleSubmit(e): ()=>redirectToLogin()}>Comment</Button>
                 </Form>
                 <br></br>
                 <h4>Comments:</h4>
