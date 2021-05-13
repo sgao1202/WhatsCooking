@@ -26,12 +26,17 @@ const Navigation = () => {
             <Navbar.Collapse>
                     <Container></Container>
                     {/* Fix with a 3 column layout for the navigation bar */}
-                    {!!currentUser ? 
-                        <DropdownButton id="nav-dropdown" variant="outline-dark" className="mr-5 pb-2" title={currentUser.displayName} menuAlign="right">
-                            <Dropdown.Item href="/my-profile">My Profile</Dropdown.Item>
-                            <Dropdown.Divider/>
-                            <Dropdown.Item href="/home" onClick={logout}>Log Out</Dropdown.Item>
-                        </DropdownButton> 
+                    {currentUser ? 
+                        <div>
+                            <Link className="mr-5 pb-2" to="/newrecipe">
+                                <Button>Create Recipe</Button>
+                            </Link>
+                            <DropdownButton id="nav-dropdown" variant="outline-dark" className="mr-5 pb-2" title={currentUser.displayName} menuAlign="right">
+                              <Dropdown.Item href="/my-profile">My Profile</Dropdown.Item>
+                              <Dropdown.Divider/>
+                              <Dropdown.Item href="/home" onClick={logout}>Log Out</Dropdown.Item>
+                            </DropdownButton> 
+                        </div>
                         : 
                         <div className="mr-5">
                             <Link className="mr-3" to="/login">
