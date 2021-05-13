@@ -2,8 +2,11 @@ import { Form, Button, Col, InputGroup } from 'react-bootstrap';
 import React, { useState } from 'react';
 import axios from 'axios';
 import Formik from 'formik'
+import { useContext } from 'react'
+import { AuthContext } from '../firebase/Auth'
 
 function NewRecipe(){
+    const { currentUser } = useContext(AuthContext);
     const initialFormData = {
         title: "",
         userId: "6097fefe6c8b900517fec8da",
@@ -24,24 +27,23 @@ function NewRecipe(){
     }
     const handleSubmit = async(e) =>{
         e.preventDefault();
-        const formErrors = findFormErrors();
-        console.log(formErrors)
-        setErrors(formErrors);
-        const form = e.target;
-        if (form.checkValidity() === false){
-            e.preventDefault();
-            e.stopPropagation();
-            console.log("errored")
-        }
+        // const formErrors = findFormErrors();
+        // console.log(formErrors)
+        // setErrors(formErrors);
         setValidated(true);
-        try{
-            await axios.post(`${url}recipes`, formData)
-        }catch(e){
-            console.log(e)
+        if (validateForm()){
+            try{
+                await axios.post(`${url}recipes`, formData)
+            }catch(e){
+                console.log(e)
+            }
         }
         
-        
+    }
+    const validateForm = () =>{
+        if (formData.title){
 
+        }
     }
     const findFormErrors = () => {
         const newErrors = {ingredients: []}
@@ -98,82 +100,89 @@ function NewRecipe(){
         <div>
             <h1>Create a Recipe</h1>
             <Form noValidate validated={validated} onSubmit={handleSubmit}>
-                        <Form.Row>
-                            <Form.Group controlId="recipeName">
-                            <Form.Label>Recipe Name:</Form.Label>
-                            <Form.Control
-                                required
-                                type="text" 
-                                name='title'
-                                onChange={handleChange}
-                            />
-                            </Form.Group>
-                            </Form.Row>
-                        <Form.Row>
-                            <Form.Group controlId="description">
-                            <Form.Label>Description:</Form.Label>
-                            <Form.Control
-                                required
-                                type="text"
-                                name="description"
-                                as='textarea'
-                                onChange={handleChange}
-                            />
-                            </Form.Group>
-                        </Form.Row>
-                        <label>Ingredients:</label>
-                        {formData.ingredients.map((ingredient, index) => (
-                            <Form.Row key={index}>
+                <Form.Row>
+                    <Form.Group controlId="recipeName">
+                    <Form.Label>Recipe Name:</Form.Label>
+                    <Form.Control
+                        required
+                        type="text" 
+                        name='title'
+                        onChange={handleChange}
+                    />
+                    </Form.Group>
+                    </Form.Row>
+                <Form.Row>
+                    <Form.Group size='lg' controlId="description">
+                    <Form.Label>Description:</Form.Label>
+                    <Form.Control
+                        required
+                        type="text"
+                        name="description"
+                        as='textarea'
+                        onChange={handleChange}
+                    />
+                    </Form.Group>
+                </Form.Row>
+                <Form.Row>
+                    <Form.Group controlId='updateImage'>
+                        <Form.Label>Image:</Form.Label>
+                        <Form.File type='file' onClick={handleChange}></Form.File>
+                    </Form.Group>
+                </Form.Row>
                             
-                            <InputGroup as={Col}>
-                                <InputGroup.Prepend>
-                                    <InputGroup.Text>Name:</InputGroup.Text>
-                                </InputGroup.Prepend>
-                                <Form.Control required type="text" name="name" onChange={(e) => handleIngredientChange(e, index)}></Form.Control>
-                                <Form.Control.Feedback type="invalid">Must provide an ingredient name!</Form.Control.Feedback>
-                            </InputGroup>
-                            <InputGroup as={Col}>
-                                <InputGroup.Prepend>
-                                    <InputGroup.Text>Portion:</InputGroup.Text>
-                                </InputGroup.Prepend>
-                                <Form.Control required type="number" name="portion" onChange={(e) => handleIngredientChange(e, index)}></Form.Control>
-                                <Form.Control.Feedback type="invalid">Must provide a non-negative portion amount!</Form.Control.Feedback>
-                            </InputGroup>
-                            <InputGroup as={Col}>
-                                <InputGroup.Prepend>
-                                    <InputGroup.Text>Units:</InputGroup.Text>
-                                </InputGroup.Prepend>
-                                <Form.Control required type="text" name="units" onChange={(e) => handleIngredientChange(e, index)}></Form.Control>
-                                <Form.Control.Feedback type="invalid">Must provide a unit of measurement!</Form.Control.Feedback>
-                            </InputGroup>
-                            <Button variant="danger" as={Col} xs={1} onClick={(e) => deleteIngredient(index)}>X</Button>
-                        </Form.Row>
-                        ))}
-                        
-                        <br></br>
-                        <Button type="button" onClick={() => addIngredient()}>Add Ingredient+</Button>
-                        <br></br>
-                        <label>Procedure:</label>
-                        {formData.procedure.map((step, index)=>(
-                            <Form.Row key={index}>
+                <label>Ingredients:</label>
+                {formData.ingredients.map((ingredient, index) => (
+                    <Form.Row key={index}>
+                    
+                    <InputGroup as={Col}>
+                        <InputGroup.Prepend>
+                            <InputGroup.Text>Name:</InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <Form.Control required type="text" name="name" onChange={(e) => handleIngredientChange(e, index)}></Form.Control>
+                        <Form.Control.Feedback type="invalid">Must provide an ingredient name!</Form.Control.Feedback>
+                    </InputGroup>
+                    <InputGroup as={Col}>
+                        <InputGroup.Prepend>
+                            <InputGroup.Text>Portion:</InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <Form.Control required type="number" name="portion" onChange={(e) => handleIngredientChange(e, index)}></Form.Control>
+                        <Form.Control.Feedback type="invalid">Must provide a non-negative portion amount!</Form.Control.Feedback>
+                    </InputGroup>
+                    <InputGroup as={Col}>
+                        <InputGroup.Prepend>
+                            <InputGroup.Text>Units:</InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <Form.Control required type="text" name="units" onChange={(e) => handleIngredientChange(e, index)}></Form.Control>
+                        <Form.Control.Feedback type="invalid">Must provide a unit of measurement!</Form.Control.Feedback>
+                    </InputGroup>
+                    <Button variant="danger" as={Col} xs={1} onClick={(e) => deleteIngredient(index)}>X</Button>
+                </Form.Row>
+                ))}
+                
+                <br></br>
+                <Button type="button" onClick={() => addIngredient()}>Add Ingredient+</Button>
+                <br></br>
+                <label>Procedure:</label>
+                {formData.procedure.map((step, index)=>(
+                    <Form.Row key={index}>
 
-                                <InputGroup as={Col}>
-                                    <InputGroup.Prepend>
-                                        <InputGroup.Text>{index+1}.</InputGroup.Text>
-                                    </InputGroup.Prepend>
-                                    <Form.Control required as="textarea" onChange={(e) => handleProcedureChange(e, index)}></Form.Control>
-                                    <Form.Control.Feedback type="invalid">Step cannot be empty!</Form.Control.Feedback>
-                                </InputGroup>
-                                <Button className='del-btn' variant="danger" as={Col} xs={1} onClick={() => deleteStep(index)}>X</Button>
-                            </Form.Row>
-                            
-                        ))}
-                        <br></br>
-                        <Button onClick={() => addStep()}>Add Step+</Button>
-                        <br></br>
-                        <br></br>
-                        <Button type="submit">Submit</Button>
-                    </Form>
+                        <InputGroup as={Col}>
+                            <InputGroup.Prepend>
+                                <InputGroup.Text>{index+1}.</InputGroup.Text>
+                            </InputGroup.Prepend>
+                            <Form.Control required as="textarea" onChange={(e) => handleProcedureChange(e, index)}></Form.Control>
+                            <Form.Control.Feedback type="invalid">Step cannot be empty!</Form.Control.Feedback>
+                        </InputGroup>
+                        <Button className='del-btn' variant="danger" as={Col} xs={1} onClick={() => deleteStep(index)}>X</Button>
+                    </Form.Row>
+                    
+                ))}
+                <br></br>
+                <Button onClick={() => addStep()}>Add Step+</Button>
+                <br></br>
+                <br></br>
+                <Button type="submit" onClick={handleSubmit}>Submit</Button>
+            </Form>
         </div>
     )
 }

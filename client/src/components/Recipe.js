@@ -55,14 +55,14 @@ const Recipe = (props) =>{
         e.preventDefault();
         if(!bookmarked){
             try{
-                let user = await axios.post(`${url}users/6097fefe6c8b900517fec8d6/bookmarks`, recipeData);
+                await axios.post(`${url}users/6097fefe6c8b900517fec8d6/bookmarks`, recipeData);
                 setBookmarked(true);
             }catch(e){
                 console.log(e.error)
             }
         }else{
             try{
-                let user = await axios.delete(`${url}users/6097fefe6c8b900517fec8d6/bookmarks/${recipeData._id}`)
+                await axios.delete(`${url}users/6097fefe6c8b900517fec8d6/bookmarks/${recipeData._id}`)
                 setBookmarked(false);
             }catch(e){
                 console.log(e);

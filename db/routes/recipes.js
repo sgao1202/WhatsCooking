@@ -218,14 +218,14 @@ router.put('/:id', async (req, res) => {
     }
 
     let recipeInfo = req.body;
-
+    console.log(recipeInfo)
     if (!recipeInfo) {
         res.status(400).json({
             error: 'You must provide data to create a recipe'
         });
         return;
     }
-
+    console.log(1)
     if (!recipeInfo.userId || typeof recipeInfo.userId != "string") {
         res.status(400).json({
             error: 'You must provide a valid userId'
@@ -244,6 +244,7 @@ router.put('/:id', async (req, res) => {
             // do nothing
         }
     }
+    console.log(2)
 
     if (!recipeInfo.title || typeof recipeInfo.title != "string") {
         res.status(400).json({
@@ -251,21 +252,21 @@ router.put('/:id', async (req, res) => {
         });
         return;
     }
-
+    console.log(3)
     if (!recipeInfo.picture || typeof recipeInfo.picture != "string") {
         res.status(400).json({
             error: 'You must provide a valid picture'
         });
         return;
     }
-
+    console.log(4)
     if (!recipeInfo.description || typeof recipeInfo.description != "string") {
         res.status(400).json({
             error: 'You must provide a valid description'
         });
         return;
     }
-
+    console.log(5)
     if (!recipeInfo.ingredients || !Array.isArray(recipeInfo.ingredients)) {
         res.status(400).json({
             error: 'You must provide a valid array of ingredients'
@@ -295,7 +296,7 @@ router.put('/:id', async (req, res) => {
             }
         });
     }
-
+    console.log(6)
     if (!recipeInfo.procedure || !Array.isArray(recipeInfo.procedure)) {
         res.status(400).json({
             error: 'You must provide a valid procedure'
@@ -311,7 +312,7 @@ router.put('/:id', async (req, res) => {
             }
         });
     }
-
+    console.log(7)
     try {
         await recipeData.getRecipeById(req.params.id);
     } catch (e) {
@@ -320,7 +321,7 @@ router.put('/:id', async (req, res) => {
         });
         return;
     }
-
+    console.log(8)
     try {
         await recipeData.updateRecipe(req.params.id, recipeInfo);
         let updatedRecipe = await recipeData.getRecipeById(req.params.id);

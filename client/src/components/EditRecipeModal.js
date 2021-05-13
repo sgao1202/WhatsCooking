@@ -33,7 +33,6 @@ function EditRecipeModal(props) {
         setFormData({
             ...formData, [e.target.name]: e.target.value.trim()
         })
-        console.log(formData)
     }
     const handleModalIngredientChange = (e, index) => {
         // console.log(formData.ingredients[index])
@@ -46,24 +45,25 @@ function EditRecipeModal(props) {
         setFormData(formData);
     }
     const handleModalSubmit = async(e) =>{
+        e.preventDefault();
         const form = e.target;
         if (form.checkValidity() === false){
+            console.log("invalid form")
             e.preventDefault();
             e.stopPropagation();
         }
-        else{
-            setValidated(true);
-            try{
-                let updatedRecipe = await axios.put(`${url}recipes/${formData.recipeid}`, formData);
-                setFormData(updatedRecipe.data);
-                props.updateModal(formData);
-            
-                handleCloseModal();
-            }catch(e){
-                console.log(e);
-            }
-            setShowEditModal(false);
+        setValidated(true);
+        console.log(formData)
+        try{
+            let updatedRecipe = await axios.put(`${url}recipes/${formData.recipeid}`, formData);
+            setFormData(updatedRecipe.data);
+            props.updateModal(formData);
+        
+            handleCloseModal();
+        }catch(e){
+            console.log(e);
         }
+        setShowEditModal(false);
         
         return;
     }
@@ -104,6 +104,8 @@ function EditRecipeModal(props) {
             <Modal.Body>
                 <Form noValidate validated={validated} onSubmit={(e) => handleModalSubmit(e)}>
                     <Form.Group controlId='updateImage'>
+                        <Form.Label className='modal-subtitle'>Image:</Form.Label>
+                        <Form.Control type='image' src={formData.picture} alt='noimg'></Form.Control>
                         <Form.File type='file' onClick={handleModalChange}></Form.File>
                     </Form.Group>
                     <Form.Group controlId="updateTitle">
@@ -129,7 +131,7 @@ function EditRecipeModal(props) {
                                     <Form.Control.Feedback type="invalid">Must provide an ingredient name!</Form.Control.Feedback>
                                 </Col>
                                 <Col>
-                                    <Form.Control required type="number" name="portion" min="0" step=".1" defaultValue={ingredient.portion} onChange={(e) => handleModalIngredientChange(e,index)}></Form.Control>
+                                    <Form.Control required type="number" name="portion" min="0" step=".1" onInput={() => "validity.valid||(value='')"} defaultValue={ingredient.portion} onChange={(e) => handleModalIngredientChange(e,index)}></Form.Control>
                                     <Form.Control.Feedback type="invalid">Must provide a non-negative portion amount!</Form.Control.Feedback>
                                 </Col>
                                 <Col>
