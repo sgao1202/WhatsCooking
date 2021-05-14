@@ -2,9 +2,10 @@ module.exports = [
     {
         firstName: 'Frank',
         lastName: 'Besson',
+        uid: 'mjAzMlCYqbc6ET6oQxm6VR9nhxi2',
         username: 'bessonf',
         password: '$2a$16$TR0iphtk84k/wLVRaqEYm.npNn4K0esPRfeg9O7nvYw4o4fCCIS3W',
-        profilePicture: './img/none.jpg',
+        profilePicture: 'koala.jpg',
         aboutMe: 'computer scientist turned chef',
         recipes: [
             {
@@ -90,9 +91,10 @@ module.exports = [
     {
         firstName: 'Simon',
         lastName: 'Gao',
+        uid: '5kE8fhFiQeXEdNmdGFjg7BZJxL52',
         username: 'sgao',
         password: '$2a$16$TR0iphtk84k/wLVRaqEYm.npNn4K0esPRfeg9O7nvYw4o4fCCIS3W',
-        profilePicture: './img/none.jpg',
+        profilePicture: 'koala.jpg',
         aboutMe: 'another computer scientist turned chef',
         recipes: [
             {
@@ -160,9 +162,10 @@ module.exports = [
     {
         firstName: 'Farid',
         lastName: 'Jafri',
+        uid: 'EmLLhfuipmf56vkHcx7sVgpA4LD3',
         username: 'fjafri',
         password: '$2a$16$TR0iphtk84k/wLVRaqEYm.npNn4K0esPRfeg9O7nvYw4o4fCCIS3W',
-        profilePicture: './img/none.jpg',
+        profilePicture: 'koala.jpg',
         aboutMe: 'incredible chef who also enjoy computer science',
         recipes: [
             {
@@ -230,6 +233,7 @@ module.exports = [
     {
         firstName: 'Albert',
         lastName: 'Chen',
+        uid: '1TjTuT3EYnS5GMGTemUNOpvbxIm1',
         username: 'achen',
         password: '$2a$16$TR0iphtk84k/wLVRaqEYm.npNn4K0esPRfeg9O7nvYw4o4fCCIS3W',
         profilePicture: './img/none.jpg',
