@@ -1,63 +1,151 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
+import { AuthContext } from '../firebase/Auth';
+import { Redirect } from 'react-router-dom'
 import '../App.css';
 import axios from 'axios'
-import { Container, ListGroup, Row, Col, Image, Button, Form, Modal } from 'react-bootstrap'
+import { Container, Row, Col, Image, Button, Form, ListGroup } from 'react-bootstrap'
+import { BsFillBookmarkFill, BsBookmark} from 'react-icons/bs'
 import logo from '../img/whats-cooking-logo.png';
+import EditRecipeModal from './EditRecipeModal';
 const Recipe = (props) =>{
-    /* Contents to be included:
-    Name
-    Author Name
-    Image
-    Description
-    Ingredients
-    Procedure
-    */
-
-   /* Core Features:
-    Updating Recipe Button (only if you own the recipe)
-    Add Comment to Recipe
-    Display Comments of a Recipe
+   /* Core Features still need to be implemented:
+    Updating Recipe Button (only if you are logged in as the owner of the recipe)
+    Pull photos from database for page
    */
+
+  /*Need:
+  users in mongodb
+  photos in database
+  */
+
+    /* Bugs
+    Form validation
+    DB: headers sent to client multiple times
+    */
 
     /* Ideas:
     add optional photo field for each ingredient/step?
     clicking on chef name will bring you to his/her profile page?
-    AJAX Refresh?
-    
     */
+    const { currentUser } = useContext(AuthContext);
     const url = 'http://localhost:3001/';
     const [loading, setLoading] = useState(true);
-    const [recipeData, setRecipeData] = useState(undefined);
-    const [userData, setUserData] = useState(undefined);
-    const [modal, showModal] = useState(false);
-    // const [modalIngredients, addModalIngredient] = useState();
-    // const [modalProcedure, addModalProcedure] = useState();
+    const [recipeData, setRecipeData] = useState();
+    const [userData, setUserData] = useState();
+    const [commentData, setCommentData] = useState();
+    const [errors, setErrors] = useState();
+    const [redirect, setRedirect] = useState(false);
 
-    const updateRecipe = () => showModal(true);
-    const closeModal = () => showModal(false);
-    const addIngredient = () => {
-        
-    }
-    const addStep = () => {
-        
-    }
+    const [showEditModal, setShowEditModal] = useState(false);
+    
+    const initialCommentData = Object.freeze({
+        comment: ""
+    });
+    const [comment, setComment] = useState(initialCommentData);
+    const updateRecipe = () => setShowEditModal(true);
+    const updateModal = (data) => setRecipeData(data);
+    const closeModal = () => setShowEditModal(false);
+    const redirectToLogin = () =>{ setRedirect(true) }
 
-    useEffect(() =>{
-        async function fetchData(){
+    const [bookmarked, setBookmarked] = useState();
+    const [submitted, setSubmitted] = useState(false);
+
+    const toggleBookmarks = async(e) => {
+        //REPLACE WITH USER UID WHEN IMPLEMENTED
+        e.preventDefault();
+        if(!bookmarked){
             try{
-                let { data } = await axios.get(`${url}recipes/${props.match.params.id}`); //getRecipeById
-                console.log(data);
-                setRecipeData(data);
-                let user = await axios.get(`${url}users/${recipeData.userId}`);
-                setUserData(user.data);
-                setLoading(false);
+                await axios.post(`${url}users/6097fefe6c8b900517fec8d6/bookmarks`, recipeData);
+                setBookmarked(true);
+            }catch(e){
+                console.log(e.error)
+            }
+        }else{
+            try{
+                await axios.delete(`${url}users/6097fefe6c8b900517fec8d6/bookmarks/${recipeData._id}`)
+                setBookmarked(false);
             }catch(e){
                 console.log(e);
             }
         }
-        fetchData();
-    }, [props.match.params.id])
+    }
+
+    const handleChange = (e) =>{
+        setComment({
+            ...comment, [e.target.name]: e.target.value
+        });
+    }
     
+    async function handleSubmit(e){
+        e.preventDefault();
+        //REPLACE WITH USER UID WHEN IMPLEMENTED
+        if (comment.comment.trim().length === 0) {
+            e.preventDefault();
+            setErrors("Comment cannot be empty!");
+            return;
+        }
+        try{
+            let newComment = await axios.post(`${url}comments`, {
+                comment: comment.comment,
+                recipeId: recipeData._id,
+                userId: "6097fefe6c8b900517fec8d6"
+            });
+            await axios.get(`${url}users/${newComment.data.userId}`).then((user)=>{
+                newComment.data.userId = user.data.firstName + " " + user.data.lastName;
+                //add new comment to commentList and re-render
+                let comments = [...commentData];
+                // comments.push(newComment.data);
+                comments.push(newComment.data)
+                setCommentData(comments);
+                
+                setComment(initialCommentData);
+                setSubmitted(true);
+            });
+            
+        }catch(e){
+            console.log(e);
+        }
+        return;
+    }
+    
+    useEffect(() =>{
+        async function fetchData(){
+            try{
+                let { data } = await axios.get(`${url}recipes/${props.match.params.id}`); //getRecipeById
+                setRecipeData(data);
+                //get user data associated with recipe
+                let user = await axios.get(`${url}users/${data.userId}`);
+                setUserData(user.data);
+                //get all comments associated with recipe
+                let comments = await axios.get(`${url}comments/recipe/${props.match.params.id}`);
+                //check if user has this page bookmarked
+                user.data.bookmarks.includes(data._id)? setBookmarked(true) : setBookmarked(false);
+
+                //get user name for the comment data
+                let recipeComments = comments.data;
+                Promise.all(recipeComments.map(async(comment)=>{
+                    try{
+                        let userName = await axios.get(`${url}users/${comment.userId}`);
+                        comment.userId = userName.data.firstName + " " + userName.data.lastName;
+                    }catch(e){
+                        console.log(e)
+                    }
+                    
+                })).then((data)=>{
+                    setCommentData(recipeComments);
+                    setLoading(false);
+                })
+            }catch(e){
+                return (<p>{e.message}</p>)
+            }
+        }
+        fetchData();
+        
+    }, [props.match.params.id]);
+
+    if (redirect){
+        return <Redirect to='/login'></Redirect>
+    }
     if (loading){
         return(
             <h1>Loading...</h1>
@@ -65,98 +153,73 @@ const Recipe = (props) =>{
     }
     else{
         let ingredients = recipeData.ingredients.map((ingredient)=>(
-            <ListGroup.Item key={ingredient.name} as="li" className='ingredient'>
+            <li key={ingredient.name} className='ingredient'>
                 {ingredient.name}: {ingredient.portion} {ingredient.units}
-            </ListGroup.Item>
-        ))
+            </li>
+        ));
         let procedure = recipeData.procedure.map((step)=>(
-            <ListGroup.Item key={step} as="li" className='procedure'>
+            <li key={step} className='procedure'>
                 {step}
-            </ListGroup.Item>
-        ))
+            </li>
+        ));
+
         return (
             <Container>
                 <Row>
                     <Col>
-                        <h1 id='recipe-title'>{recipeData.title}</h1>
+                        <span>
+                        <h1 id='recipe-title'>{recipeData.title}
+                        {!bookmarked || !currentUser?<BsBookmark onClick={currentUser? (e)=>toggleBookmarks(e): ()=>redirectToLogin()}></BsBookmark> : <BsFillBookmarkFill className='filled' onClick={currentUser? (e)=>toggleBookmarks(e): ()=>redirectToLogin()}></BsFillBookmarkFill>}</h1>
+                        </span>
                         <h2 id='recipe-chef'>Posted By: {userData.firstName} {userData.lastName}</h2>
                         <br></br>
                         <p id='recipe-desc'>{recipeData.description}</p>
                     </Col>
-                    <Col xs={2}>
+                    {/* check if current user is owner of recipe (ONCE UID IS IMPLEMENTED) */}
+                    {currentUser && <Col xs={2}>
                         <Button onClick={updateRecipe}>Update Recipe</Button>
-                        <Modal show={modal} onHide={closeModal}>
-                        <Modal.Header closeButton>
-                        <Modal.Title>Update {recipeData.title}</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-                            <Form>
-                                <Form.Group controlId="updateTitle">
-                                    <Form.Label>Name:</Form.Label>
-                                    <Form.Control type="text" placeholder={recipeData.title}></Form.Control>
-                                </Form.Group>
-                                <Form.Group controlId="displayChef">
-                                    <Form.Label>Chef:</Form.Label>
-                                    <Form.Control plaintext readOnly defaultValue={userData.firstName + " " + userData.lastName}/>
-                                </Form.Group>
-                                <Form.Group controlId="updateDesc">
-                                    <Form.Label>Description:</Form.Label>
-                                    <Form.Control type="text" placeholder={recipeData.description}></Form.Control>
-                                </Form.Group>
-                                <Form.Group controlId="updateIngredients">
-                                    <Form.Label>Ingredients:</Form.Label>
-                                    <Form.Row>
-                                        <Col>
-                                            <Form.Control type="text" placeholder="Sugar"></Form.Control>
-                                        </Col>
-                                        <Col>
-                                            <Form.Control type="number" placeholder={0}></Form.Control>
-                                        </Col>
-                                        <Col>
-                                            <Form.Control type="text" placeholder="tsps"></Form.Control>
-                                        </Col>
-                                    </Form.Row>
-                                    <Button onClick={addIngredient}>Add +</Button>
-                                </Form.Group>
-                                <Form.Group controlId="updateProcedure">
-                                    <Form.Label>Procedure:</Form.Label>
-                                    <Form.Control type="text" placeholder={recipeData.procedure[0]}></Form.Control>
-                                    <Button onClick={addStep}>Add +</Button>
-                                </Form.Group>
-
-                            </Form>
-                        </Modal.Body>
-                        <Modal.Footer>
-                        <Button variant="secondary" onClick={closeModal}>
-                            Close
-                        </Button>
-                        <Button variant="primary" onClick={closeModal}>
-                            Save Changes
-                        </Button>
-                        </Modal.Footer>
-                    </Modal>
-                    </Col>
+                        <EditRecipeModal isOpen={showEditModal} data={recipeData} user={userData} closeModal={closeModal} updateModal={updateModal}></EditRecipeModal>
+                    </Col>}
                     <Col xs={6} md={4}>
                         <Image src={logo} alt = "noimg" thumbnail="true"></Image>
                     </Col>
                 </Row>
                 
                 <h3>Ingredients:</h3>
-                <ListGroup as="ul">
+                <ul>
                     {ingredients}
-                </ListGroup>
+                </ul>
                 <br></br>
                 <h3>Procedure:</h3>
-                <ListGroup as="ol">
+                <ol>
                     {procedure}
-                </ListGroup>
+                </ol>
                 <br></br>
                 <Form>
-                    <Form.Group controlId="addComment">
-                        <Form.Control type="text" placeholder="Add a public comment..."/>
+                    <Form.Group controlId="addComment" onSubmit={handleSubmit}>
+                        <Form.Control name='comment' type="text" value={comment.comment} placeholder="Add a public comment..." onChange={handleChange}/>
+                        {submitted && <p className='success'>Your comment has been submitted!</p>}
                     </Form.Group>
-                    <Button>Comment</Button>
+                    {errors && <p className='error'>{errors}</p>}
+                    <Button type='submit' onClick={currentUser? (e)=>handleSubmit(e): ()=>redirectToLogin()}>Comment</Button>
                 </Form>
+                <br></br>
+                <h4>Comments:</h4>
+                <hr></hr>
+                <ListGroup>
+                {commentData.map((comment)=>(
+                    <ListGroup.Item key={comment._id} as="li">
+                        <Container>
+                            <Row>
+                                <span className="user-comment-name">{comment.userId}</span>
+                            </Row>
+                            <Row>
+                                <span>{comment.comment}</span>
+                            </Row>
+                        </Container> 
+                    </ListGroup.Item>
+                ))}
+                </ListGroup>
             </Container>
         )
     }

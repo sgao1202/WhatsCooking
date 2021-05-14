@@ -1,10 +1,13 @@
-import React, { useState, useContext } from 'react';
-import { Button, Form } from 'react-bootstrap';
+import React, { useState, useEffect, useContext } from 'react';
+import { Redirect } from 'react-router-dom';
+import { Button, Container, Form, Spinner } from 'react-bootstrap';
 import { AuthContext } from '../firebase/Auth';
 import { doCreateUserWithEmailAndPassword } from '../firebase/FirebaseFunctions';
+import axios from 'axios';
+import utils from '../lib/Utility';
 
 const SignUp = () => {
-    const { currentUser } = useContext(AuthContext);
+    const { currentUser, baseUrl } = useContext(AuthContext);
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
@@ -12,29 +15,53 @@ const SignUp = () => {
     const [loading, setLoading] = useState(false);
     const [validated, setValidated] = useState(false);
 
+    useEffect(() => {
+        document.title = "Sign Up";
+    }, []);
+    
     // Custom validation for fields
     const validateForm = (form) => {
-        return true;
-    };
-
-    const handleSignUp = async (event) => {
-        event.preventDefault();
-        const form = event.currentTarget;
-        setValidated(true);
-        if (validateForm()) {
-            try {
-                doCreateUserWithEmailAndPassword(email, password, `${firstName} ${lastName}`);
-            } catch(e) {
-                alert(e);
-            }
-        }
-    };
-
-    const validForm = () => {
-        // return email.length > 0 && password.length > 0 && firstName.length > 0 && lastName.length > 0;
+        if (!utils.validString(firstName) || !utils.validString(lastName) || !utils.validString(email) || !utils.validString(password)) return false;
+        // Make sure that an email contains the @ symbol
+        if (!email.includes('@')) return false;
         return true;
     };
     
+    const createUser = async () => {
+        try {
+            const user = await doCreateUserWithEmailAndPassword(email, password, `${firstName} ${lastName}`);
+            console.log(user);
+            const { data } = await axios.post(`${baseUrl}/users`, {
+               uid: user.uid,
+               firstName: firstName,
+               lastName: lastName
+            });
+            console.log(data);
+            setLoading(false);
+        } catch (e) {
+            console.log(e);
+            alert(e);
+            setLoading(false);
+        }
+    }
+
+    const handleSignUp = (event) => {
+        event.preventDefault();
+        setValidated(true);
+        setLoading(true);
+        if (validateForm()) createUser();
+        else setLoading(false);
+    };
+
+    const validForm = () => {return email.length > 0 && password.length > 0 && firstName.length > 0 && lastName.length > 0;};
+    
+    if (loading) return (
+        <Container className="text-center">
+            <Spinner animation="border"></Spinner>
+        </Container>
+    );
+
+    if (currentUser && !loading) return <Redirect to='/home'></Redirect>
     return (
         <div className="Login">
             <Form noValidate validated={validated} onSubmit={handleSignUp}>
@@ -69,7 +96,7 @@ const SignUp = () => {
                         onChange={(e) => setEmail(e.target.value)}
                     />
                     <Form.Control.Feedback type="invalid">
-                        Please enter a valid first name.
+                        Please enter a valid email.
                     </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group size="lg" controlId="password">
@@ -84,7 +111,7 @@ const SignUp = () => {
                     </Form.Control.Feedback>
                 </Form.Group>
                 <Button block size="lg" variant="primary" type="submit" disabled={!validForm()}>
-                    Sign Up
+                    {loading ? 'Loading...' : 'Sign Up'}
                 </Button>
             </Form>
         </div>

@@ -1,0 +1,30 @@
+version: "3.8"
+
+services: 
+  whats-cooking-elasticsearch: 
+    image: elasticsearch:7.12.0
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    networks:
+      - whats-cooking-network
+    environment:
+      discovery.type: single-node
+
+  whats-cooking-mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+    networks:
+      - whats-cooking-network
+  
+  whats-cooking-redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - whats-cooking-network
+    
+networks:
+  whats-cooking-network:
+    

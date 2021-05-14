@@ -11,7 +11,7 @@ async function search(data) {
     index: "recipes",
     body: {
       query: {
-        query_string: { query: data },
+        query_string: { query: "*" + data + "*" },
       },
     },
   });
