@@ -4,6 +4,7 @@ const elasticData = require('../elasticdata');
 const elasticRecipes = elasticData.recipes;
 const recipes = mongoCollections.recipes;
 const users = mongoCollections.users;
+const utils = require('../utils/utils');
 
 let exportedMethods = {
 
@@ -16,7 +17,8 @@ let exportedMethods = {
   },
 
   async getRecipeById(id) {
-	  if (!id || typeof id !== 'string') throw 'must provide valid id';
+    
+	  if (!utils.validString(id)) throw 'must provide valid id';
     const recipeCollection = await recipes();
     let recipe = await recipeCollection.findOne({ _id: mongoDB.ObjectID(String(id)) });
     if (!recipe) throw 'Recipe not found';
@@ -24,14 +26,14 @@ let exportedMethods = {
   },
 
   async getRecipesByUser(userId) {
-	  if (!userId || typeof userId !== 'string') throw 'must provide valid recipeId';
+	  if (!utils.validString(userId)) throw 'must provide valid recipeId';
     const recipeCollection = await recipes();
     let recipeList = await recipeCollection.find({userId: userId}).toArray();
     return recipeList;
   },
 
   async getUserById(id) {
-    if (!id || typeof id !== 'string') throw 'must provide valid id';
+    if (!utils.validString(id)) throw 'must provide valid id';
 
     const userCollection = await users();
     let user = await userCollection.findOne({
@@ -43,10 +45,10 @@ let exportedMethods = {
 
   // POST /recipes
   async addRecipe(userId, title, picture, description, ingredients, procedure) {
-    if (!userId || typeof userId != "string") throw 'You must provide a valid userId'
-	  if (!title || typeof title != "string") throw 'You must provide a valid title'
-    if (!picture || typeof picture != "string") throw 'You must provide a valid picture'
-    if (!description || typeof description != "string") throw 'You must provide a valid description'
+    if (!utils.validString(userId)) throw 'You must provide a valid userId'
+	  if (!utils.validString(title)) throw 'You must provide a valid title'
+    if (!utils.validString(picture)) throw 'You must provide a valid picture'
+    if (!utils.validString(description)) throw 'You must provide a valid description'
 
     let user = await this.getUserById(userId);
 
@@ -100,10 +102,10 @@ let exportedMethods = {
   // PUT /recipes/{id}
   // PATCH /recipes/{id}
   async updateRecipe(id, updatedRecipe) {
-    if (!id || typeof id != "string") throw 'You must provide a valid id'
-	  if (!updatedRecipe.title || typeof updatedRecipe.title != "string") throw 'You must provide a valid title'
-    if (!updatedRecipe.picture || typeof updatedRecipe.picture != "string") throw 'You must provide a valid picture'
-    if (!updatedRecipe.description || typeof updatedRecipe.description != "string") throw 'You must provide a valid description'
+    if (!utils.validString(id)) throw 'You must provide a valid id'
+	  if (!utils.validString(updatedRecipe.title)) throw 'You must provide a valid title'
+    if (!utils.validString(updatedRecipe.picture)) throw 'You must provide a valid picture'
+    if (!utils.validString(updatedRecipe.description)) throw 'You must provide a valid description'
 
     const recipe = await this.getRecipeById(id);
 
@@ -157,7 +159,7 @@ let exportedMethods = {
 
   // DELETE /recipes/{id}
   async deleteRecipe(id) {
-	  if (!id || typeof id !== 'string') throw 'must provide valid id';
+	  if (!utils.validString(id)) throw 'must provide valid id';
 
     const recipeCollection = await recipes();
     const deletionInfo = await recipeCollection.removeOne({ _id: mongoDB.ObjectID(String(id)) });
