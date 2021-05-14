@@ -47,11 +47,10 @@ async function main() {
                 // (firstName, lastName, username, password, profilePicture, aboutMe) 
                 
                 u = await users.addUser(
-                    '0',
+                    user.uid,
                     user.firstName,
                     user.lastName,
                     user.username,
-                    user.password,
                     user.profilePicture,
                     user.aboutMe
                 );
