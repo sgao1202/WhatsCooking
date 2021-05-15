@@ -7,9 +7,12 @@ const bluebird = require('bluebird');
 const redis = require('redis');
 const path = require('path')
 const static = express.static(__dirname + '/public');
+const isImage = require('is-image');
+const { v4: uuidv4 } = require('uuid');
 
 const multer = require("multer");
 const fs = require("fs");
+const e = require('express');
 
 const handleError = (err, res) => {
   console.log(err)
@@ -53,44 +56,45 @@ app.post(
   "/uploadImage",
   upload.single("file" /* name attribute of <file> element in your form */),
   (req, res) => {
+    let id = String(uuidv4());
     const uploadPath = path.join(__dirname, "public", "img", req.file.originalname);
-
-    if (path.extname(req.file.originalname).toLowerCase() === ".png") {      
-
-      fs.renameSync(req.file.path, uploadPath, err => {
-        if (err) return handleError(err, res);
-
+    const idPath = path.join(__dirname, "public", "img", id);
+    try {
+      fs.renameSync(req.file.path, uploadPath, err => {throw 'file upload failed'});
+      if (!isImage(uploadPath)) throw 'file is not an image';
+      else {
+        fs.renameSync(uploadPath, idPath, err => {throw 'file upload failed'});
         res
           .status(200)
           .contentType("text/plain")
-          .end("File uploaded!");
-      });
-    } else {
-      fs.unlink(req.file.path, err => {
-        if (err) return handleError(err, res);
-
+          .end(String(id));
+      }
+    } catch {
+      fs.unlink(uploadPath, err => {
         res
           .status(403)
           .contentType("text/plain")
-          .end("Only .png files are allowed!");
+          .end('file upload failed');
       });
     }
   }
 );
 
-app.get("/images/:imageName", (req, res) => {
-  if (!req.params.imageName) {
-    res.status(400).json({error: 'You must supply imageName'});
+app.get("/images/:imageId", (req, res) => {
+  if (!req.params.imageId) {
+    res.status(400).json({error: 'You must supply imageId'});
     return;
   }
-  let imagePath = path.join(__dirname, "public", "img", req.params.imageName);
+  let imagePath = path.join(__dirname, "public", "img", req.params.imageId);
   try {
     if (fs.existsSync(path)) {}
   } catch(err) {
     res.status(404).json({error: 'image not found'});
     return;
   }
-  res.sendFile(path.join(imagePath));
+  res
+    .contentType("image/png")
+    .sendFile(path.join(imagePath))
 });
 
 configRoutes(app);
