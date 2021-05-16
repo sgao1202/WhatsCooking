@@ -15,11 +15,13 @@ const ListDisplay = (props) => {
         return (
             <ListGroup.Item key={user._id}>
                 <Row>
-                    <Col md={3}>
+                    <Col md={1}>
                         <img className="following-user-profile-picture border" src={user.profilePicture ? `${baseUrl}/images/${user.profilePicture}` : genericProfile} alt={`profile-${user._id}`}/>
                     </Col>
                     <Col>
-                        <span>{`${user.firstName} ${user.lastName.charAt(0)}`}</span>
+                        <Link to={`/users/${user._id}`}>
+                            <span>{`${user.firstName} ${user.lastName.charAt(0)}`}</span>
+                        </Link>
                     </Col>
                 </Row>
             </ListGroup.Item>

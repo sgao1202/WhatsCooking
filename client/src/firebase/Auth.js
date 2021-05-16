@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import firebaseApp from './Firebase';
 import { Container, Spinner } from 'react-bootstrap';
-import UserProfile from '../components/UserProfile';
 import axios from 'axios';
 
 const AuthContext = React.createContext();
