@@ -70,7 +70,7 @@ router.get('/my-profile/:uid', async (req, res) => {
             if (!utils.validString(userId)) return res.status(400).json({ error: 'following list contains invalid ids' });
             let currentUser = await userData.getUserById(userId);
             followingUsers.push({
-                _id: recipeId,
+                _id: userId,
                 firstName: currentUser.firstName,
                 lastName: currentUser.lastName,
                 profilePicture: currentUser.profilePicture,
