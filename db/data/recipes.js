@@ -42,16 +42,14 @@ let exportedMethods = {
     if (!user) throw 'User not found';
     return user;
   },
-
+  
   // POST /recipes
   async addRecipe(userId, title, picture, description, ingredients, procedure) {
     if (!utils.validString(userId)) throw 'You must provide a valid userId'
 	  if (!utils.validString(title)) throw 'You must provide a valid title'
     if (!utils.validString(picture)) throw 'You must provide a valid picture'
     if (!utils.validString(description)) throw 'You must provide a valid description'
-
     let user = await this.getUserById(userId);
-
     if (!ingredients || !Array.isArray(ingredients)) {
       throw 'You must provide a valid array of ingredients'
     } else {

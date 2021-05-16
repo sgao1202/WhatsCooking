@@ -1,7 +1,6 @@
 import { Form, Button, Col, InputGroup } from 'react-bootstrap';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import Formik from 'formik'
 import { useContext } from 'react'
 import { AuthContext } from '../firebase/Auth'
 
@@ -9,17 +8,29 @@ function NewRecipe(){
     const { currentUser } = useContext(AuthContext);
     const initialFormData = {
         title: "",
-        userId: "6097fefe6c8b900517fec8da",
-        picture: "noimg.jpg",
+        userId: "",
+        picture: "",
         description: "",
-        ingredients: [{name: "", portion: 0, units: ""}],
+        ingredients: [{name: "", portion: "", units: ""}],
         procedure: [""]
     }
     const url = 'http://localhost:3001/';
     const [validated, setValidated] = useState(false);
     const [formData, setFormData] = useState(initialFormData);
-    const [errors, setErrors] = useState();
-    
+    const [submitted, setSubmitted] = useState(false);
+    const [errors, setErrors] = useState({
+        title: false,
+        description: false,
+        ingredients: [false],
+        procedure: [false]
+    });
+    const handleFileChange = (e) => {
+        console.log(e.target.files[0])
+        setFormData({
+            ...formData, [e.target.name]: e.target.files[0]
+        })
+        console.log(formData)
+    }
     const handleChange = (e) =>{
         setFormData({
             ...formData, [e.target.name]: e.target.value.trim()
@@ -33,17 +44,38 @@ function NewRecipe(){
         setValidated(true);
         if (validateForm()){
             try{
-                await axios.post(`${url}recipes`, formData)
+                //upload the image, receive the generated uid of image
+                const imageData = new FormData();
+                imageData.append("file", formData.picture, formData.picture.name)
+                let picId = await axios.post(`${url}uploadImage`, imageData)
+
+                //store the picture in the database as a uid
+                formData.picture = picId.data;
+                let newRecipe = await axios.post(`${url}recipes`, formData)
+                
+                //reset form data
+                // setFormData(initialFormData);
+                setSubmitted(true);
+                
             }catch(e){
                 console.log(e)
             }
         }
         
     }
-    const validateForm = () =>{
-        if (formData.title){
-
+    useEffect(()=>{
+        async function fetchData(){
+            let user = await axios.get(`${url}users/uid/${currentUser.uid}`);
+            console.log(user)
+            setFormData({
+                ...formData, ['userId'] : user.data._id
+            })
+            console.log(formData)
         }
+        fetchData();  
+    }, [currentUser])
+    const validateForm = () =>{
+        return true;
     }
     const findFormErrors = () => {
         const newErrors = {ingredients: []}
@@ -75,6 +107,10 @@ function NewRecipe(){
         }
         const fields = {...formData};
         fields.ingredients.push(emptyIngredient);
+        // const errorsList = {...errors}
+        // setErrors({
+        //     ...errorsList, [ingredients]: 
+        // })
         setFormData(fields)
     }
 
@@ -99,7 +135,7 @@ function NewRecipe(){
     return (
         <div>
             <h1>Create a Recipe</h1>
-            <Form noValidate validated={validated} onSubmit={handleSubmit}>
+            <Form noValidate validated={validated} encType="multipart/form-data" onSubmit={handleSubmit}>
                 <Form.Row>
                     <Form.Group controlId="recipeName">
                     <Form.Label>Recipe Name:</Form.Label>
@@ -108,6 +144,7 @@ function NewRecipe(){
                         type="text" 
                         name='title'
                         onChange={handleChange}
+                        value={formData.title}
                     />
                     </Form.Group>
                     </Form.Row>
@@ -120,13 +157,14 @@ function NewRecipe(){
                         name="description"
                         as='textarea'
                         onChange={handleChange}
+                        value={formData.description}
                     />
                     </Form.Group>
                 </Form.Row>
                 <Form.Row>
                     <Form.Group controlId='updateImage'>
                         <Form.Label>Image:</Form.Label>
-                        <Form.File type='file' onClick={handleChange}></Form.File>
+                        <Form.File required type='file' name='picture' onChange={handleFileChange}></Form.File>
                     </Form.Group>
                 </Form.Row>
                             
@@ -182,6 +220,7 @@ function NewRecipe(){
                 <br></br>
                 <br></br>
                 <Button type="submit" onClick={handleSubmit}>Submit</Button>
+                {submitted && <p className='success'>Your recipe has been submitted!</p>}
             </Form>
         </div>
     )
