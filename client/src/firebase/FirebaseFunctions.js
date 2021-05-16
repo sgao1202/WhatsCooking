@@ -2,8 +2,11 @@ import firebase from 'firebase/app';
 
 async function doCreateUserWithEmailAndPassword(email, password, displayName) {
     await firebase.auth().createUserWithEmailAndPassword(email, password);
-    await firebase.auth().currentUser.updateProfile({ displayName: displayName });
-    return firebase.auth().currentUser;
+    let currentUser = firebase.auth().currentUser;
+    // Store displayName and profile picture in photoUrl (empty on initial create);
+    await currentUser.updateProfile({ displayName: displayName, photoURL: ''});
+    await firebase.auth().updateCurrentUser(currentUser);
+    return currentUser;
 }
 
 async function doChangePassword(email, oldPassword, newPassword) {

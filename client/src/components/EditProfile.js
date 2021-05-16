@@ -45,6 +45,7 @@ const ProfileEdit = () => {
         setLoading(true);
         if (isValidForm()) updateUser();
     };
+
     // Load spinner
     if (loading) return (
         <Container className="text-center">

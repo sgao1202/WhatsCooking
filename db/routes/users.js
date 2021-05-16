@@ -59,16 +59,29 @@ router.get('/my-profile/:uid', async (req, res) => {
             if (!utils.validString(recipeId)) return res.status(400).json({error: 'bookmarkList contains invalid ids'});
             let recipe = await recipeData.getRecipeById(recipeId);
             bookmarkedRecipes.push({
-                id: recipeId,
+                _id: recipeId,
                 title: recipe.title,
                 picture: recipe.picture
             });
         }
         let myRecipes = await recipeData.getRecipesByUser(user._id.toString());
+        let followingUsers = [];
+        for (let userId of user.following) {
+            if (!utils.validString(userId)) return res.status(400).json({ error: 'following list contains invalid ids' });
+            let currentUser = await userData.getUserById(userId);
+            followingUsers.push({
+                _id: recipeId,
+                firstName: currentUser.firstName,
+                lastName: currentUser.lastName,
+                profilePicture: currentUser.profilePicture,
+            });
+        }
+
         res.json({
             user: user,
             bookmarkedRecipes: bookmarkedRecipes,
-            myRecipes: myRecipes
+            myRecipes: myRecipes,
+            following: followingUsers
         });
     } catch (e) {
         res.status(404).json({error: e});
