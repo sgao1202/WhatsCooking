@@ -6,6 +6,10 @@ function EditRecipeModal(props) {
     const [loading, setLoading] = useState(true);
     const [showEditModal, setShowEditModal] = useState(props.isOpen);
     const [validated, setValidated] = useState(false);
+    const [{src, alt}, setImage] = useState({
+        src: props.data.picture,
+        alt: "Upload an image"
+    })
     useEffect(()=>{
         setShowEditModal(props.isOpen);
         setLoading(false);
@@ -55,6 +59,13 @@ function EditRecipeModal(props) {
         setValidated(true);
         console.log(formData)
         try{
+            const imageData = new FormData();
+            imageData.append("file", formData.picture, formData.picture.name)
+            let picId = await axios.post(`${url}uploadImage`, imageData)
+            console.log(picId)
+            //store the picture in the database as a uid
+            formData.picture = picId.data;
+            console.log(formData)
             let updatedRecipe = await axios.put(`${url}recipes/${formData.recipeid}`, formData);
             setFormData(updatedRecipe.data);
             props.updateModal(formData);
@@ -93,20 +104,27 @@ function EditRecipeModal(props) {
         setFormData(fields);
     }
 
-    const handleFileInput = () => { 
-        
+    const handleFileChange = (e) => {
+        console.log(e.target.files[0])
+        setFormData({
+            ...formData, [e.target.name]: e.target.files[0]
+        })
+        console.log(formData)
     }
+
     return(!loading &&
         <Modal show={showEditModal} onHide={handleCloseModal}>
             <Modal.Header closeButton>
-            <Modal.Title>Update Your Recipe</Modal.Title>
+            <Modal.Title>Update {initialFormData.title}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Form noValidate validated={validated} onSubmit={(e) => handleModalSubmit(e)}>
+                <Form noValidate validated={validated} enctype="multipart/form-data" onSubmit={(e) => handleModalSubmit(e)}>
+                    <Form.Group controlId='image'>
+                        <Form.Label className='modal-subtitle'>Current Image:</Form.Label>
+                        <Form.Control className='modal-image' type='image' src={`${url}images/${initialFormData.picture}`} alt='noimg'></Form.Control>
+                    </Form.Group>
                     <Form.Group controlId='updateImage'>
-                        <Form.Label className='modal-subtitle'>Image:</Form.Label>
-                        <Form.Control type='image' src={formData.picture} alt='noimg'></Form.Control>
-                        <Form.File type='file' onClick={handleModalChange}></Form.File>
+                        <Form.File type='file' name='picture' onChange={handleFileChange}></Form.File>
                     </Form.Group>
                     <Form.Group controlId="updateTitle">
                         <Form.Label className='modal-subtitle'>Name:</Form.Label>
