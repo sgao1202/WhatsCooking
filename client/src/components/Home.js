@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Search from "./Search";
 import { Link } from "react-router-dom";
+import { Button } from 'react-bootstrap';
 import {
   Card,
   CardActionArea,
@@ -137,7 +138,9 @@ const Home = () => {
   } else {
     return (
       <div>
-        <p>This is the discovery page</p>
+        <Link className="mr-5 pb-2" to="/newrecipe">
+            <Button>Create Recipe</Button>
+        </Link>
         <Search searchValue={searchValue}></Search>
         <br />
         <br />

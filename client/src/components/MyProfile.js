@@ -3,14 +3,16 @@ import { AuthContext } from '../firebase/Auth';
 import { Link, Redirect } from 'react-router-dom';
 import { Container, Row, Col, Nav, Tab, ListGroup, Spinner, Image} from 'react-bootstrap';
 import { FaBookmark, FaCamera, FaRegNewspaper, FaUser, FaUserFriends, FaUtensils } from 'react-icons/fa';
+import ListDisplay from './ListDisplay';
 import genericProfile from '../img/generic-user-profile.jpeg';
 import axios from 'axios';
 
 const MyProfile = () => {
     const { currentUser, baseUrl } = useContext(AuthContext);
     const [userProfile, setUserProfile] = useState(undefined);
-    const [bookmarkedRecipes, setBookmarkedRecipes] = useState(undefined);
     const [myRecipes, setMyRecipes] = useState(undefined);
+    const [following, setFollowing] = useState(undefined);
+    const [bookmarkedRecipes, setBookmarkedRecipes] = useState(undefined);
     const [loading, setLoading] = useState(true);
 
     // Fetch user data from server
@@ -23,8 +25,9 @@ const MyProfile = () => {
                 // Get user from database
                 const { data } = await axios.get(`${baseUrl}/users/my-profile/${currentUser.uid}`);
                 setUserProfile(data.user);
-                setBookmarkedRecipes(data.bookmarkedRecipes);
                 setMyRecipes(data.myRecipes);
+                setFollowing(data.following);
+                setBookmarkedRecipes(data.bookmarkedRecipes);
             } catch (e) {
                 console.log(e);
                 alert(e);
@@ -43,19 +46,19 @@ const MyProfile = () => {
         About Me
         My Recipes
     */
+
     if (loading) return (
         <Container className="text-center">
             <Spinner animation="border"></Spinner>
         </Container>
     );
-    
     return (
         <Container>
             <Row className="mb-5 border-bottom">
                 <Col className="py-3">
                     <Row>
-                        <Col>
-                            <Image src={userProfile.profilePicture ? userProfile.profilePicture : genericProfile} alt="profile-picture" roundedCircle/>
+                        <Col className="pr-0">
+                            <Image className="border shadow my-profile-image"src={userProfile.profilePicture ? `${baseUrl}/images/${userProfile.profilePicture}` : genericProfile} alt="profile-picture" roundedCircle/>
                         </Col>    
                         <Col>
                             <Row>
@@ -161,23 +164,42 @@ const MyProfile = () => {
                     <Col sm={9}>
                         <Tab.Content>
                             <Tab.Pane eventKey="aboutMe">
-                                {userProfile.aboutMe ? userProfile.aboutMe : <h2>Nothing to display</h2>}
+                                <div>
+                                    <h2 className="pb-2 border-bottom text-primary">About Me</h2>
+                                </div>
+                                <div>
+                                    {userProfile.aboutMe ? userProfile.aboutMe : <h3>Nothing to display</h3>}
+                                </div>
                             </Tab.Pane>
                             <Tab.Pane eventKey="myRecipes">
-                                { myRecipes.length === 0 ? <h2>You have not created any recipes yet</h2> :
-                                    (<div></div>)
-                                }
+                                <div>
+                                    <h2 className="pb-2 border-bottom text-primary">My Recipes</h2>
+                                </div>
+                                <div>
+                                    { myRecipes.length === 0 ? <h3>You have not created any recipes yet</h3> :
+                                        (<ListDisplay recipe list={myRecipes}/>)
+                                    }
+                                </div>
                             </Tab.Pane>
                             <Tab.Pane eventKey="following">
-                                {userProfile.following.length === 0 ? <h2>No followers available</h2> : 
-                                    (<div></div>)
-                                }
+                                <div>
+                                    <h2 className="pb-2 border-bottom text-primary">Following</h2>
+                                </div>
+                                <div>
+                                    {userProfile.following.length === 0 ? <h3>No followers available</h3> : 
+                                        (<ListDisplay user list={following}/>)
+                                    }
+                                </div>
                             </Tab.Pane>
                             <Tab.Pane eventKey="bookmarks">
-                                { bookmarkedRecipes.length === 0 ? <h2>No bookmarks available</h2> : (
-                                    <div></div>   
-                                )
-                                }
+                                <div>
+                                    <h2 className="pb-2 border-bottom text-primary">Bookmarks</h2>
+                                </div>
+                                <div>
+                                    { bookmarkedRecipes.length === 0 ? <h3>No bookmarks available</h3> : 
+                                        (<ListDisplay recipe list={bookmarkedRecipes}/>)
+                                    }
+                                </div>
                             </Tab.Pane>
                         </Tab.Content>
                     </Col>
