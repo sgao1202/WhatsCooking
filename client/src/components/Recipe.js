@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useContext} from 'react';
 import { AuthContext } from '../firebase/Auth';
-import { Redirect } from 'react-router-dom'
+import { Link, Redirect } from 'react-router-dom'
 import '../App.css';
 import axios from 'axios'
 import { Container, Row, Col, Image, Button, Form, ListGroup } from 'react-bootstrap'
@@ -27,6 +27,15 @@ const Recipe = (props) =>{
     add optional photo field for each ingredient/step?
     clicking on chef name will bring you to his/her profile page?
     */
+    
+
+    /**
+     * Image Uploading
+     * <form method="post" enctype="multipart/form-data" action="/uploadImage”>
+            <input type="file" name="file">
+            <input type="submit" value="Submit">
+        </form>
+     */
     const { currentUser } = useContext(AuthContext);
     const url = 'http://localhost:3001/';
     const [loading, setLoading] = useState(true);
@@ -55,14 +64,14 @@ const Recipe = (props) =>{
         e.preventDefault();
         if(!bookmarked){
             try{
-                await axios.post(`${url}users/6097fefe6c8b900517fec8d6/bookmarks`, recipeData);
+                await axios.post(`${url}users/${userData._id}/bookmarks`, recipeData);
                 setBookmarked(true);
             }catch(e){
                 console.log(e.error)
             }
         }else{
             try{
-                await axios.delete(`${url}users/6097fefe6c8b900517fec8d6/bookmarks/${recipeData._id}`)
+                await axios.delete(`${url}users/${userData._id}/bookmarks/${recipeData._id}`)
                 setBookmarked(false);
             }catch(e){
                 console.log(e);
@@ -88,7 +97,7 @@ const Recipe = (props) =>{
             let newComment = await axios.post(`${url}comments`, {
                 comment: comment.comment,
                 recipeId: recipeData._id,
-                userId: "6097fefe6c8b900517fec8d6"
+                userId: userData._id
             });
             await axios.get(`${url}users/${newComment.data.userId}`).then((user)=>{
                 newComment.data.userId = user.data.firstName + " " + user.data.lastName;
@@ -126,7 +135,7 @@ const Recipe = (props) =>{
                 Promise.all(recipeComments.map(async(comment)=>{
                     try{
                         let userName = await axios.get(`${url}users/${comment.userId}`);
-                        comment.userId = userName.data.firstName + " " + userName.data.lastName;
+                        comment.userName = userName.data.firstName + " " + userName.data.lastName;
                     }catch(e){
                         console.log(e)
                     }
@@ -171,7 +180,10 @@ const Recipe = (props) =>{
                         <h1 id='recipe-title'>{recipeData.title}
                         {!bookmarked || !currentUser?<BsBookmark onClick={currentUser? (e)=>toggleBookmarks(e): ()=>redirectToLogin()}></BsBookmark> : <BsFillBookmarkFill className='filled' onClick={currentUser? (e)=>toggleBookmarks(e): ()=>redirectToLogin()}></BsFillBookmarkFill>}</h1>
                         </span>
-                        <h2 id='recipe-chef'>Posted By: {userData.firstName} {userData.lastName}</h2>
+                        <h2 id='recipe-chef'>
+                            Posted By: 
+                            <Link to={`/users/${userData._id}`}> {userData.firstName} {userData.lastName}</Link>
+                            </h2>
                         <br></br>
                         <p id='recipe-desc'>{recipeData.description}</p>
                     </Col>
@@ -181,7 +193,7 @@ const Recipe = (props) =>{
                         <EditRecipeModal isOpen={showEditModal} data={recipeData} user={userData} closeModal={closeModal} updateModal={updateModal}></EditRecipeModal>
                     </Col>}
                     <Col xs={6} md={4}>
-                        <Image src={logo} alt = "noimg" thumbnail="true"></Image>
+                        <Image src={`${url}images/${recipeData.picture}`} alt = "noimg" thumbnail="true"></Image>
                     </Col>
                 </Row>
                 
@@ -211,7 +223,9 @@ const Recipe = (props) =>{
                     <ListGroup.Item key={comment._id} as="li">
                         <Container>
                             <Row>
-                                <span className="user-comment-name">{comment.userId}</span>
+                                <span className="user-comment-name">
+                                    <Link to={`/users/${comment.userId}`}>{comment.userName}</Link>
+                                </span>
                             </Row>
                             <Row>
                                 <span>{comment.comment}</span>

@@ -9,7 +9,7 @@ const path = require('path')
 const static = express.static(__dirname + '/public');
 const isImage = require('is-image');
 const { v4: uuidv4 } = require('uuid');
-
+const recipeData = require('./data/recipes')
 const multer = require("multer");
 const fs = require("fs");
 const e = require('express');
@@ -35,8 +35,8 @@ bluebird.promisifyAll(redis.RedisClient.prototype);
 bluebird.promisifyAll(redis.Multi.prototype);
 
 app.use('/public', static);
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '50mb', extended: true}));
+app.use(express.urlencoded({ limit: '50mb', extended: true, parameterLimit: 100000000 }));
 
 // INCREMENT SEARCHES IN REDIS SORTED SET
 app.use(async (req, res, next) => {
@@ -67,14 +67,14 @@ app.post(
         res
           .status(200)
           .contentType("text/plain")
-          .end(String(id));
+          .send(String(id));
       }
     } catch {
       fs.unlink(uploadPath, err => {
         res
           .status(403)
           .contentType("text/plain")
-          .end('file upload failed');
+          .send('file upload failed');
       });
     }
   }
