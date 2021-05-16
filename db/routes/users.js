@@ -204,12 +204,7 @@ router.put('/:id', async (req, res) => {
         });
         return;
     }
-    if (!userInfo.password || typeof userInfo.password != "string") {
-        res.status(400).json({
-            error: 'You must provide a valid password'
-        });
-        return;
-    }
+
     if (!userInfo.profilePicture || typeof userInfo.profilePicture != "string") {
         res.status(400).json({
             error: 'You must provide a valid profile picture'
@@ -222,26 +217,6 @@ router.put('/:id', async (req, res) => {
             error: 'You must provide a valid about me'
         });
         return;
-    }
-
-    // CHECK IF USERNAME IS UNIQUE
-    if (!userInfo.username || typeof userInfo.username != "string") {
-        res.status(400).json({
-            error: 'You must provide a valid username'
-        });
-        return;
-    } else {
-		try {
-			let user = await userData.getUserByUsername(userInfo.username);
-			if (user) {
-				res.status(400).json({
-					error: 'username is taken'
-				});
-				return;
-			}
-		} catch (error) {
-			// do nothing
-		}
     }
 
     try {
@@ -321,18 +296,18 @@ router.patch('/:id', async (req, res) => {
         updatedObject.lastName = oldUser.lastName;
     }
 
-	if (userInfo.password && userInfo.password !== oldUser.password) {
-        if (typeof userInfo.password != "string") {
-            res.status(400).json({
-                error: 'You must provide a valid password'
-            });
-            return;
-        } else {
-            updatedObject.password = userInfo.password;
-        }
-    } else {
-        updatedObject.password = oldUser.password;
-    }
+	// if (userInfo.password && userInfo.password !== oldUser.password) {
+    //     if (typeof userInfo.password != "string") {
+    //         res.status(400).json({
+    //             error: 'You must provide a valid password'
+    //         });
+    //         return;
+    //     } else {
+    //         updatedObject.password = userInfo.password;
+    //     }
+    // } else {
+    //     updatedObject.password = oldUser.password;
+    // }
 
 	if (userInfo.profilePicture && userInfo.profilePicture !== oldUser.profilePicture) {
         if (typeof userInfo.profilePicture != "string") {

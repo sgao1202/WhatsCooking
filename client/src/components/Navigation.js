@@ -35,7 +35,7 @@ const Navigation = () => {
                                     {/* <img className="following-user-profile-picture" src={currentProfile ? `${baseUrl}/images/${currentProfile.profilePicture}` : genericProfile} alt="nav-profile"></img> */}
                                     <Image className="shadow following-user-profile-picture" src={currentProfile && currentProfile.profilePicture ? `${baseUrl}/images/${currentProfile.profilePicture}` : genericProfile} alt="nav-profile" roundedCircle/>
                                 </Dropdown.Toggle>
-                                <Dropdown.Menu className="shadow nav-dropdown-menu">
+                                <Dropdown.Menu className="p-3 shadow nav-dropdown-menu">
                                     <Dropdown.Item href="/my-profile">
                                         <Row>
                                             <Col md={2}>

@@ -165,7 +165,7 @@ const MyProfile = () => {
                         <Tab.Content>
                             <Tab.Pane eventKey="aboutMe">
                                 <div>
-                                    <h2 className="pb-2 border-bottom">About Me</h2>
+                                    <h2 className="pb-2 border-bottom text-primary">About Me</h2>
                                 </div>
                                 <div>
                                     {userProfile.aboutMe ? userProfile.aboutMe : <h3>Nothing to display</h3>}
@@ -173,7 +173,7 @@ const MyProfile = () => {
                             </Tab.Pane>
                             <Tab.Pane eventKey="myRecipes">
                                 <div>
-                                    <h2 className="pb-2 border-bottom">My Recipes</h2>
+                                    <h2 className="pb-2 border-bottom text-primary">My Recipes</h2>
                                 </div>
                                 <div>
                                     { myRecipes.length === 0 ? <h3>You have not created any recipes yet</h3> :
@@ -183,7 +183,7 @@ const MyProfile = () => {
                             </Tab.Pane>
                             <Tab.Pane eventKey="following">
                                 <div>
-                                    <h2 className="pb-2 border-bottom">Following</h2>
+                                    <h2 className="pb-2 border-bottom text-primary">Following</h2>
                                 </div>
                                 <div>
                                     {userProfile.following.length === 0 ? <h3>No followers available</h3> : 
@@ -193,7 +193,7 @@ const MyProfile = () => {
                             </Tab.Pane>
                             <Tab.Pane eventKey="bookmarks">
                                 <div>
-                                    <h2 className="pb-2 border-bottom">Bookmarks</h2>
+                                    <h2 className="pb-2 border-bottom text-primary">Bookmarks</h2>
                                 </div>
                                 <div>
                                     { bookmarkedRecipes.length === 0 ? <h3>No bookmarks available</h3> : 

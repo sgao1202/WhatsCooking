@@ -117,3 +117,7 @@ body {
   border: none;
   width: 226px;
 }
+
+.edit-container {
+  border-radius: 25px;
+}
