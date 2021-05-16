@@ -42,15 +42,7 @@ let exportedMethods = {
     if (!user) throw 'User not found';
     return user;
   },
-
-  async getUserByUid(uid) {
-    if (!utils.validString(uid)) throw 'User uid must be valid';
-    const userCollection = await users();
-    let user = await userCollection.findOne({ uid: uid });
-    if (!user) throw `User with uid=${uid} was not found`;
-    return utils.convertId(user);
-},
-
+  
   // POST /recipes
   async addRecipe(userId, title, picture, description, ingredients, procedure) {
     if (!utils.validString(userId)) throw 'You must provide a valid userId'
