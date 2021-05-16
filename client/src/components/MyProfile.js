@@ -24,6 +24,7 @@ const MyProfile = () => {
             try {
                 // Get user from database
                 const { data } = await axios.get(`${baseUrl}/users/my-profile/${currentUser.uid}`);
+                console.log(data);
                 setUserProfile(data.user);
                 setMyRecipes(data.myRecipes);
                 setFollowing(data.following);
@@ -58,7 +59,7 @@ const MyProfile = () => {
                 <Col className="py-3">
                     <Row>
                         <Col className="pr-0">
-                            <Image className="border shadow my-profile-image"src={userProfile.profilePicture ? `${baseUrl}/images/${userProfile.profilePicture}` : genericProfile} alt="profile-picture" roundedCircle/>
+                            <Image className="border shadow my-profile-image"src={userProfile && userProfile.profilePicture ? `${baseUrl}/images/${userProfile.profilePicture}` : genericProfile} alt="profile-picture" roundedCircle/>
                         </Col>    
                         <Col>
                             <Row>

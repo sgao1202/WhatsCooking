@@ -35,11 +35,11 @@ const ListDisplay = (props) => {
                             {recipe.title}
                         </Link>
                     </div>
-                    <div className="col">
+                    {/* <div className="col">
                         <Button variant="danger" onClick={() => removeItem(recipe._id)}>
                             <FaTrash></FaTrash>
                         </Button>
-                    </div>
+                    </div> */}
                 </div>
             </ListGroup.Item>
         );
