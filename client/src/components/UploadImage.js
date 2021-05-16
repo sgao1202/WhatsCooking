@@ -1,20 +1,19 @@
 import { useContext, useState, useEffect } from 'react';
 import { Button, Container, Form, Spinner } from 'react-bootstrap';
-import { Redirect } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import { AuthContext } from '../firebase/Auth';
 import bsCustomFileInput from 'bs-custom-file-input';
 import axios from 'axios';
 
 const UploadImage = () => {
-    const { baseUrl, currentUser, currentProfile } = useContext(AuthContext);
+    const { baseUrl, currentUser, currentProfile, updateProfile } = useContext(AuthContext);
     const [file, setFile] = useState(undefined);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [invalid, setInvalid] = useState(false);
 
     useEffect(() => {
         bsCustomFileInput.init();
-        setLoading(false);
     }, []);
 
     // Check file type
@@ -38,8 +37,13 @@ const UploadImage = () => {
             try {
                 const formData = new FormData();
                 formData.append("file", file, file.name);
+                // Post image to backend
                 const imageId = await axios.post(`${baseUrl}/uploadImage`, formData);
-                console.log(imageId);
+                // Update user's profilePicture field
+                const updateUser = await axios.patch(`${baseUrl}/users/${currentProfile._id}`, {
+                    profilePicture: imageId.data
+                });
+                updateProfile(updateUser.data);
                 setSubmitted(true);
             } catch (e) {
                 console.log(e);
@@ -49,12 +53,12 @@ const UploadImage = () => {
     };
 
     const handleFileChange = (event) => {
-        console.log(event.target.files[0]);
         setFile(event.target.files[0]);
     };
 
     console.log('currentUser', currentUser);
     console.log('userProfile', currentProfile);
+
     if (loading) return (
         <Container className="text-center">
             <Spinner animation="border"></Spinner>
@@ -76,9 +80,12 @@ const UploadImage = () => {
                         File must have an extension of 'jpg', 'jpeg', or 'png'
                     </Form.Control.Feedback>
                 </Form.File>
-                <Button variant="secondary" className="upload-button" type="submit" disabled={!file}>
-                    Upload
-                </Button>
+                <Form.Group>
+                    <Button variant="secondary" className="upload-button" type="submit" disabled={!file}>
+                        Upload
+                    </Button>
+                    <Link className="text-secondary ml-3" to="/my-profile"><span>Cancel</span></Link>
+                </Form.Group>
             </Form>
         </Container>
     );

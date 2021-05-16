@@ -84,6 +84,9 @@ const ProfileEdit = () => {
         <Container className="edit-container shadow-lg p-5">
             <h2 className="border-bottom pb-3 mb-4">Edit Profile</h2>
             <Form noValidate onSubmit={handleSubmit}>
+                <Form.Group>
+                    <Link to="/my-profile/upload-image">Update Profile Picture</Link>
+                </Form.Group>
                 <Form.Group controlId="firstName">
                     <Form.Label>First Name</Form.Label>
                     <Form.Control 

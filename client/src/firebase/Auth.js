@@ -28,8 +28,8 @@ const AuthProvider = ({ children }) => {
         });
     }, []);
 
-    const setProfile = (user) => {
-        setCurrentProfile(user);
+    const updateProfile = (profile) => {
+        setCurrentProfile(profile);
     };
 
     if (loadingUser) return ( 
@@ -41,7 +41,7 @@ const AuthProvider = ({ children }) => {
     );
     
     return (
-        <AuthContext.Provider value={{ currentUser, currentProfile, setProfile, baseUrl: baseUrl }}>
+        <AuthContext.Provider value={{ currentUser, currentProfile, updateProfile, baseUrl: baseUrl }}>
             {children}
         </AuthContext.Provider>
     );
