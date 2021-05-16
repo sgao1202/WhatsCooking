@@ -7,7 +7,7 @@ import axios from 'axios';
 import utils from '../lib/Utility';
 
 const SignUp = () => {
-    const { currentUser, baseUrl } = useContext(AuthContext);
+    const { currentUser, setProfile, baseUrl } = useContext(AuthContext);
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
@@ -31,12 +31,15 @@ const SignUp = () => {
         try {
             const user = await doCreateUserWithEmailAndPassword(email, password, `${firstName} ${lastName}`);
             console.log(user);
+            // Give the user a default profile picture
             const { data } = await axios.post(`${baseUrl}/users`, {
                uid: user.uid,
                firstName: firstName,
-               lastName: lastName
+               lastName: lastName,
+               profilePicture: "generic-user-profile.jpg"
             });
             console.log(data);
+            setProfile(data);
             setLoading(false);
         } catch (e) {
             console.log(e);

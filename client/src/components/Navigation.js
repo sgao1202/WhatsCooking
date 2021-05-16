@@ -32,8 +32,7 @@ const Navigation = () => {
                         <div className="mr-5 pb-2">
                             <Dropdown className="mr-5" alignRight>
                                 <Dropdown.Toggle className="align-top nav-dropdown-toggle nav-profile-picture bg-primary" id="nav-dropdown-toggle" as="div">
-                                    {/* <img className="following-user-profile-picture" src={currentProfile ? `${baseUrl}/images/${currentProfile.profilePicture}` : genericProfile} alt="nav-profile"></img> */}
-                                    <Image className="shadow following-user-profile-picture" src={currentProfile && currentProfile.profilePicture ? `${baseUrl}/images/${currentProfile.profilePicture}` : genericProfile} alt="nav-profile" roundedCircle/>
+                                    <Image className="shadow following-user-profile-picture" src={ currentProfile && currentProfile.profilePicture ? `${baseUrl}/images/${currentProfile.profilePicture}` : genericProfile} alt="nav-profile" roundedCircle/>
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu className="p-3 shadow nav-dropdown-menu">
                                     <Dropdown.Item href="/my-profile">
@@ -63,7 +62,7 @@ const Navigation = () => {
                                                 <FaSignOutAlt/>
                                             </Col>
                                             <Col>
-                                                <span>Edit Profile</span>
+                                                <span>Log Out</span>
                                             </Col>
                                         </Row>
                                     </Dropdown.Item>

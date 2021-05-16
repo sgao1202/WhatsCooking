@@ -112,22 +112,15 @@ router.post('/', async (req, res) => {
         });
         return;
     }
-    // if (!userInfo.password || typeof userInfo.password != "string") {
-    //     res.status(400).json({
-    //         error: 'You must provide a valid password'
-    //     });
-    //     return;
-    // }
 
-    // if (!userInfo.profilePicture || typeof userInfo.profilePicture != "string") {
-    //     res.status(400).json({
-    //         error: 'You must provide a valid profile picture'
-    //     });
-    //     return;
-    // }
+    if (!userInfo.profilePicture || typeof userInfo.profilePicture != "string") {
+        res.status(400).json({
+            error: 'You must provide a valid profile picture'
+        });
+        return;
+    }
 
     // About me should be optional and only used when the user edits their profile, same with profile picture
-
     // if (!userInfo.aboutMe || typeof userInfo.aboutMe != "string") {
     //     res.status(400).json({
     //         error: 'You must provide a valid about me'
@@ -135,33 +128,11 @@ router.post('/', async (req, res) => {
     //     return;
     // }
 
-    // CHECK IF USERNAME IS UNIQUE
-    // if (!userInfo.username || typeof userInfo.username != "string") {
-    //     res.status(400).json({
-    //         error: 'You must provide a valid username'
-    //     });
-    //     return;
-    // } else {
-	// 	try {
-	// 		let user = await userData.getUserByUsername(userInfo.username);
-	// 		if (user) {
-	// 			res.status(400).json({
-	// 				error: 'username is taken'
-	// 			});
-	// 			return;
-	// 		}
-	// 	} catch (error) {
-	// 		// do nothing
-	// 	}
-    // }
-
     try {
         const newUser = await userData.addUser(
             userInfo.uid,
             userInfo.firstName,
             userInfo.lastName,
-            userInfo.username,
-            userInfo.password,
             userInfo.profilePicture,
             userInfo.aboutMe
         );
@@ -295,19 +266,6 @@ router.patch('/:id', async (req, res) => {
     } else {
         updatedObject.lastName = oldUser.lastName;
     }
-
-	// if (userInfo.password && userInfo.password !== oldUser.password) {
-    //     if (typeof userInfo.password != "string") {
-    //         res.status(400).json({
-    //             error: 'You must provide a valid password'
-    //         });
-    //         return;
-    //     } else {
-    //         updatedObject.password = userInfo.password;
-    //     }
-    // } else {
-    //     updatedObject.password = oldUser.password;
-    // }
 
 	if (userInfo.profilePicture && userInfo.profilePicture !== oldUser.profilePicture) {
         if (typeof userInfo.profilePicture != "string") {

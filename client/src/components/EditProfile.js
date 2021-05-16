@@ -4,7 +4,6 @@ import { Link, Redirect} from 'react-router-dom';
 import { Button, Container, Form, Spinner } from 'react-bootstrap';
 import axios from 'axios';
 import utils from '../lib/Utility';
-import { FaLastfmSquare } from 'react-icons/fa';
 
 const ProfileEdit = () => {
     const { currentUser, baseUrl} = useContext(AuthContext);
@@ -19,11 +18,6 @@ const ProfileEdit = () => {
         lastName: false,
         aboutMe: false
     });
-    // const errors = {
-    //     firstName: false,
-    //     lastName: false,
-    //     aboutMe: false
-    // };
 
     useEffect(() => {
         document.title = 'Edit Profile';
@@ -61,10 +55,11 @@ const ProfileEdit = () => {
     };
 
     const isValidForm = () => {
-        let newErrors = Object.assign(errors);
-        newErrors.firstName = !utils.validString(firstName);
-        newErrors.lastName = !utils.validString(lastName);
-        newErrors.aboutMe = !utils.validString(aboutMe);
+        let newErrors = {
+            firstName: !utils.validString(firstName),
+            lastName: !utils.validString(lastName),
+            aboutMe: !utils.validString(aboutMe)
+        }
         setErrors(newErrors);
         if (newErrors.firstName || newErrors.lastName || newErrors.aboutMe) return false;
         return true;

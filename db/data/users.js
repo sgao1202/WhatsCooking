@@ -66,13 +66,12 @@ let exportedMethods = {
         return user;
     },
 
-    // We don't need to store password in the database
     // POST /users
-    async addUser(uid, firstName, lastName, username, profilePicture, aboutMe) {
+    async addUser(uid, firstName, lastName, profilePicture, aboutMe) {
         if (!utils.validString(uid)) throw 'You must provide a valid uid'
         if (!utils.validString(firstName)) throw 'You must provide a valid first name'
         if (!utils.validString(lastName)) throw 'You must provide a valid last name'
-        // if (!utils.validString(profilePicture)) throw 'You must provide a valid profile picture'
+        if (!utils.validString(profilePicture)) throw 'You must provide a valid profile picture'
         // if (!utils.validString(aboutMe)) throw 'You must provide a valid about me'
 
         const userCollection = await users();
@@ -103,6 +102,7 @@ let exportedMethods = {
         if (!utils.validString(updatedUser.profilePicture)) throw 'You must provide a valid profile picture'
         if (!utils.validString(updatedUser.aboutMe)) throw 'You must provide a valid about me'
 
+        const userCollection = await users();
         const user = await this.getUserById(id);
         let newUser = {
             uid: user.uid,

@@ -22,13 +22,16 @@ const AuthProvider = ({ children }) => {
                     setCurrentProfile(data);
                 } catch (e) {
                     console.log(e);
-                    alert(e);
                 }
             } else setCurrentProfile(null);
             setCurrentUser(user);
             setLoadingUser(false);
         });
     }, []);
+
+    const setProfile = (user) => {
+        setCurrentProfile(user);
+    };
 
     if (loadingUser) return ( 
         <Container className="mt-5 text-center">
@@ -39,7 +42,7 @@ const AuthProvider = ({ children }) => {
     );
     
     return (
-        <AuthContext.Provider value={{ currentUser, currentProfile, baseUrl: baseUrl }}>
+        <AuthContext.Provider value={{ currentUser, currentProfile, setProfile, baseUrl: baseUrl }}>
             {children}
         </AuthContext.Provider>
     );
