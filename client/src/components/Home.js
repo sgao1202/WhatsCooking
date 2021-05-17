@@ -3,9 +3,9 @@ import axios from "axios";
 import Search from "./Search";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../firebase/Auth";
-import { Button } from "react-bootstrap";
+import { Button, ListGroup, Card } from "react-bootstrap";
+import genericProfile from "../img/generic-user-profile.jpeg";
 import {
-  Card,
   CardActionArea,
   CardContent,
   CardMedia,
@@ -33,18 +33,26 @@ const useStyles = makeStyles({
     flexDirection: "row",
   },
   media: {
-    height: "100%",
-    width: "100%",
+    height: "130px",
+    maxWidth: 250,
   },
   button: {
     color: "#1e8678",
     fontWeight: "bold",
     fontSize: 12,
   },
+  leftElement: {
+    float: "left",
+    width: "80%",
+  },
+  rightElement: {
+    float: "right",
+    width: "20%",
+  },
 });
 
 const Home = () => {
-  const { currentUser } = useContext(AuthContext);
+  const { baseUrl, currentUser, currentProfile } = useContext(AuthContext);
   const classes = useStyles();
   const url = "http://localhost:3001";
   const [loading, setLoading] = useState(true);
@@ -52,8 +60,8 @@ const Home = () => {
   const [searchData, setSearchData] = useState(undefined);
   const [popularRecipes, setPopularRecipes] = useState(undefined);
   const [allRecipes, setAllRecipes] = useState([]);
+  const [userBookmarks, setUserBookmarks] = useState([]);
   let li = null;
-  let bookmarks = null;
 
   useEffect(() => {
     async function fetchData() {
@@ -72,7 +80,7 @@ const Home = () => {
     }
   }, [searchTerm]);
 
-  useEffect(() => {
+  useEffect(async () => {
     async function fetchPopularData() {
       try {
         const { data } = await axios.get(url + "/recipes/popular");
@@ -91,21 +99,57 @@ const Home = () => {
         console.log(e);
       }
     }
+    async function fetchUserBookmarks() {
+      try {
+        const userBookmarksData = await axios.get(
+          `${baseUrl}/users/uid/${currentUser.uid}`
+        );
+        let userBookmarks = [];
+        console.log(`${baseUrl}/users/uid/${currentUser.uid}`);
+        console.log(userBookmarksData.data);
+        for (let i = 0; i < userBookmarksData.data.bookmarks.length; i++) {
+          const recipeData = await axios.get(
+            url + "/recipes/" + userBookmarksData.data.bookmarks[i]
+          );
+          let userBookmark = {
+            id: recipeData.data._id,
+            name: recipeData.data.title,
+          };
+          userBookmarks.push(userBookmark);
+        }
+        setUserBookmarks(userBookmarks);
+        console.log(userBookmarks);
+        console.log(currentUser.uid);
+      } catch (e) {
+        console.log(e);
+      }
+    }
     fetchPopularData();
     fetchData();
+    fetchUserBookmarks();
   }, []);
 
   const searchValue = async (value) => {
     setSearchTerm(value);
   };
 
+  const bookmarks =
+    userBookmarks &&
+    userBookmarks.map((bookmark) => {
+      return (
+        <ListGroup.Item action href={`/recipe/${bookmark.id}`}>
+          {bookmark.name}
+        </ListGroup.Item>
+      );
+    });
+
   const popularSearches =
     popularRecipes &&
     popularRecipes.map((s) => {
       return (
-        <li key={s.id}>
-          <Link to={`/series/${s.id}`}>{s.title}</Link>
-        </li>
+        <ListGroup.Item action href={`/recipe/${s._id}`}>
+          {s.title}
+        </ListGroup.Item>
       );
     });
 
@@ -118,8 +162,8 @@ const Home = () => {
               <CardMedia
                 className={classes.media}
                 component="img"
-                image={`${url}/images/${
-                  s.picture ? s.picture : "no-image.jpeg"
+                image={`${baseUrl}/images/${
+                  s.picture ? s.picture : genericProfile
                 }`}
                 title="show image"
               />
@@ -158,21 +202,28 @@ const Home = () => {
   } else {
     return (
       <div>
-        <p>This is the discovery page</p>
-        <div class="left-element">
-          <Search searchValue={searchValue}></Search>
+        <Search searchValue={searchValue}></Search>
+        <div className={classes.leftElement}>
           <br />
           <br />
           <Grid container className={classes.grid} spacing={5}>
             {li}
           </Grid>
         </div>
-        <div class="right-element">
-          Popular:
-          {popularSearches}
+        <div className={classes.rightElement}>
+          <Card style={{ width: "18rem" }}>
+            <Card.Header>Popular</Card.Header>
+            <ListGroup variant="flush">{popularSearches}</ListGroup>
+          </Card>
           <br />
-          Bookmarks:
-          {currentUser ? <div>logged in</div> : <div>Not logged in</div>}
+          {currentUser ? (
+            <Card style={{ width: "18rem" }}>
+              <Card.Header>Bookmarks</Card.Header>
+              <ListGroup variant="flush">{bookmarks}</ListGroup>
+            </Card>
+          ) : (
+            ""
+          )}
         </div>
       </div>
     );

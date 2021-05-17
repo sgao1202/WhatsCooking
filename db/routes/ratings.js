@@ -60,6 +60,32 @@ router.get('/recipe/:recipeId', async (req, res) => {
     return;
 });
 
+router.get('/recipe/:recipeId/user/:userId', async (req, res) => {
+    if (!req.params.recipeId) {
+        res.status(400).json({
+            error: 'You must supply recipeId'
+        });
+        return;
+    }
+    try {
+        let rating = await ratingData.getRatingByRecipeAndUser(req.params.recipeId, req.params.userId);
+        if(!rating) {
+            res.status(200).json({
+                rating: 0
+            });
+            return;
+        }
+        res.status(200).json(rating);
+        return;
+    } catch (e) {
+        console.log('caught');
+        res.status(404).json({
+            rating: 0
+        });
+        return;
+    }
+});
+
 router.post('/', async (req, res) => {
     let ratingInfo = req.body;
 
@@ -98,7 +124,7 @@ router.post('/', async (req, res) => {
         return;
     } else {
         try {
-            user = await userData.getUserById(ratingInfo.userId);
+            user = await userData.getUserByUid(ratingInfo.userId);
             if (!user) {
                 res.status(400).json({
                     error: 'user does not exist'
@@ -106,7 +132,10 @@ router.post('/', async (req, res) => {
                 return;
             }
         } catch (error) {
-            // do nothing
+            res.status(400).json({
+                error: 'user does not exist'
+            });
+            return;
         }
     }
 

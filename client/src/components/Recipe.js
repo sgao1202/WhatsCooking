@@ -5,6 +5,7 @@ import '../App.css';
 import axios from 'axios'
 import { Container, Row, Col, Image, Button, Form, ListGroup } from 'react-bootstrap'
 import { BsFillBookmarkFill, BsBookmark} from 'react-icons/bs'
+import { Rating } from "@material-ui/lab";
 import logo from '../img/whats-cooking-logo.png';
 import EditRecipeModal from './EditRecipeModal';
 const Recipe = (props) =>{
@@ -44,6 +45,9 @@ const Recipe = (props) =>{
     const [commentData, setCommentData] = useState();
     const [errors, setErrors] = useState();
     const [redirect, setRedirect] = useState(false);
+    const [userRating, setUserRating] = useState(0);
+    const [userRatingId, setUserRatingId] = useState(undefined);
+    const [averageRating, setAverageRating] = useState(0);
 
     const [showEditModal, setShowEditModal] = useState(false);
     
@@ -84,6 +88,27 @@ const Recipe = (props) =>{
             ...comment, [e.target.name]: e.target.value
         });
     }
+
+    const handleRating = async (event, newValue) => {
+        let ratingData = {
+            userId: currentUser.uid,
+            recipeId: props.match.params.id,
+            rating: newValue
+        }
+        if(!userRatingId) {
+            console.log('userRatingId not found')
+            console.log(userRatingId)
+            let {data} = await axios.post(`${url}ratings`, ratingData);
+            console.log('data is')
+            console.log(data)
+            setUserRatingId(data._id)
+        } else {
+            console.log('userratingId found')
+            console.log(userRatingId)
+            await axios.put(`${url}ratings/${userRatingId}`, ratingData);
+        }
+        setUserRating(newValue);
+    }
     
     async function handleSubmit(e){
         e.preventDefault();
@@ -115,6 +140,14 @@ const Recipe = (props) =>{
             console.log(e);
         }
         return;
+    }
+
+    async function getAverageRating() {
+        let { data } = await axios.get(`${url}ratings/recipe/${props.match.params.id}`);
+        var ratingTotal = data.reduce(function(prev, cur) {
+            return prev + cur.rating;
+          }, 0);
+        setAverageRating(parseInt(ratingTotal/data.length));
     }
     
     useEffect(() =>{
@@ -148,9 +181,25 @@ const Recipe = (props) =>{
                 return (<p>{e.message}</p>)
             }
         }
+
+        async function getUserRating() {
+            let { data } = await axios.get(`${url}ratings/recipe/${props.match.params.id}/user/${currentUser.uid}`);
+            setUserRatingId(data._id);
+            setUserRating(data.rating);
+            console.log('user rating id is')
+            console.log(data._id)
+        }
         fetchData();
-        
+        if(currentUser) {
+            getUserRating();
+        }
+        getAverageRating();
     }, [props.match.params.id]);
+
+    useEffect(() =>{
+        console.log('average rating set after update')
+        getAverageRating();
+    }, [userRating]);
 
     if (redirect){
         return <Redirect to='/login'></Redirect>
@@ -189,14 +238,21 @@ const Recipe = (props) =>{
                     </Col>
                     {/* check if current user is owner of recipe (ONCE UID IS IMPLEMENTED) */}
                     {currentUser && <Col xs={2}>
+                        <Row>
                         <Button onClick={updateRecipe}>Update Recipe</Button>
                         <EditRecipeModal isOpen={showEditModal} data={recipeData} user={userData} closeModal={closeModal} updateModal={updateModal}></EditRecipeModal>
+                        </Row>
+                        <Row>
+                        <Rating name="rating" value={userRating} precision={1} onChange={(event, newValue) => handleRating(event, newValue)}/>
+                        </Row>
                     </Col>}
                     <Col xs={6} md={4}>
                         <Image src={`${url}images/${recipeData.picture}`} alt = "noimg" thumbnail="true"></Image>
                     </Col>
                 </Row>
-                
+                <h3>Average Rating:</h3>
+                <Rating name="rating1" value={averageRating} precision={1} readOnly/>
+
                 <h3>Ingredients:</h3>
                 <ul>
                     {ingredients}
