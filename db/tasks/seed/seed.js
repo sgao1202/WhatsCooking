@@ -50,7 +50,6 @@ async function main() {
                     user.uid,
                     user.firstName,
                     user.lastName,
-                    user.username,
                     user.profilePicture,
                     user.aboutMe
                 );
