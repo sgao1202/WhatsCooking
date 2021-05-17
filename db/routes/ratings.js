@@ -78,7 +78,6 @@ router.get('/recipe/:recipeId/user/:userId', async (req, res) => {
         res.status(200).json(rating);
         return;
     } catch (e) {
-        console.log('caught');
         res.status(404).json({
             rating: 0
         });

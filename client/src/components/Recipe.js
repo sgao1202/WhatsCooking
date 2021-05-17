@@ -96,15 +96,9 @@ const Recipe = (props) =>{
             rating: newValue
         }
         if(!userRatingId) {
-            console.log('userRatingId not found')
-            console.log(userRatingId)
             let {data} = await axios.post(`${url}ratings`, ratingData);
-            console.log('data is')
-            console.log(data)
             setUserRatingId(data._id)
         } else {
-            console.log('userratingId found')
-            console.log(userRatingId)
             await axios.put(`${url}ratings/${userRatingId}`, ratingData);
         }
         setUserRating(newValue);
@@ -186,8 +180,6 @@ const Recipe = (props) =>{
             let { data } = await axios.get(`${url}ratings/recipe/${props.match.params.id}/user/${currentUser.uid}`);
             setUserRatingId(data._id);
             setUserRating(data.rating);
-            console.log('user rating id is')
-            console.log(data._id)
         }
         fetchData();
         if(currentUser) {
@@ -197,7 +189,6 @@ const Recipe = (props) =>{
     }, [props.match.params.id]);
 
     useEffect(() =>{
-        console.log('average rating set after update')
         getAverageRating();
     }, [userRating]);
 

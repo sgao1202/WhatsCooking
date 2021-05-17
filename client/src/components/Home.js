@@ -67,8 +67,6 @@ const Home = () => {
     async function fetchData() {
       try {
         const { data } = await axios.get(url + "/search/" + searchTerm);
-        console.log("users is:");
-        console.log(data.users);
         setLoading(false);
         setSearchData(data.recipes);
       } catch (e) {
@@ -105,8 +103,6 @@ const Home = () => {
           `${baseUrl}/users/uid/${currentUser.uid}`
         );
         let userBookmarks = [];
-        console.log(`${baseUrl}/users/uid/${currentUser.uid}`);
-        console.log(userBookmarksData.data);
         for (let i = 0; i < userBookmarksData.data.bookmarks.length; i++) {
           const recipeData = await axios.get(
             url + "/recipes/" + userBookmarksData.data.bookmarks[i]
@@ -118,8 +114,6 @@ const Home = () => {
           userBookmarks.push(userBookmark);
         }
         setUserBookmarks(userBookmarks);
-        console.log(userBookmarks);
-        console.log(currentUser.uid);
       } catch (e) {
         console.log(e);
       }
