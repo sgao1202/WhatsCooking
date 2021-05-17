@@ -59,16 +59,29 @@ router.get('/my-profile/:uid', async (req, res) => {
             if (!utils.validString(recipeId)) return res.status(400).json({error: 'bookmarkList contains invalid ids'});
             let recipe = await recipeData.getRecipeById(recipeId);
             bookmarkedRecipes.push({
-                id: recipeId,
+                _id: recipeId,
                 title: recipe.title,
                 picture: recipe.picture
             });
         }
         let myRecipes = await recipeData.getRecipesByUser(user._id.toString());
+        let followingUsers = [];
+        for (let userId of user.following) {
+            if (!utils.validString(userId)) return res.status(400).json({ error: 'following list contains invalid ids' });
+            let currentUser = await userData.getUserById(userId);
+            followingUsers.push({
+                _id: userId,
+                firstName: currentUser.firstName,
+                lastName: currentUser.lastName,
+                profilePicture: currentUser.profilePicture,
+            });
+        }
+
         res.json({
             user: user,
             bookmarkedRecipes: bookmarkedRecipes,
-            myRecipes: myRecipes
+            myRecipes: myRecipes,
+            following: followingUsers
         });
     } catch (e) {
         res.status(404).json({error: e});
@@ -99,22 +112,15 @@ router.post('/', async (req, res) => {
         });
         return;
     }
-    // if (!userInfo.password || typeof userInfo.password != "string") {
-    //     res.status(400).json({
-    //         error: 'You must provide a valid password'
-    //     });
-    //     return;
-    // }
 
-    // if (!userInfo.profilePicture || typeof userInfo.profilePicture != "string") {
-    //     res.status(400).json({
-    //         error: 'You must provide a valid profile picture'
-    //     });
-    //     return;
-    // }
+    if (!userInfo.profilePicture || typeof userInfo.profilePicture != "string") {
+        res.status(400).json({
+            error: 'You must provide a valid profile picture'
+        });
+        return;
+    }
 
     // About me should be optional and only used when the user edits their profile, same with profile picture
-
     // if (!userInfo.aboutMe || typeof userInfo.aboutMe != "string") {
     //     res.status(400).json({
     //         error: 'You must provide a valid about me'
@@ -122,33 +128,11 @@ router.post('/', async (req, res) => {
     //     return;
     // }
 
-    // CHECK IF USERNAME IS UNIQUE
-    // if (!userInfo.username || typeof userInfo.username != "string") {
-    //     res.status(400).json({
-    //         error: 'You must provide a valid username'
-    //     });
-    //     return;
-    // } else {
-	// 	try {
-	// 		let user = await userData.getUserByUsername(userInfo.username);
-	// 		if (user) {
-	// 			res.status(400).json({
-	// 				error: 'username is taken'
-	// 			});
-	// 			return;
-	// 		}
-	// 	} catch (error) {
-	// 		// do nothing
-	// 	}
-    // }
-
     try {
         const newUser = await userData.addUser(
             userInfo.uid,
             userInfo.firstName,
             userInfo.lastName,
-            userInfo.username,
-            userInfo.password,
             userInfo.profilePicture,
             userInfo.aboutMe
         );
@@ -191,12 +175,7 @@ router.put('/:id', async (req, res) => {
         });
         return;
     }
-    if (!userInfo.password || typeof userInfo.password != "string") {
-        res.status(400).json({
-            error: 'You must provide a valid password'
-        });
-        return;
-    }
+
     if (!userInfo.profilePicture || typeof userInfo.profilePicture != "string") {
         res.status(400).json({
             error: 'You must provide a valid profile picture'
@@ -209,26 +188,6 @@ router.put('/:id', async (req, res) => {
             error: 'You must provide a valid about me'
         });
         return;
-    }
-
-    // CHECK IF USERNAME IS UNIQUE
-    if (!userInfo.username || typeof userInfo.username != "string") {
-        res.status(400).json({
-            error: 'You must provide a valid username'
-        });
-        return;
-    } else {
-		try {
-			let user = await userData.getUserByUsername(userInfo.username);
-			if (user) {
-				res.status(400).json({
-					error: 'username is taken'
-				});
-				return;
-			}
-		} catch (error) {
-			// do nothing
-		}
     }
 
     try {
@@ -306,19 +265,6 @@ router.patch('/:id', async (req, res) => {
         }
     } else {
         updatedObject.lastName = oldUser.lastName;
-    }
-
-	if (userInfo.password && userInfo.password !== oldUser.password) {
-        if (typeof userInfo.password != "string") {
-            res.status(400).json({
-                error: 'You must provide a valid password'
-            });
-            return;
-        } else {
-            updatedObject.password = userInfo.password;
-        }
-    } else {
-        updatedObject.password = oldUser.password;
     }
 
 	if (userInfo.profilePicture && userInfo.profilePicture !== oldUser.profilePicture) {
@@ -401,13 +347,12 @@ router.post('/:id/bookmarks', async (req, res) => {
         });
         return;
     }
-    if (!bookmarkInfo.recipeId || typeof bookmarkInfo.recipeId != "string") {
+    if (!bookmarkInfo._id || typeof bookmarkInfo._id != "string") {
         res.status(400).json({
             error: 'You must provide recipeId'
         });
         return;
     }
-
     let user = null;
     try {
         user = await userData.getUserById(req.params.id);
@@ -420,16 +365,15 @@ router.post('/:id/bookmarks', async (req, res) => {
 
 	let recipe = null;
 	try {
-        recipe = await recipeData.getRecipeById(bookmarkInfo.recipeId);
+        recipe = await recipeData.getRecipeById(bookmarkInfo._id);
     } catch (e) {
         res.status(404).json({
             error: 'recipe not found'
         });
         return;
     }
-
     try {
-        const newUser = await userData.addBookmarkToUser(req.params.id, bookmarkInfo.recipeId);
+        const newUser = await userData.addBookmarkToUser(req.params.id, bookmarkInfo._id);
         res.status(200).json(newUser);
         return;
     } catch (e) {

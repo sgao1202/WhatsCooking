@@ -66,31 +66,19 @@ let exportedMethods = {
         return user;
     },
 
-    // We don't need to store password in the database
     // POST /users
-    async addUser(uid, firstName, lastName, username, profilePicture, aboutMe) {
+    async addUser(uid, firstName, lastName, profilePicture, aboutMe) {
         if (!utils.validString(uid)) throw 'You must provide a valid uid'
         if (!utils.validString(firstName)) throw 'You must provide a valid first name'
         if (!utils.validString(lastName)) throw 'You must provide a valid last name'
-        // if (!utils.validString(username)) throw 'You must provide a username'
-        // if (!utils.validString(password)) throw 'You must provide a valid password'
-        // if (!utils.validString(profilePicture)) throw 'You must provide a valid profile picture'
+        if (!utils.validString(profilePicture)) throw 'You must provide a valid profile picture'
         // if (!utils.validString(aboutMe)) throw 'You must provide a valid about me'
 
-        // I don't think we're going to use username 
-        // CHECK IF USERNAME IS UNIQUE
         const userCollection = await users();
-        // let userNameTaken = await userCollection.findOne({
-        //     username: username
-        // });
-        // if (userNameTaken) throw `Username '${username}' is taken`;
-
         let newUser = {
             uid: uid,
             firstName: firstName,
             lastName: lastName,
-            // username: username,
-            // password: password,  I do not think we need password as a field in the document (handeld by Firebase)
             profilePicture: profilePicture,
             aboutMe: '',
             bookmarks: [],
@@ -111,31 +99,15 @@ let exportedMethods = {
     async updateUser(id, updatedUser) {
         if (!utils.validString(updatedUser.firstName)) throw 'You must provide a valid first name'
         if (!utils.validString(updatedUser.lastName)) throw 'You must provide a valid last name'
-        if (!utils.validString(updatedUser.password)) throw 'You must provide a valid password'
         if (!utils.validString(updatedUser.profilePicture)) throw 'You must provide a valid profile picture'
         if (!utils.validString(updatedUser.aboutMe)) throw 'You must provide a valid about me'
 
-        // Not sure if we need username
-        // CHECK IF USERNAME IS UNIQUE
-        // const userCollection = await users();
-        // if (!updatedUser.username || typeof updatedUser.username != "string") {
-        //     throw 'You must provide a valid username'
-        // } else {
-        //     let userNameTaken = await userCollection.findOne({
-        //         username: updatedUser.username
-        //     });
-        //     if (userNameTaken) {
-        //         throw 'username is taken'
-        //     }
-        // }
-
+        const userCollection = await users();
         const user = await this.getUserById(id);
         let newUser = {
             uid: user.uid,
             firstName: updatedUser.firstName,
             lastName: updatedUser.lastName,
-            username: updatedUser.username,
-            password: updatedUser.password,
             profilePicture: updatedUser.profilePicture,
             bookmarks: user.bookmarks,
             following: user.following,

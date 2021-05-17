@@ -3,6 +3,7 @@ const mongoCollections = require('../config/mongoCollections');
 const ratings = mongoCollections.ratings;
 const userData = require('./users');
 const recipeData = require('./recipes');
+const utils = require('../utils/utils');
 
 const exportedMethods = {
   
@@ -14,7 +15,7 @@ const exportedMethods = {
   },
 
   async getRatingById(id) {
-    if (!id || typeof id !== 'string') throw 'must provide valid id';
+    if (!utils.validString(id)) throw 'must provide valid id';
     const ratingCollection = await ratings();
     const rating = await ratingCollection.findOne({ _id: mongoDB.ObjectId(String(id)) });
     if (!rating) throw 'rating not found';
@@ -22,16 +23,16 @@ const exportedMethods = {
   },
 
   async getRatingsByRecipe(recipeId) {
-	  if (!recipeId || typeof recipeId !== 'string') throw 'must provide valid recipeId';
+	  if (!utils.validString(recipeId)) throw 'must provide valid recipeId';
     const ratingCollection = await ratings();
     const ratingsList = await ratingCollection.find({recipeId: recipeId}).toArray();
     return ratingsList;
   },
   
   async addRating(rating, userId, recipeId) {
-    if (!rating || typeof rating != "number" || rating < 1 || rating > 5) throw 'You must provide a valid rating'
-    if (!userId || typeof userId !== 'string') throw 'must provide valid userId';
-    if (!recipeId || typeof recipeId !== 'string') throw 'must provide valid recipeId';
+    if (!rating || typeof rating != "number" || rating < 1 || rating > 5) throw 'You must provide a valid rating';
+    if (!utils.validString(userId)) throw 'must provide valid userId';
+    if (!utils.validString(recipeId)) throw 'must provide valid recipeId';
 
     let u = await userData.getUserById(userId);
     let r = await recipeData.getRecipeById(recipeId);
@@ -52,7 +53,7 @@ const exportedMethods = {
   // PUT /recipes/{id}
   // PATCH /recipes/{id}
   async updateRating(id, updatedRating) {
-    if (!id || typeof id != "string") throw 'You must provide a valid id'
+    if (!utils.validString(id)) throw 'You must provide a valid id'
     if (!updatedRating.rating || typeof updatedRating.rating != "number" || updatedRating.rating < 1 || updatedRating.rating > 5) throw 'You must provide a valid rating'
 
     const rating = await this.getRatingById(id);
@@ -75,7 +76,7 @@ const exportedMethods = {
   },
   
   async deleteRating(ratingId) {
-    if (!ratingId || typeof ratingId !== 'string') throw 'must provide valid ratingId';
+    if (!utils.validString(ratingId)) throw 'must provide valid ratingId';
 
     const ratingCollection = await ratings();
     const rating = await this.getRatingById(ratingId);

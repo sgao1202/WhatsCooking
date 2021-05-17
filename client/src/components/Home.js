@@ -3,6 +3,7 @@ import axios from "axios";
 import Search from "./Search";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../firebase/Auth";
+import { Button } from "react-bootstrap";
 import {
   Card,
   CardActionArea,
