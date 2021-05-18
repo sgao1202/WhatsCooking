@@ -155,8 +155,11 @@ const Recipe = (props) =>{
                 setUserData(user.data);
                 //get all comments associated with recipe
                 let comments = await axios.get(`${url}comments/recipe/${props.match.params.id}`);
-                //check if user has this page bookmarked
-                user.data.bookmarks.includes(data._id)? setBookmarked(true) : setBookmarked(false);
+                if(currentUser) {
+                    //check if user has this page bookmarked
+                    let cUser = await axios.get(`${url}users/uid/${currentUser.uid}`);
+                    cUser.data.bookmarks.includes(data._id)? setBookmarked(true) : setBookmarked(false);
+                }
 
                 //get user name for the comment data
                 let recipeComments = comments.data;
@@ -236,9 +239,9 @@ const Recipe = (props) =>{
                         <EditRecipeModal isOpen={showEditModal} data={recipeData} user={userData} closeModal={closeModal} updateModal={updateModal}></EditRecipeModal>
                         </Row>
                     </div>}
-                        <Row>
+                    {currentUser && <Row>
                         <Rating name="rating" value={userRating} precision={1} onChange={(event, newValue) => handleRating(event, newValue)}/>
-                        </Row>
+                    </Row>}
                     </Col>
                     <Col xs={6} md={4}>
                         <Image src={`${url}images/${recipeData.picture}`} alt = "noimg" thumbnail="true"></Image>

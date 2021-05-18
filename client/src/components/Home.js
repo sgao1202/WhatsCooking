@@ -120,7 +120,9 @@ const Home = () => {
     }
     fetchPopularData();
     fetchData();
-    fetchUserBookmarks();
+    if(currentUser) {
+      fetchUserBookmarks();
+    }
   }, []);
 
   const searchValue = async (value) => {
