@@ -91,7 +91,7 @@ const UserProfile = (props) => {
                 <Col className="py-3">
                     <Row>
                         <Col>
-                            <Image src={userProfile.profilePicture ? `${url}images/${userProfile.profilePicture}` : genericProfile} alt="profile-picture" roundedCircle/>
+                            <Image className="my-profile-image"src={userProfile.profilePicture ? `${url}images/${userProfile.profilePicture}` : genericProfile} alt="profile-picture" roundedCircle/>
                         </Col>    
                         <Col>
                             <Row>

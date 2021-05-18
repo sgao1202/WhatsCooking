@@ -10,35 +10,51 @@ const Login = () => {
     const { currentUser } = useContext(AuthContext);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [validated, setValidated] = useState(false);
     const [userNotFound, setUserNotFound] = useState(false);
-    const userNotFoundErrorCode = 'auth/user-not-found';       // Show error div where the user is 
+    const [tooManyRequests, setTooManyRequests] = useState(false);
+    const [errors, setErrors] = useState({});
+    const errorCodes = {
+        userNotFound: 'auth/user-not-found',
+        wrongPassword: 'auth/wrong-password',
+        tooManyRequests: 'auth/too-many-requests'
+    };
 
     useEffect(() => {
         document.title = "Login";
     }, []);
 
+    useEffect(() => {
+        // Side effect to reset email and password input fields
+        if (userNotFound) {
+            setEmail('');
+            setPassword('');
+        }
+    }, [userNotFound, tooManyRequests]);
+
     const validateForm = () => {
-        if (!utils.validString(email) || !utils.validString(password)) return false;
+        const newErrors = {
+            email: !utils.validString(email) || !email.includes('@'),
+            password: !utils.validString(password) || password.length < 6
+        }
+        setErrors(newErrors);
+        if (newErrors.email || newErrors.password) return false;
         return true;
     };
 
     const handleLogin = async (event) => {
         event.preventDefault();
-        setValidated(true);
         if (validateForm()){ 
             try {
                 await doSignInWithEmailAndPassword(email, password);
                 setUserNotFound(false);
+                setTooManyRequests(false);
             } catch(e) {
                 // Display a message to the user if they sign in with invalid credentials
-                if (e.code === userNotFoundErrorCode) setUserNotFound(true);
+                if (e.code === errorCodes.tooManyRequests) setTooManyRequests(true);
+                if (e.code === errorCodes.userNotFound || e.code === errorCodes.wrongPassword) setUserNotFound(true);
                 console.log(e);
             }
         }
-        // Reset input field values
-        setEmail('');
-        setPassword('');
     };
 
     // const passwordReset = (event) => {
@@ -54,10 +70,10 @@ const Login = () => {
         <div className="Login">
             { userNotFound && 
                 <Alert variant="danger" className="login-error pb-0 mb-3">
-                    <p>Email or password is incorrect</p>
+                    <p>{tooManyRequests ? 'Too many attempts':'Email or password is incorrect'}</p>
                 </Alert>
             }
-            <Form noValidate validated = {validated} onSubmit={handleLogin}>
+            <Form noValidate onSubmit={handleLogin}>
                 <Form.Group size="lg" controlId="email">
                     <Form.Label>Email</Form.Label>
                     <Form.Control 
@@ -65,7 +81,14 @@ const Login = () => {
                         autoFocus 
                         type="email"
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        onChange={(e) => {
+                            setEmail(e.target.value);
+                            setErrors({
+                                ...errors,
+                                email: false
+                            })
+                        }}
+                        isInvalid = {errors.email || userNotFound}
                     />
                     <Form.Control.Feedback type="invalid">
                         Please enter a valid email.
@@ -77,7 +100,14 @@ const Login = () => {
                         required
                         type="password"
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        onChange={(e) => {
+                            setPassword(e.target.value);
+                            setErrors({
+                                ...errors,
+                                password: false
+                            });
+                        }}
+                        isInvalid = {errors.password || userNotFound}
                     />
                     <Form.Control.Feedback type="invalid">
                         Please enter a valid password.

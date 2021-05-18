@@ -24,14 +24,12 @@ const MyProfile = () => {
             try {
                 // Get user from database
                 const { data } = await axios.get(`${baseUrl}/users/my-profile/${currentUser.uid}`);
-                console.log(data);
                 setUserProfile(data.user);
                 setMyRecipes(data.myRecipes);
                 setFollowing(data.following);
                 setBookmarkedRecipes(data.bookmarkedRecipes);
             } catch (e) {
                 console.log(e);
-                alert(e);
             }
             setLoading(false);
         }
