@@ -262,6 +262,7 @@ const Recipe = (props) =>{
                 <br></br>
                 <Form>
                     <Form.Group controlId="addComment" onSubmit={handleSubmit}>
+                        <Form.Label></Form.Label>
                         <Form.Control name='comment' type="text" value={comment.comment} placeholder="Add a public comment..." onChange={handleChange}/>
                         {submitted && <p className='success'>Your comment has been submitted!</p>}
                     </Form.Group>
