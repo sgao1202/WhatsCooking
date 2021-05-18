@@ -1,6 +1,6 @@
 import React, {useContext, useState, useEffect} from 'react';
 import { AuthContext } from '../firebase/Auth';
-import { Link, Redirect } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Container, Row, Col, Nav, Tab, ListGroup, Spinner, Image} from 'react-bootstrap';
 import { FaBookmark, FaCamera, FaRegNewspaper, FaUser, FaUserFriends, FaUtensils } from 'react-icons/fa';
 import ListDisplay from './ListDisplay';
@@ -24,14 +24,12 @@ const MyProfile = () => {
             try {
                 // Get user from database
                 const { data } = await axios.get(`${baseUrl}/users/my-profile/${currentUser.uid}`);
-                console.log(data);
                 setUserProfile(data.user);
                 setMyRecipes(data.myRecipes);
                 setFollowing(data.following);
                 setBookmarkedRecipes(data.bookmarkedRecipes);
             } catch (e) {
                 console.log(e);
-                alert(e);
             }
             setLoading(false);
         }
@@ -90,7 +88,7 @@ const MyProfile = () => {
                                     <span><FaCamera></FaCamera></span>
                                 </div>
                                 <div className="col-10 pl-0">
-                                    <span>Upload Profile Photo</span>
+                                    <span>Upload Profile Picture</span>
                                 </div>
                             </Row>
                         </Link>
