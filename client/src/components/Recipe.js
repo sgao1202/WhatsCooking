@@ -116,17 +116,13 @@ const Recipe = (props) =>{
         }
         try{
             let user = await axios.get(`${url}users/uid/${currentUser.uid}`);
-            console.log('user is')
-            console.log(user)
             let newComment = await axios.post(`${url}comments`, {
                 comment: comment.comment,
                 recipeId: recipeData._id,
                 userId: user.data._id
             });
-            user = await axios.get(`${url}users/${newComment.data.userId}`);
             newComment.data.userName = user.data.firstName + " " + user.data.lastName;
             //add new comment to commentList and re-render
-            console.log(newComment)
             let comments = [...commentData];
             // comments.push(newComment.data);
             comments.push(newComment.data)
@@ -160,10 +156,6 @@ const Recipe = (props) =>{
                 //get all comments associated with recipe
                 let comments = await axios.get(`${url}comments/recipe/${props.match.params.id}`);
                 //check if user has this page bookmarked
-                console.log('user bookmarks is')
-                console.log(user.data.bookmarks)
-                console.log('bookmark id is')
-                console.log(data._id)
                 user.data.bookmarks.includes(data._id)? setBookmarked(true) : setBookmarked(false);
 
                 //get user name for the comment data
