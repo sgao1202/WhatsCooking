@@ -30,6 +30,9 @@ const Navigation = () => {
                     {/* Fix with a 3 column layout for the navigation bar */}
                     {currentUser ? 
                         <div className="mr-5 pb-2">
+                            <Link className="mr-5 pb-2" to="/newrecipe">
+                                <Button>Create Recipe</Button>
+                            </Link>
                             <Dropdown className="mr-5" alignRight>
                                 <Dropdown.Toggle className="align-top nav-dropdown-toggle nav-profile-picture bg-primary" id="nav-dropdown-toggle" as="div">
                                     <Image className="shadow following-user-profile-picture" src={ currentProfile && currentProfile.profilePicture ? `${baseUrl}/images/${currentProfile.profilePicture}` : genericProfile} alt="nav-profile" roundedCircle/>

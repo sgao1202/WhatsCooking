@@ -28,13 +28,21 @@ const exportedMethods = {
     const ratingsList = await ratingCollection.find({recipeId: recipeId}).toArray();
     return ratingsList;
   },
+
+  async getRatingByRecipeAndUser(recipeId, userId) {
+    if (!utils.validString(recipeId)) throw 'must provide valid recipeId';
+    if (!utils.validString(userId)) throw 'must provide valid userId';
+    const ratingCollection = await ratings();
+    const rating = await ratingCollection.findOne({recipeId: recipeId, userId: userId});
+    return rating;
+  },
   
   async addRating(rating, userId, recipeId) {
     if (!rating || typeof rating != "number" || rating < 1 || rating > 5) throw 'You must provide a valid rating';
     if (!utils.validString(userId)) throw 'must provide valid userId';
     if (!utils.validString(recipeId)) throw 'must provide valid recipeId';
 
-    let u = await userData.getUserById(userId);
+    let u = await userData.getUserByUid(userId);
     let r = await recipeData.getRecipeById(recipeId);
 
     const ratingCollection = await ratings();
