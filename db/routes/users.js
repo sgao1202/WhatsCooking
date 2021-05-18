@@ -120,13 +120,12 @@ router.post('/', async (req, res) => {
         return;
     }
 
-    // About me should be optional and only used when the user edits their profile, same with profile picture
-    // if (!userInfo.aboutMe || typeof userInfo.aboutMe != "string") {
-    //     res.status(400).json({
-    //         error: 'You must provide a valid about me'
-    //     });
-    //     return;
-    // }
+    if (!userInfo.aboutMe || typeof userInfo.aboutMe != "string") {
+        res.status(400).json({
+            error: 'You must provide a valid about me'
+        });
+        return;
+    }
 
     try {
         const newUser = await userData.addUser(

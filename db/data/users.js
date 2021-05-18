@@ -72,15 +72,15 @@ let exportedMethods = {
         if (!utils.validString(firstName)) throw 'You must provide a valid first name'
         if (!utils.validString(lastName)) throw 'You must provide a valid last name'
         if (!utils.validString(profilePicture)) throw 'You must provide a valid profile picture'
-        // if (!utils.validString(aboutMe)) throw 'You must provide a valid about me'
+        if (!utils.validString(aboutMe)) throw 'You must provide a valid about me'
 
         const userCollection = await users();
         let newUser = {
-            uid: uid,
-            firstName: firstName,
-            lastName: lastName,
+            uid: uid.trim(),
+            firstName: firstName.trim(),
+            lastName: lastName.trim(),
             profilePicture: profilePicture,
-            aboutMe: '',
+            aboutMe: aboutMe.trim(),
             bookmarks: [],
             following: [],
             recipes: []
