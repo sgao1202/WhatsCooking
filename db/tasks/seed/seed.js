@@ -50,7 +50,6 @@ async function main() {
                     user.uid,
                     user.firstName,
                     user.lastName,
-                    user.username,
                     user.profilePicture,
                     user.aboutMe
                 );
@@ -100,7 +99,7 @@ async function main() {
                     }
 
                     for (const rating of user.ratings) {
-                        let rat = await ratings.addRating(rating.rating, u._id.toString(), r._id.toString());
+                        let rat = await ratings.addRating(rating.rating, u.uid.toString(), r._id.toString());
                         // let allRatings = await ratings.getAllRatings();
                         // let idRating = await ratings.getRatingById(String(rec._id))
                         // let recipeRating = await ratings.getRatingsByRecipe(String(r._id));

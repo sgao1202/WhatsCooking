@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { Button, Col, ListGroup, Row}  from 'react-bootstrap';
+import { Button, Col, Image, ListGroup, Row}  from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { FaTrash } from 'react-icons/fa';
 import { AuthContext } from '../firebase/Auth';
@@ -14,14 +14,16 @@ const ListDisplay = (props) => {
     const createUserItem = (user) => {
         return (
             <ListGroup.Item key={user._id}>
-                <Row>
-                    <Col md={3}>
-                        <img className="following-user-profile-picture border" src={user.profilePicture ? `${baseUrl}/images/${user.profilePicture}` : genericProfile} alt={`profile-${user._id}`}/>
-                    </Col>
-                    <Col>
-                        <span>{`${user.firstName} ${user.lastName.charAt(0)}`}</span>
-                    </Col>
-                </Row>
+                <Link to={`/users/${user._id}`}>
+                    <Row>
+                        <Col md={1}>
+                            <Image className="shadow-lg following-user-profile-picture" src={user.profilePicture ? `${baseUrl}/images/${user.profilePicture}` : genericProfile} alt={`profile-${user._id}`} roundedCircle/>
+                        </Col>
+                        <Col>
+                            <span>{`${user.firstName} ${user.lastName.charAt(0)}`}</span>
+                        </Col>
+                    </Row>
+                </Link>
             </ListGroup.Item>
         );
     };
@@ -29,18 +31,16 @@ const ListDisplay = (props) => {
     const createRecipeItem = (recipe) => {
         return (
             <ListGroup.Item key={recipe._id}>
-                <div className="row">
-                    <div className="col">
-                        <Link to={`/recipe/${recipe._id}`}>
-                            {recipe.title}
-                        </Link>
-                    </div>
-                    {/* <div className="col">
-                        <Button variant="danger" onClick={() => removeItem(recipe._id)}>
-                            <FaTrash></FaTrash>
-                        </Button>
-                    </div> */}
-                </div>
+                <Link to={`/recipe/${recipe._id}`}>
+                    <Row>
+                        <Col md={1}>
+                            <Image className="shadow-lg following-user-profile-picture" src={recipe.picture ? `${baseUrl}/images/${recipe.profilePicture}` : genericProfile} alt={`recipe-${recipe.title}`} roundedCircle/>
+                        </Col>
+                        <Col>
+                            <span>{recipe.title}</span>
+                        </Col>
+                    </Row>
+                </Link>
             </ListGroup.Item>
         );
     };

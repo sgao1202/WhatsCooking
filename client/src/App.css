@@ -123,6 +123,10 @@ body {
   max-width: 700px;
 }
 
+.upload-button {
+  border-radius: 25px;
+}
+
 .modal-image{
   min-height: 300px;
 }

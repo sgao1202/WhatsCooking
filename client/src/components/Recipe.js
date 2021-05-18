@@ -5,6 +5,7 @@ import '../App.css';
 import axios from 'axios'
 import { Container, Row, Col, Image, Button, Form, ListGroup } from 'react-bootstrap'
 import { BsFillBookmarkFill, BsBookmark} from 'react-icons/bs'
+import { Rating } from "@material-ui/lab";
 import logo from '../img/whats-cooking-logo.png';
 import EditRecipeModal from './EditRecipeModal';
 const Recipe = (props) =>{
@@ -44,6 +45,9 @@ const Recipe = (props) =>{
     const [commentData, setCommentData] = useState();
     const [errors, setErrors] = useState();
     const [redirect, setRedirect] = useState(false);
+    const [userRating, setUserRating] = useState(0);
+    const [userRatingId, setUserRatingId] = useState(undefined);
+    const [averageRating, setAverageRating] = useState(0);
 
     const [showEditModal, setShowEditModal] = useState(false);
     
@@ -56,7 +60,7 @@ const Recipe = (props) =>{
     const closeModal = () => setShowEditModal(false);
     const redirectToLogin = () =>{ setRedirect(true) }
 
-    const [bookmarked, setBookmarked] = useState();
+    const [bookmarked, setBookmarked] = useState(false);
     const [submitted, setSubmitted] = useState(false);
 
     const toggleBookmarks = async(e) => {
@@ -64,14 +68,14 @@ const Recipe = (props) =>{
         e.preventDefault();
         if(!bookmarked){
             try{
-                await axios.post(`${url}users/${userData._id}/bookmarks`, recipeData);
+                await axios.post(`${url}users/${currentUser.uid}/bookmarks`, recipeData);
                 setBookmarked(true);
             }catch(e){
                 console.log(e.error)
             }
         }else{
             try{
-                await axios.delete(`${url}users/${userData._id}/bookmarks/${recipeData._id}`)
+                await axios.delete(`${url}users/${currentUser.uid}/bookmarks/${recipeData._id}`)
                 setBookmarked(false);
             }catch(e){
                 console.log(e);
@@ -83,6 +87,23 @@ const Recipe = (props) =>{
         setComment({
             ...comment, [e.target.name]: e.target.value
         });
+        setSubmitted(false);
+        setErrors("");
+    }
+
+    const handleRating = async (event, newValue) => {
+        let ratingData = {
+            userId: currentUser.uid,
+            recipeId: props.match.params.id,
+            rating: newValue
+        }
+        if(!userRatingId) {
+            let {data} = await axios.post(`${url}ratings`, ratingData);
+            setUserRatingId(data._id)
+        } else {
+            await axios.put(`${url}ratings/${userRatingId}`, ratingData);
+        }
+        setUserRating(newValue);
     }
     
     async function handleSubmit(e){
@@ -94,27 +115,34 @@ const Recipe = (props) =>{
             return;
         }
         try{
+            let user = await axios.get(`${url}users/uid/${currentUser.uid}`);
             let newComment = await axios.post(`${url}comments`, {
                 comment: comment.comment,
                 recipeId: recipeData._id,
-                userId: userData._id
+                userId: user.data._id
             });
-            await axios.get(`${url}users/${newComment.data.userId}`).then((user)=>{
-                newComment.data.userId = user.data.firstName + " " + user.data.lastName;
-                //add new comment to commentList and re-render
-                let comments = [...commentData];
-                // comments.push(newComment.data);
-                comments.push(newComment.data)
-                setCommentData(comments);
-                
-                setComment(initialCommentData);
-                setSubmitted(true);
-            });
+            newComment.data.userName = user.data.firstName + " " + user.data.lastName;
+            //add new comment to commentList and re-render
+            let comments = [...commentData];
+            // comments.push(newComment.data);
+            comments.push(newComment.data)
+            setCommentData(comments);
+            
+            setComment(initialCommentData);
+            setSubmitted(true);
             
         }catch(e){
             console.log(e);
         }
         return;
+    }
+
+    async function getAverageRating() {
+        let { data } = await axios.get(`${url}ratings/recipe/${props.match.params.id}`);
+        var ratingTotal = data.reduce(function(prev, cur) {
+            return prev + cur.rating;
+          }, 0);
+        setAverageRating(parseInt(ratingTotal/data.length));
     }
     
     useEffect(() =>{
@@ -127,8 +155,11 @@ const Recipe = (props) =>{
                 setUserData(user.data);
                 //get all comments associated with recipe
                 let comments = await axios.get(`${url}comments/recipe/${props.match.params.id}`);
-                //check if user has this page bookmarked
-                user.data.bookmarks.includes(data._id)? setBookmarked(true) : setBookmarked(false);
+                if(currentUser) {
+                    //check if user has this page bookmarked
+                    let cUser = await axios.get(`${url}users/uid/${currentUser.uid}`);
+                    cUser.data.bookmarks.includes(data._id)? setBookmarked(true) : setBookmarked(false);
+                }
 
                 //get user name for the comment data
                 let recipeComments = comments.data;
@@ -148,9 +179,22 @@ const Recipe = (props) =>{
                 return (<p>{e.message}</p>)
             }
         }
+
+        async function getUserRating() {
+            let { data } = await axios.get(`${url}ratings/recipe/${props.match.params.id}/user/${currentUser.uid}`);
+            setUserRatingId(data._id);
+            setUserRating(data.rating);
+        }
         fetchData();
-        
+        if(currentUser) {
+            getUserRating();
+        }
+        getAverageRating();
     }, [props.match.params.id]);
+
+    useEffect(() =>{
+        getAverageRating();
+    }, [userRating]);
 
     if (redirect){
         return <Redirect to='/login'></Redirect>
@@ -188,15 +232,24 @@ const Recipe = (props) =>{
                         <p id='recipe-desc'>{recipeData.description}</p>
                     </Col>
                     {/* check if current user is owner of recipe (ONCE UID IS IMPLEMENTED) */}
-                    {currentUser && <Col xs={2}>
+                    <Col xs={2}>
+                    {currentUser && currentUser.uid == userData.uid && <div>
+                        <Row>
                         <Button onClick={updateRecipe}>Update Recipe</Button>
                         <EditRecipeModal isOpen={showEditModal} data={recipeData} user={userData} closeModal={closeModal} updateModal={updateModal}></EditRecipeModal>
-                    </Col>}
+                        </Row>
+                    </div>}
+                    {currentUser && <Row>
+                        <Rating name="rating" value={userRating} precision={1} onChange={(event, newValue) => handleRating(event, newValue)}/>
+                    </Row>}
+                    </Col>
                     <Col xs={6} md={4}>
                         <Image src={`${url}images/${recipeData.picture}`} alt = "noimg" thumbnail="true"></Image>
                     </Col>
                 </Row>
-                
+                <h3>Average Rating:</h3>
+                <Rating name="rating1" value={averageRating} precision={1} readOnly/>
+
                 <h3>Ingredients:</h3>
                 <ul>
                     {ingredients}

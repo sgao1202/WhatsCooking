@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import firebaseApp from './Firebase';
 import { Container, Spinner } from 'react-bootstrap';
-import UserProfile from '../components/UserProfile';
 import axios from 'axios';
 
 const AuthContext = React.createContext();
@@ -29,8 +28,8 @@ const AuthProvider = ({ children }) => {
         });
     }, []);
 
-    const setProfile = (user) => {
-        setCurrentProfile(user);
+    const updateProfile = (profile) => {
+        setCurrentProfile(profile);
     };
 
     if (loadingUser) return ( 
@@ -42,7 +41,7 @@ const AuthProvider = ({ children }) => {
     );
     
     return (
-        <AuthContext.Provider value={{ currentUser, currentProfile, setProfile, baseUrl: baseUrl }}>
+        <AuthContext.Provider value={{ currentUser, currentProfile, updateProfile, baseUrl: baseUrl }}>
             {children}
         </AuthContext.Provider>
     );

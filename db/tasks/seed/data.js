@@ -5,12 +5,12 @@ module.exports = [
         uid: 'mjAzMlCYqbc6ET6oQxm6VR9nhxi2',
         username: 'bessonf',
         password: '$2a$16$TR0iphtk84k/wLVRaqEYm.npNn4K0esPRfeg9O7nvYw4o4fCCIS3W',
-        profilePicture: 'koala.jpg',
+        profilePicture: '20b3f083-a589-457e-9a81-16a2366f469c',
         aboutMe: 'computer scientist turned chef',
         recipes: [
             {
                 title: 'Blueberry Scones',
-                picture: './img/blueberryScone.jpg',
+                picture: '77285e87-0ff7-4b97-83e0-d2843cd871aa',
                 description: 'These better-than-the-bakery blueberry scones are bursting with juicy blueberries',
                 ingredients: [
                     {
@@ -94,12 +94,12 @@ module.exports = [
         uid: '5kE8fhFiQeXEdNmdGFjg7BZJxL52',
         username: 'sgao',
         password: '$2a$16$TR0iphtk84k/wLVRaqEYm.npNn4K0esPRfeg9O7nvYw4o4fCCIS3W',
-        profilePicture: 'koala.jpg',
+        profilePicture: '20b3f083-a589-457e-9a81-16a2366f469c',
         aboutMe: 'another computer scientist turned chef',
         recipes: [
             {
                 title: '15-MINUTE HONEY GARLIC CHICKEN',
-                picture: './img/honeygarlicchicken.jpg',
+                picture: '648792ed-9c0f-4eed-bc37-9c5a637b9533',
                 description: 'quick and easy juicy chicken!',
                 ingredients: [
                     {
@@ -165,12 +165,12 @@ module.exports = [
         uid: 'EmLLhfuipmf56vkHcx7sVgpA4LD3',
         username: 'fjafri',
         password: '$2a$16$TR0iphtk84k/wLVRaqEYm.npNn4K0esPRfeg9O7nvYw4o4fCCIS3W',
-        profilePicture: 'koala.jpg',
+        profilePicture: '20b3f083-a589-457e-9a81-16a2366f469c',
         aboutMe: 'incredible chef who also enjoy computer science',
         recipes: [
             {
                 title: 'quick & easy creamy herb chicken',
-                picture: './img/herbchicken.jpg',
+                picture: 'd9776af1-196d-40c3-a461-5d2e6171c25d',
                 description: 'quick and easy creamy herb chicken filled with so much flavour, ready and on your table in 15 minutes? yes!',
                 ingredients: [
                     {
@@ -236,12 +236,12 @@ module.exports = [
         uid: '1TjTuT3EYnS5GMGTemUNOpvbxIm1',
         username: 'achen',
         password: '$2a$16$TR0iphtk84k/wLVRaqEYm.npNn4K0esPRfeg9O7nvYw4o4fCCIS3W',
-        profilePicture: './img/none.jpg',
+        profilePicture: 'no-image.jpeg',
         aboutMe: 'an inspiring chef',
         recipes: [
             {
                 title: 'Broccoli Pesto Pasta',
-                picture: './img/pestopasta.jpg',
+                picture: '66fb94d9-b2e2-48ff-8515-ca35b83bf991',
                 description: 'Today, a verdant, bright broccoli pesto pasta that’s as healthy as it is delicious.',
                 ingredients: [
                     {

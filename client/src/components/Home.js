@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import Search from "./Search";
 import { Link } from "react-router-dom";
-import { Button } from 'react-bootstrap';
+import { AuthContext } from "../firebase/Auth";
+import { Button, ListGroup, Card } from "react-bootstrap";
+import genericProfile from "../img/generic-user-profile.jpeg";
 import {
-  Card,
   CardActionArea,
   CardContent,
   CardMedia,
@@ -32,31 +33,40 @@ const useStyles = makeStyles({
     flexDirection: "row",
   },
   media: {
-    height: "100%",
-    width: "100%",
+    height: "130px",
+    maxWidth: 250,
   },
   button: {
     color: "#1e8678",
     fontWeight: "bold",
     fontSize: 12,
   },
+  leftElement: {
+    float: "left",
+    width: "80%",
+  },
+  rightElement: {
+    float: "right",
+    width: "20%",
+  },
 });
 
 const Home = () => {
+  const { baseUrl, currentUser, currentProfile } = useContext(AuthContext);
   const classes = useStyles();
   const url = "http://localhost:3001";
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchData, setSearchData] = useState(undefined);
   const [popularRecipes, setPopularRecipes] = useState(undefined);
+  const [allRecipes, setAllRecipes] = useState([]);
+  const [userBookmarks, setUserBookmarks] = useState([]);
   let li = null;
 
   useEffect(() => {
     async function fetchData() {
       try {
         const { data } = await axios.get(url + "/search/" + searchTerm);
-        console.log("users is:");
-        console.log(data.users);
         setLoading(false);
         setSearchData(data.recipes);
       } catch (e) {
@@ -68,8 +78,8 @@ const Home = () => {
     }
   }, [searchTerm]);
 
-  useEffect(() => {
-    async function fetchData() {
+  useEffect(async () => {
+    async function fetchPopularData() {
       try {
         const { data } = await axios.get(url + "/recipes/popular");
         setPopularRecipes(data);
@@ -78,45 +88,95 @@ const Home = () => {
         console.log(e);
       }
     }
+    async function fetchData() {
+      try {
+        const { data } = await axios.get(url + "/recipes");
+        setAllRecipes(data);
+        setLoading(false);
+      } catch (e) {
+        console.log(e);
+      }
+    }
+    async function fetchUserBookmarks() {
+      try {
+        const userBookmarksData = await axios.get(
+          `${baseUrl}/users/uid/${currentUser.uid}`
+        );
+        let userBookmarks = [];
+        for (let i = 0; i < userBookmarksData.data.bookmarks.length; i++) {
+          const recipeData = await axios.get(
+            url + "/recipes/" + userBookmarksData.data.bookmarks[i]
+          );
+          let userBookmark = {
+            id: recipeData.data._id,
+            name: recipeData.data.title,
+          };
+          userBookmarks.push(userBookmark);
+        }
+        setUserBookmarks(userBookmarks);
+      } catch (e) {
+        console.log(e);
+      }
+    }
+    fetchPopularData();
     fetchData();
+    if(currentUser) {
+      fetchUserBookmarks();
+    }
   }, []);
 
   const searchValue = async (value) => {
     setSearchTerm(value);
   };
 
+  const bookmarks =
+    userBookmarks &&
+    userBookmarks.map((bookmark) => {
+      return (
+        <ListGroup.Item action href={`/recipe/${bookmark.id}`}>
+          {bookmark.name}
+        </ListGroup.Item>
+      );
+    });
+
+  const popularSearches =
+    popularRecipes &&
+    popularRecipes.map((s) => {
+      return (
+        <ListGroup.Item action href={`/recipe/${s._id}`}>
+          {s.title}
+        </ListGroup.Item>
+      );
+    });
+
   const buildCard = (s) => {
     return (
-      <Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={s._id}>
-            <Card className={classes.card} variant="outlined">
-              <CardActionArea>
-                <Link to={`/recipe/${s._id}`}>
-                  <CardMedia
-                    className={classes.media}
-                    component="img"
-                    image={`${url}/images/${
-                      s.picture ? s.picture : "no-image.jpeg"
-                    }`}
-                    title="show image"
-                  />
+      <Grid item xs={12} sm={6} md={4} lg={5} xl={2} key={s._id}>
+        <Card className={classes.card} variant="outlined">
+          <CardActionArea>
+            <Link to={`/recipe/${s._id}`}>
+              <CardMedia
+                className={classes.media}
+                component="img"
+                image={`${baseUrl}/images/${
+                  s.picture ? s.picture : genericProfile
+                }`}
+                title="show image"
+              />
 
-                  <CardContent>
-                    <Typography gutterBottom variant="h6" component="h3">
-                      {s.title}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="textSecondary"
-                      component="p"
-                    >
-                      {s.description ? s.description : "No Summary"}
-                      <span>More Info</span>
-                    </Typography>
-                  </CardContent>
-                </Link>
-              </CardActionArea>
-            </Card>
-          </Grid>
+              <CardContent>
+                <Typography gutterBottom variant="h6" component="h3">
+                  {s.title}
+                </Typography>
+                <Typography variant="body2" color="textSecondary" component="p">
+                  {s.description ? s.description : "No Summary"}
+                  <span>More Info</span>
+                </Typography>
+              </CardContent>
+            </Link>
+          </CardActionArea>
+        </Card>
+      </Grid>
     );
   };
 
@@ -128,8 +188,8 @@ const Home = () => {
       });
   } else {
     li =
-      popularRecipes &&
-      popularRecipes.map((s) => {
+      allRecipes &&
+      allRecipes.map((s) => {
         return buildCard(s);
       });
   }
@@ -138,15 +198,29 @@ const Home = () => {
   } else {
     return (
       <div>
-        <Link className="mr-5 pb-2" to="/newrecipe">
-            <Button>Create Recipe</Button>
-        </Link>
         <Search searchValue={searchValue}></Search>
-        <br />
-        <br />
-        <Grid container className={classes.grid} spacing={5}>
-          {li}
-        </Grid>
+        <div className={classes.leftElement}>
+          <br />
+          <br />
+          <Grid container className={classes.grid} spacing={5}>
+            {li}
+          </Grid>
+        </div>
+        <div className={classes.rightElement}>
+          <Card style={{ width: "18rem" }}>
+            <Card.Header>Popular</Card.Header>
+            <ListGroup variant="flush">{popularSearches}</ListGroup>
+          </Card>
+          <br />
+          {currentUser ? (
+            <Card style={{ width: "18rem" }}>
+              <Card.Header>Bookmarks</Card.Header>
+              <ListGroup variant="flush">{bookmarks}</ListGroup>
+            </Card>
+          ) : (
+            ""
+          )}
+        </div>
       </div>
     );
   }

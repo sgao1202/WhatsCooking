@@ -28,9 +28,9 @@ const UserProfile = (props) => {
             setLoading(true);
             try {
                 // Get user from database
-                const { data } = await axios.get(`${baseUrl}/users/${String(props.match.params.id)}`);
-                let r = await axios.get(`${url}users/uid/${currentUser.uid}`);
-                let u = r.data;
+                const { data } = await axios.get(`${baseUrl}/users/uid/${String(props.match.params.id)}`);
+                //let r = await axios.get(`${url}users/uid/${currentUser.uid}`);
+                //let u = r.data;
                 setUserProfile(data);
                 setBookmarkedRecipes(data.bookmarks);
                 setMyRecipes(data.recipes);
@@ -45,7 +45,7 @@ const UserProfile = (props) => {
 
     const toggleFollowing = async(e) => {
         let followInfo = {
-            followUserId: String(props.match.params.id)
+            followUserId: String(userProfile._id)//String(props.match.params.id)
         }
 
         e.preventDefault();
@@ -62,7 +62,7 @@ const UserProfile = (props) => {
             try{
                 let r = await axios.get(`${url}users/uid/${currentUser.uid}`, followInfo);
                 let u = r.data;
-                await axios.delete(`${url}users/${u._id}/following/${String(props.match.params.id)}`)
+                await axios.delete(`${url}users/${u._id}/following/${String(userProfile._id)}`)
                 setFollowing(false);
             }catch(e){
                 console.log(e);
@@ -84,6 +84,15 @@ const UserProfile = (props) => {
             <Spinner animation="border"></Spinner>
         </Container>
     );
+
+    let followButton = null;
+    if (currentUser.uid != userProfile.uid) {
+        if (currentUser && !following) {
+            followButton = <FiUserPlus size={40} onClick={currentUser? (e)=>toggleFollowing(e): ()=>redirectToLogin()}></FiUserPlus>;
+        } else if (currentUser && following) {
+            followButton = <FaUserMinus size={40}  onClick={currentUser? (e)=>toggleFollowing(e): ()=>redirectToLogin()}></FaUserMinus>
+        }
+    }
     
     return (
         <Container>
@@ -91,12 +100,12 @@ const UserProfile = (props) => {
                 <Col className="py-3">
                     <Row>
                         <Col>
-                            <Image src={userProfile.profilePicture ? `${url}images/${userProfile.profilePicture}` : genericProfile} alt="profile-picture" roundedCircle/>
+                            <Image className="my-profile-image"src={userProfile.profilePicture ? `${url}images/${userProfile.profilePicture}` : genericProfile} alt="profile-picture" roundedCircle/>
                         </Col>    
                         <Col>
                             <Row>
                                 <Col>
-                                <h1>{`${userProfile.firstName} ${userProfile.lastName}`}&nbsp;&nbsp;{currentUser && !following?<FiUserPlus size={40} onClick={currentUser? (e)=>toggleFollowing(e): ()=>redirectToLogin()}></FiUserPlus> : <FaUserMinus size={40}  onClick={currentUser? (e)=>toggleFollowing(e): ()=>redirectToLogin()}></FaUserMinus>}</h1> 
+                                <h1>{`${userProfile.firstName} ${userProfile.lastName}`}&nbsp;&nbsp;{followButton}</h1> 
                                 </Col>   
                             </Row>
                             <Row>

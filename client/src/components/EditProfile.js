@@ -79,11 +79,13 @@ const ProfileEdit = () => {
         </Container>
     );
     if (submitted) return <Redirect to="/my-profile"></Redirect>;
-    console.log('errors', errors);
     return (
         <Container className="edit-container shadow-lg p-5">
             <h2 className="border-bottom pb-3 mb-4">Edit Profile</h2>
             <Form noValidate onSubmit={handleSubmit}>
+                <Form.Group>
+                    <Link to="/my-profile/upload-image">Update Profile Picture</Link>
+                </Form.Group>
                 <Form.Group controlId="firstName">
                     <Form.Label>First Name</Form.Label>
                     <Form.Control 
@@ -97,6 +99,7 @@ const ProfileEdit = () => {
                                 firstName: false
                             });
                         }}
+                        isValid = {!!errors.firstName}
                         isInvalid = {errors.firstName}
                     />
                     <Form.Control.Feedback type="invalid">
@@ -115,6 +118,7 @@ const ProfileEdit = () => {
                                 lastName: false
                             });
                         }}
+                        isValid = {!!errors.lastName}
                         isInvalid = {errors.lastName}
                     />
                     <Form.Control.Feedback type="invalid">
@@ -124,6 +128,9 @@ const ProfileEdit = () => {
                 <Form.Group controlId="aboutMe">
                     <Form.Label>About Me</Form.Label>
                     <Form.Control 
+                        as="textarea"
+                        rows="3"
+                        placeholder="Tell us a little bit about yourself. Maybe some of your favorite cuisines, popular chefs, or even some of your favorite dishes!"
                         type="text" 
                         defaultValue={profileInfo.aboutMe}
                         onChange={(e) => {
@@ -133,7 +140,8 @@ const ProfileEdit = () => {
                                 aboutMe: false
                             });
                         }}
-                        isInvalid = {!!errors.aboutMe}
+                        isValid = {!!errors.aboutMe}
+                        isInvalid = {errors.aboutMe}
                     />
                     <Form.Control.Feedback type="invalid">
                         Please enter a valid about me section
