@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useContext } from 'react'
 import { AuthContext } from '../firebase/Auth'
 import utils from '../lib/Utility';
+import { FaBullseye } from 'react-icons/fa';
 
 function NewRecipe(props){
     const { currentUser } = useContext(AuthContext);
@@ -17,14 +18,14 @@ function NewRecipe(props){
         procedure: [""]
     }
     const url = 'http://localhost:3001/';
-    const [validated, setValidated] = useState(false);
     const [formData, setFormData] = useState(initialFormData);
     const [errors, setErrors] = useState({
         title: false,
         description: false,
-        ingredients: [{name: false, portion: false, units: false}],
-        procedure: [false]
+        ingredients: false,
+        procedure: false
     });
+    const [submitted, setSubmitted] = useState(false);
 
     useEffect(()=>{
         async function fetchData(){
@@ -34,14 +35,13 @@ function NewRecipe(props){
             })
         }
         fetchData();  
+        
     }, [currentUser])
 
     const handleFileChange = (e) => {
-        console.log(e.target.files[0])
         setFormData({
             ...formData, [e.target.name]: e.target.files[0]
         })
-        console.log(formData)
     }
     const handleChange = (e) =>{
         setFormData({
@@ -50,50 +50,92 @@ function NewRecipe(props){
     }
     const handleSubmit = async(e) =>{
         e.preventDefault();
-        // const formErrors = findFormErrors();
-        // console.log(formErrors)
-        // setErrors(formErrors);
-        setValidated(true);
+        setSubmitted(true);
         if (validateForm()){
             try{
                 //upload the image, receive the generated uid of image
                 const imageData = new FormData();
-                imageData.append("file", formData.picture, formData.picture.name)
+                console.log(formData.picture)
+                imageData.append("file", formData.picture)
                 let picId = await axios.post(`${url}uploadImage`, imageData)
 
                 //store the picture in the database as a uid
                 formData.picture = picId.data;
                 let newRecipe = await axios.post(`${url}recipes`, formData)
                 
-                //redirect to new page after recipe created
-                //props.history.push(`/recipe/${newRecipe.data._id}`)
+                // redirect to new page after recipe created
+                props.history.push(`/recipe/${newRecipe.data._id}`)
                 
             }catch(e){
                 console.log(e)
             }
         }
         else{
-
+            console.log("form has failed to submit");
         }
-        
     }
     
 
     const validateForm = () =>{
-        if (!utils.validString(formData.title)){
+        let procedureErrors = checkProcedureErrors();
+        // const newErrors = {
+        //     title: !utils.validString(formData.title),
+        //     description: !utils.validString(formData.description),
+        //     picture: !formData.picture,
+        //     ingredients: ingredientErrors,
+        //     procedure: procedureErrors
+        // }
+        const newErrors = {
+            title: !utils.validString(formData.title),
+            description: !utils.validString(formData.description),
+            picture: !formData.picture,
+            ingredientNames: checkIngredientNames(),
+            ingredientPortions: checkIngredientPortions(),
+            ingredientUnits: checkIngredientUnits(),
+            procedure: checkProcedureErrors()
+        }
+
+        console.log(newErrors);
+        setErrors(newErrors);
+        function checkIngredientNames(){
+            let ingredients = formData.ingredients
+            for (let i = 0; i<ingredients.length; i++){
+                if(!utils.validString(ingredients[i].name)){
+                    return true;
+                }
+            }
             return false;
         }
-        formData.ingredients.forEach((ingredient, index) => {
-            if(ingredient.portion < 0){
-                console.log()
-                let portionErr = {name: false, portion: true, units: false}
-                setErrors({
-                    ...errors, ingredients: portionErr
-                })
-                console.log(errors)
-                return false;
+        function checkIngredientPortions(){
+            let ingredients = formData.ingredients
+            console.log(ingredients)
+            for (let i = 0; i<ingredients.length; i++){
+                if(!ingredients[i].portion || ingredients[i].portion < 0){
+                    return true;
+                }
             }
-        })
+            return false;
+        }
+        function checkIngredientUnits(){
+            let ingredients = formData.ingredients
+            for (let i = 0; i<ingredients.length; i++){
+                if(!utils.validString(ingredients[i].units)){
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function checkProcedureErrors(){
+            let procedure = formData.procedure;
+            for (let i = 0; i<procedure.length; i++){
+                if(!utils.validString(procedure[i])){
+                    return true;
+                }
+            }
+            return false;
+        }
+        if (newErrors.title || newErrors.description || newErrors.picture || newErrors.ingredientNames || newErrors.ingredientPortions || newErrors.ingredientUnits || newErrors.procedure) return false;
         return true;
     }
 
@@ -139,7 +181,7 @@ function NewRecipe(props){
     return (
         <div>
             <h1>Create a Recipe</h1>
-            <Form noValidate validated={validated} encType="multipart/form-data" onSubmit={handleSubmit}>
+            <Form noValidate encType="multipart/form-data" onSubmit={handleSubmit}>
                 <Form.Row>
                     <Form.Group controlId="recipeName">
                     <Form.Label>Recipe Name:</Form.Label>
@@ -147,9 +189,12 @@ function NewRecipe(props){
                         required
                         type="text" 
                         name='title'
-                        onChange={handleChange}
-                        isInvalid={errors.itlte}
+                        onChange={(e) => {handleChange(e) 
+                                        setErrors({...errors, title: false})}}
+                        isValid={!!errors.title}
+                        isInvalid={errors.title}
                     />
+                    <Form.Control.Feedback type="invalid">Must provide a title!</Form.Control.Feedback>
                     </Form.Group>
                     </Form.Row>
                 <Form.Row>
@@ -161,16 +206,26 @@ function NewRecipe(props){
                         name="description"
                         as='textarea'
                         rows='5'
-                        onChange={handleChange}
+                        onChange={(e) => {handleChange(e) 
+                            setErrors({...errors, description: false})}}
+                        isValid={!!errors.description}
                         isInvalid={errors.description}
                     />
+                    <Form.Control.Feedback type="invalid">Must provide a description!</Form.Control.Feedback>
                     </Form.Group>
                 </Form.Row>
                 <Form.Row>
                     <Form.Group controlId='updateImage'>
                         <Form.Label>Image:</Form.Label>
-                        <Form.File required type='file' name='picture' accept="image/*" onChange={handleFileChange}></Form.File>
-                        <Form.Control.Feedback type="invalid">Must provide an image!</Form.Control.Feedback>
+                        
+                        <Form.File 
+                            type='file' 
+                            name='picture' 
+                            accept="image/*" 
+                            onChange={(e) => {handleFileChange(e)
+                                setErrors({...errors, picture : false})
+                            }}></Form.File>
+                        {errors.picture && submitted && <p className='error'>Must provide an image!</p>}
                     </Form.Group>
                 </Form.Row>
                             
@@ -182,22 +237,40 @@ function NewRecipe(props){
                         <InputGroup.Prepend>
                             <InputGroup.Text>Name:</InputGroup.Text>
                         </InputGroup.Prepend>
-                        <Form.Control required type="text" name="name" onChange={(e) => handleIngredientChange(e, index)} isInvalid={errors.ingredients[index]['name']}></Form.Control>
-                        <Form.Control.Feedback type="invalid">Must provide an ingredient name!</Form.Control.Feedback>
+                        <Form.Control required 
+                                type="text" 
+                                name="name" 
+                                onChange={(e) => {handleIngredientChange(e, index)
+                                                setErrors({...errors, ingredientNames : false})}} 
+                                isValid={!!errors.ingredientNames} 
+                                isInvalid={errors.ingredientNames}></Form.Control>
+                        <Form.Control.Feedback type="invalid">Must provide an ingredient name for all ingredients!</Form.Control.Feedback>
                     </InputGroup>
                     <InputGroup as={Col}>
                         <InputGroup.Prepend>
                             <InputGroup.Text>Portion:</InputGroup.Text>
                         </InputGroup.Prepend>
-                        <Form.Control required type="number" name="portion" onChange={(e) => handleIngredientChange(e, index)} isInvalid={errors.ingredients[index]['portion']}></Form.Control>
-                        <Form.Control.Feedback type="invalid">Must provide a non-negative portion amount!</Form.Control.Feedback>
+                        <Form.Control required 
+                            type="number" 
+                            name="portion" 
+                            onChange={(e) => {handleIngredientChange(e, index)
+                                setErrors({...errors, ingredientPortions : false})}} 
+                            isValid={!!errors.ingredientPortions} 
+                            isInvalid={errors.ingredientPortions}></Form.Control>
+                        <Form.Control.Feedback type="invalid">Must provide a non-negative portion amount for all ingredients!</Form.Control.Feedback>
                     </InputGroup>
                     <InputGroup as={Col}>
                         <InputGroup.Prepend>
                             <InputGroup.Text>Units:</InputGroup.Text>
                         </InputGroup.Prepend>
-                        <Form.Control required type="text" name="units" onChange={(e) => handleIngredientChange(e, index)} isInvalid={errors.ingredients[index]['units']}></Form.Control>
-                        <Form.Control.Feedback type="invalid">Must provide a unit of measurement!</Form.Control.Feedback>
+                        <Form.Control required 
+                        type="text" 
+                        name="units" 
+                        onChange={(e) => {handleIngredientChange(e, index)
+                            setErrors({...errors, ingredientUnits : false})}} 
+                        isValid={!!errors.ingredientUnits} 
+                        isInvalid={errors.ingredientUnits}></Form.Control>
+                        <Form.Control.Feedback type="invalid">Must provide a unit of measurement for all ingredients!!</Form.Control.Feedback>
                     </InputGroup>
                     <Button variant="danger" as={Col} xs={1} onClick={(e) => deleteIngredient(index)}>X</Button>
                 </Form.Row>
@@ -213,8 +286,12 @@ function NewRecipe(props){
                             <InputGroup.Prepend>
                                 <InputGroup.Text>{index+1}.</InputGroup.Text>
                             </InputGroup.Prepend>
-                            <Form.Control required as="textarea" onChange={(e) => handleProcedureChange(e, index)} isInvalid={errors.procedure[index]}></Form.Control>
-                            <Form.Control.Feedback type="invalid">Step cannot be empty!</Form.Control.Feedback>
+                            <Form.Control required 
+                                as="textarea" 
+                                onChange={(e) => {handleProcedureChange(e, index)
+                                    setErrors({...errors, procedure : false})}} 
+                                isInvalid={errors.procedure}></Form.Control>
+                            <Form.Control.Feedback type="invalid">Step cannot be empty for all steps!</Form.Control.Feedback>
                         </InputGroup>
                         <Button className='del-btn' variant="danger" as={Col} xs={1} onClick={() => deleteStep(index)}>X</Button>
                     </Form.Row>
