@@ -3,7 +3,7 @@ import axios from "axios";
 import Search from "./Search";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../firebase/Auth";
-import { Button, ListGroup, Card } from "react-bootstrap";
+import { Button, ListGroup, Card, Row, Col } from "react-bootstrap";
 import genericProfile from "../img/generic-user-profile.jpeg";
 import {
   CardActionArea,
@@ -207,6 +207,9 @@ const Home = () => {
           </Grid>
         </div>
         <div className={classes.rightElement}>
+          <Link className="pb-5" to="/newrecipe">
+            <Button>Create Recipe</Button>
+          </Link>
           <Card style={{ width: "18rem" }}>
             <Card.Header>Popular</Card.Header>
             <ListGroup variant="flush">{popularSearches}</ListGroup>
