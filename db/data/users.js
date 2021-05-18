@@ -148,12 +148,12 @@ let exportedMethods = {
         if (!utils.validString(userId)) throw 'must provide valid userId';
         if (!utils.validString(recipeId)) throw 'You must provide valid recipeId';
 
-        let user = await this.getUserById(userId);
+        let user = await this.getUserByUid(userId);
         let recipe = await recipeData.getRecipeById(recipeId);
 
         const userCollection = await users();
         const updateInfo = await userCollection.updateOne({
-            _id: mongoDB.ObjectID(String(userId))
+            uid: userId
         }, {
             $addToSet: {
                 bookmarks: String(recipe._id)
@@ -164,7 +164,7 @@ let exportedMethods = {
             throw 'Update failed';
         }
 
-        return await this.getUserById(userId);
+        return await this.getUserByUid(userId);
     },
 
     // DELETE /users/{userId}/bookmarks/{recipeId}
@@ -188,7 +188,7 @@ let exportedMethods = {
 
         const userCollection = await users();
         const updateInfo = await userCollection.updateOne({
-                _id: mongoDB.ObjectID(String(userId))
+            _id: mongoDB.ObjectID(String(userId))
             }, {
                 $pull: {
                     bookmarks: String(recipeId)
