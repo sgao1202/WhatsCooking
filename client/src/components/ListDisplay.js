@@ -10,7 +10,6 @@ const ListDisplay = (props) => {
     const { baseUrl } = useContext(AuthContext);
     const [list, setList] = useState(props.list);
     let currentList = null;
-
     const createUserItem = (user) => {
         return (
             <ListGroup.Item key={user._id}>
@@ -34,7 +33,7 @@ const ListDisplay = (props) => {
                 <Link to={`/recipe/${recipe._id}`}>
                     <Row>
                         <Col md={1}>
-                            <Image className="shadow-lg following-user-profile-picture" src={recipe.picture ? `${baseUrl}/images/${recipe.profilePicture}` : genericProfile} alt={`recipe-${recipe.title}`} roundedCircle/>
+                            <Image className="shadow-lg following-user-profile-picture" src={recipe.picture ? `${baseUrl}/images/${recipe.picture}` : genericProfile} alt={`recipe-${recipe.title}`} roundedCircle/>
                         </Col>
                         <Col>
                             <span>{recipe.title}</span>
