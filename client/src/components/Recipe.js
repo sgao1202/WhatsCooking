@@ -226,7 +226,7 @@ const Recipe = (props) =>{
                         </span>
                         <h2 id='recipe-chef'>
                             Posted By: 
-                            <Link to={`/users/${userData._id}`}> {userData.firstName} {userData.lastName}</Link>
+                            <Link to={`/users/${userData.uid}`}> {userData.firstName} {userData.lastName}</Link>
                             </h2>
                         <br></br>
                         <p id='recipe-desc'>{recipeData.description}</p>

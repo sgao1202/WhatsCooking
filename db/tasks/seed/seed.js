@@ -84,6 +84,9 @@ async function main() {
                             recipe.ingredients,
                             recipe.procedure
                         );
+                        await users.addRecipeToUser(String(u._id),String(r._id));
+
+                        
                         // let allRecipes = await recipes.getAllrecipes();
                         // let idRecipe = await recipes.getRecipeById(String(r._id));
                         // let userRecipes = await recipes.getRecipesByUser(String(u._id));

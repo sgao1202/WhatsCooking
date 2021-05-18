@@ -202,6 +202,30 @@ let exportedMethods = {
         return await this.getUserById(userId);
     },
 
+    // POST /users/{userId}/bookmarks/
+    async addRecipeToUser(userId, recipeId) {
+        if (!utils.validString(userId)) throw 'must provide valid userId';
+        if (!utils.validString(recipeId)) throw 'You must provide valid recipeId';
+
+        let user = await this.getUserById(userId);
+        let recipe = await recipeData.getRecipeById(recipeId);
+
+        const userCollection = await users();
+        const updateInfo = await userCollection.updateOne({
+            _id: mongoDB.ObjectID(String(userId))
+        }, {
+            $addToSet: {
+                recipes: String(recipe._id)
+            }
+        });
+
+        if (!updateInfo.matchedCount && !updateInfo.modifiedCount) {
+            throw 'Update failed';
+        }
+
+        return await this.getUserById(userId);
+    },
+
     // POST /users/{userId}/following/
     async addFollowToUser(userId, followUserId) {
         if (!utils.validString(userId)) throw 'must provide valid userId';

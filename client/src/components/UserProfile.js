@@ -6,6 +6,8 @@ import {FiUserPlus} from 'react-icons/fi';
 import {FaUserMinus, FaBookmark, FaCamera, FaRegNewspaper, FaUser, FaUserFriends, FaUtensils } from 'react-icons/fa';
 import genericProfile from '../img/generic-user-profile.jpeg';
 import axios from 'axios';
+import ListDisplay from './ListDisplay';
+
 
 const UserProfile = (props) => {
     const { currentUser, baseUrl } = useContext(AuthContext);
@@ -28,13 +30,13 @@ const UserProfile = (props) => {
             setLoading(true);
             try {
                 // Get user from database
-                const { data } = await axios.get(`${baseUrl}/users/uid/${String(props.match.params.id)}`);
-                //let r = await axios.get(`${url}users/uid/${currentUser.uid}`);
+                const { data } = await axios.get(`${baseUrl}/users/my-profile/${String(props.match.params.id)}`);
+                let r = await axios.get(`${url}users/uid/${currentUser.uid}`);
                 //let u = r.data;
-                setUserProfile(data);
-                setBookmarkedRecipes(data.bookmarks);
-                setMyRecipes(data.recipes);
-                setFollowing(data.following.includes(String(props.match.params.id)));
+                setUserProfile(data.user);
+                setBookmarkedRecipes(data.bookmarkedRecipes);
+                setMyRecipes(data.myRecipes);
+                setFollowing(r.data.following.includes(String(data.user._id)));
             } catch (e) {
                 alert(e);
             }
@@ -185,23 +187,42 @@ const UserProfile = (props) => {
                     <Col sm={9}>
                         <Tab.Content>
                             <Tab.Pane eventKey="aboutMe">
-                                {userProfile.aboutMe ? userProfile.aboutMe : <h2>Nothing to display</h2>}
+                                <div>
+                                    <h2 className="pb-2 border-bottom text-primary">About Me</h2>
+                                </div>
+                                <div>
+                                    {userProfile.aboutMe ? userProfile.aboutMe : <h3>Nothing to display</h3>}
+                                </div>
                             </Tab.Pane>
                             <Tab.Pane eventKey="myRecipes">
-                                { myRecipes.length === 0 ? <h2>{userProfile.firstName} has not created any recipes yet</h2> :
-                                    (<div></div>)
-                                }
+                                <div>
+                                    <h2 className="pb-2 border-bottom text-primary">My Recipes</h2>
+                                </div>
+                                <div>
+                                    { myRecipes.length === 0 ? <h3>You have not created any recipes yet</h3> :
+                                        (<ListDisplay recipe list={myRecipes}/>)
+                                    }
+                                </div>
                             </Tab.Pane>
                             <Tab.Pane eventKey="following">
-                                {userProfile.following.length === 0 ? <h2>No followers available</h2> : 
-                                    (<div></div>)
-                                }
+                                <div>
+                                    <h2 className="pb-2 border-bottom text-primary">Following</h2>
+                                </div>
+                                <div>
+                                    {userProfile.following.length === 0 ? <h3>No followers available</h3> : 
+                                        (<ListDisplay user list={following}/>)
+                                    }
+                                </div>
                             </Tab.Pane>
                             <Tab.Pane eventKey="bookmarks">
-                                { bookmarkedRecipes.length === 0 ? <h2>No bookmarks available</h2> : (
-                                    <div></div>   
-                                )
-                                }
+                                <div>
+                                    <h2 className="pb-2 border-bottom text-primary">Bookmarks</h2>
+                                </div>
+                                <div>
+                                    { bookmarkedRecipes.length === 0 ? <h3>No bookmarks available</h3> : 
+                                        (<ListDisplay recipe list={bookmarkedRecipes}/>)
+                                    }
+                                </div>
                             </Tab.Pane>
                         </Tab.Content>
                     </Col>
