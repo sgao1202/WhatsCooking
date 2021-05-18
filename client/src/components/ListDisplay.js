@@ -11,8 +11,6 @@ const ListDisplay = (props) => {
     const [list, setList] = useState(props.list);
     let currentList = null;
     const createUserItem = (user) => {
-        console.log('this is the image url')
-        console.log(`${baseUrl}/images/${user.profilePicture}`)
         return (
             <ListGroup.Item key={user._id}>
                 <Link to={`/users/${user._id}`}>
