@@ -60,7 +60,7 @@ const Recipe = (props) =>{
     const closeModal = () => setShowEditModal(false);
     const redirectToLogin = () =>{ setRedirect(true) }
 
-    const [bookmarked, setBookmarked] = useState();
+    const [bookmarked, setBookmarked] = useState(false);
     const [submitted, setSubmitted] = useState(false);
 
     const toggleBookmarks = async(e) => {
@@ -68,14 +68,14 @@ const Recipe = (props) =>{
         e.preventDefault();
         if(!bookmarked){
             try{
-                await axios.post(`${url}users/${userData._id}/bookmarks`, recipeData);
+                await axios.post(`${url}users/${currentUser.uid}/bookmarks`, recipeData);
                 setBookmarked(true);
             }catch(e){
                 console.log(e.error)
             }
         }else{
             try{
-                await axios.delete(`${url}users/${userData._id}/bookmarks/${recipeData._id}`)
+                await axios.delete(`${url}users/${currentUser.uid}/bookmarks/${recipeData._id}`)
                 setBookmarked(false);
             }catch(e){
                 console.log(e);
@@ -87,6 +87,8 @@ const Recipe = (props) =>{
         setComment({
             ...comment, [e.target.name]: e.target.value
         });
+        setSubmitted(false);
+        setErrors("");
     }
 
     const handleRating = async (event, newValue) => {
@@ -113,22 +115,25 @@ const Recipe = (props) =>{
             return;
         }
         try{
+            let user = await axios.get(`${url}users/uid/${currentUser.uid}`);
+            console.log('user is')
+            console.log(user)
             let newComment = await axios.post(`${url}comments`, {
                 comment: comment.comment,
                 recipeId: recipeData._id,
-                userId: userData._id
+                userId: user.data._id
             });
-            await axios.get(`${url}users/${newComment.data.userId}`).then((user)=>{
-                newComment.data.userId = user.data.firstName + " " + user.data.lastName;
-                //add new comment to commentList and re-render
-                let comments = [...commentData];
-                // comments.push(newComment.data);
-                comments.push(newComment.data)
-                setCommentData(comments);
-                
-                setComment(initialCommentData);
-                setSubmitted(true);
-            });
+            user = await axios.get(`${url}users/${newComment.data.userId}`);
+            newComment.data.userName = user.data.firstName + " " + user.data.lastName;
+            //add new comment to commentList and re-render
+            console.log(newComment)
+            let comments = [...commentData];
+            // comments.push(newComment.data);
+            comments.push(newComment.data)
+            setCommentData(comments);
+            
+            setComment(initialCommentData);
+            setSubmitted(true);
             
         }catch(e){
             console.log(e);
@@ -155,6 +160,10 @@ const Recipe = (props) =>{
                 //get all comments associated with recipe
                 let comments = await axios.get(`${url}comments/recipe/${props.match.params.id}`);
                 //check if user has this page bookmarked
+                console.log('user bookmarks is')
+                console.log(user.data.bookmarks)
+                console.log('bookmark id is')
+                console.log(data._id)
                 user.data.bookmarks.includes(data._id)? setBookmarked(true) : setBookmarked(false);
 
                 //get user name for the comment data
@@ -228,15 +237,17 @@ const Recipe = (props) =>{
                         <p id='recipe-desc'>{recipeData.description}</p>
                     </Col>
                     {/* check if current user is owner of recipe (ONCE UID IS IMPLEMENTED) */}
-                    {currentUser && <Col xs={2}>
+                    <Col xs={2}>
+                    {currentUser && currentUser.uid == userData.uid && <div>
                         <Row>
                         <Button onClick={updateRecipe}>Update Recipe</Button>
                         <EditRecipeModal isOpen={showEditModal} data={recipeData} user={userData} closeModal={closeModal} updateModal={updateModal}></EditRecipeModal>
                         </Row>
+                    </div>}
                         <Row>
                         <Rating name="rating" value={userRating} precision={1} onChange={(event, newValue) => handleRating(event, newValue)}/>
                         </Row>
-                    </Col>}
+                    </Col>
                     <Col xs={6} md={4}>
                         <Image src={`${url}images/${recipeData.picture}`} alt = "noimg" thumbnail="true"></Image>
                     </Col>

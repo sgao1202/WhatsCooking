@@ -355,7 +355,7 @@ router.post('/:id/bookmarks', async (req, res) => {
     }
     let user = null;
     try {
-        user = await userData.getUserById(req.params.id);
+        user = await userData.getUserByUid(req.params.id);
     } catch (e) {
         res.status(404).json({
             error: 'user not found'
@@ -396,7 +396,7 @@ router.delete('/:id/bookmarks/:recipeId', async (req, res) => {
 
     let user = null;
     try {
-        user = await userData.getUserById(req.params.id);
+        user = await userData.getUserByUid(req.params.id);
     } catch (e) {
         console.log(e)
         res.status(404).json({
