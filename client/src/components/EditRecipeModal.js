@@ -1,8 +1,10 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,useContext } from 'react';
 import { Col, Image, Button, Form, Modal } from 'react-bootstrap'
+import { AuthContext } from "../firebase/Auth";
 function EditRecipeModal(props) {
-    const url = 'http://localhost:3001/';
+    const { baseUrl } = useContext(AuthContext);
+    const url = baseUrl.substring(0, baseUrl.lastIndexOf("/"));
     const [loading, setLoading] = useState(true);
     const [showEditModal, setShowEditModal] = useState(props.isOpen);
     const [validated, setValidated] = useState(false);
@@ -61,12 +63,12 @@ function EditRecipeModal(props) {
         try{
             const imageData = new FormData();
             imageData.append("file", formData.picture, formData.picture.name)
-            let picId = await axios.post(`${url}uploadImage`, imageData)
+            let picId = await axios.post(`${url}/uploadImage`, imageData)
             console.log(picId)
             //store the picture in the database as a uid
             formData.picture = picId.data;
             console.log(formData)
-            let updatedRecipe = await axios.put(`${url}recipes/${formData.recipeid}`, formData);
+            let updatedRecipe = await axios.put(`${url}/recipes/${formData.recipeid}`, formData);
             setFormData(updatedRecipe.data);
             props.updateModal(formData);
         
@@ -121,7 +123,7 @@ function EditRecipeModal(props) {
                 <Form noValidate validated={validated} enctype="multipart/form-data" onSubmit={(e) => handleModalSubmit(e)}>
                     <Form.Group controlId='image'>
                         <Form.Label className='modal-subtitle'>Current Image:</Form.Label>
-                        <Form.Control className='modal-image' type='image' src={`${url}images/${initialFormData.picture}`} alt='noimg'></Form.Control>
+                        <Form.Control className='modal-image' type='image' src={`${url}/images/${initialFormData.picture}`} alt='noimg'></Form.Control>
                     </Form.Group>
                     <Form.Group controlId='updateImage'>
                         <Form.File type='file' name='picture' onChange={handleFileChange}></Form.File>
