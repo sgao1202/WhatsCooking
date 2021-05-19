@@ -151,8 +151,8 @@ const Home = () => {
 
   const buildCard = (s) => {
     return (
-      <Grid item xs={12} sm={6} md={4} lg={5} xl={2} key={s._id}>
-        <Card className={classes.card} variant="outlined">
+      <Grid item xs={12} sm={6} md={5} lg={5} xl={4} key={s._id}>
+        <Card className={classes.card}>
           <CardActionArea>
             <Link to={`/recipe/${s._id}`}>
               <CardMedia
