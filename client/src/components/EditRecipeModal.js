@@ -1,9 +1,12 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import { Col, Button, Form, Modal } from 'react-bootstrap'
+import React, { useEffect, useState,useContext } from 'react';
+import { Col, Image, Button, Form, Modal } from 'react-bootstrap'
 import utils from '../lib/Utility';
+import { AuthContext } from "../firebase/Auth";
+
 function EditRecipeModal(props) {
-    const url = 'http://localhost:3001/';
+    const { baseUrl } = useContext(AuthContext);
+    const url = baseUrl.substring(0, baseUrl.lastIndexOf("/"));
     const [loading, setLoading] = useState(true);
     const [showEditModal, setShowEditModal] = useState(props.isOpen);
     const [errors, setErrors] = useState(false);
@@ -171,7 +174,7 @@ function EditRecipeModal(props) {
                 <Form noValidate encType="multipart/form-data" onSubmit={(e) => handleModalSubmit(e)}>
                     <Form.Group controlId='image'>
                         <Form.Label className='modal-subtitle'>Current Image:</Form.Label>
-                        <Form.Control className='modal-image' type='image' src={`${url}images/${initialFormData.picture}`} alt='noimg'></Form.Control>
+                        <Form.Control className='modal-image' type='image' src={`${url}/images/${initialFormData.picture}`} alt='noimg'></Form.Control>
                     </Form.Group>
                     <Form.Group controlId='updateImage'>
                         <Form.File type='file' name='picture' onChange={handleFileChange}></Form.File>

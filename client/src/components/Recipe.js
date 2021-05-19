@@ -9,8 +9,9 @@ import { Rating } from "@material-ui/lab";
 import EditRecipeModal from './EditRecipeModal';
 import Error from './Error';
 const Recipe = (props) =>{
-    const { currentUser } = useContext(AuthContext);
-    const url = 'http://localhost:3001/';
+
+    const { baseUrl, currentUser } = useContext(AuthContext);
+    const url = baseUrl;
     const [loading, setLoading] = useState(true);
     const [recipeData, setRecipeData] = useState();
     const [userData, setUserData] = useState();
@@ -268,7 +269,7 @@ const Recipe = (props) =>{
                         <Container>
                             <Row>
                                 <span className="user-comment-name">
-                                    <Link to={`/users/${comment.userId}`}>{comment.userName}</Link>
+                                    {comment.userName}
                                 </span>
                             </Row>
                             <Row>

@@ -17,7 +17,7 @@ const UserProfile = (props) => {
     const [loading, setLoading] = useState(true);
     const [redirect, setRedirect] = useState(false);
     const [hasError, setHasError] = useState(false);
-    const url = 'http://localhost:3001/';
+    const url = baseUrl.substring(0, baseUrl.lastIndexOf("/"));
 
     const [following, setFollowing] = useState();
 
@@ -32,7 +32,7 @@ const UserProfile = (props) => {
             let u = null;
             try {
                 // Get user from database
-                const { data } = await axios.get(`${baseUrl}/users/my-profile/${String(props.match.params.id)}`);
+                const { data } = await axios.get(`${url}/users/my-profile/${String(props.match.params.id)}`);
                 u = data;
                 //let u = r.data;
             } catch (e) {
@@ -47,7 +47,7 @@ const UserProfile = (props) => {
                 setMyRecipes(data.myRecipes);
                 
                 if (currentUser) {
-                    let r = await axios.get(`${url}users/uid/${currentUser.uid}`);
+                    let r = await axios.get(`${url}/users/uid/${currentUser.uid}`);
                     setFollowing(r.data.following.includes(String(data.user._id)));
                 }
             setLoading(false);
@@ -63,18 +63,18 @@ const UserProfile = (props) => {
         e.preventDefault();
         if(!following){
             try{
-                let r = await axios.get(`${url}users/uid/${currentUser.uid}`, followInfo);
+                let r = await axios.get(`${url}/users/uid/${currentUser.uid}`, followInfo);
                 let u = r.data;
-                await axios.post(`${url}users/${u._id}/following`, followInfo);
+                await axios.post(`${url}/users/${u._id}/following`, followInfo);
                 setFollowing(true);
             }catch(e){
                 console.log(e.error)
             }
         }else{
             try{
-                let r = await axios.get(`${url}users/uid/${currentUser.uid}`, followInfo);
+                let r = await axios.get(`${url}/users/uid/${currentUser.uid}`, followInfo);
                 let u = r.data;
-                await axios.delete(`${url}users/${u._id}/following/${String(userProfile._id)}`)
+                await axios.delete(`${url}/users/${u._id}/following/${String(userProfile._id)}`)
                 setFollowing(false);
             }catch(e){
                 console.log(e);
@@ -116,7 +116,7 @@ const UserProfile = (props) => {
                 <Col className="py-3">
                     <Row>
                         <Col>
-                            <Image className="my-profile-image"src={userProfile.profilePicture ? `${url}images/${userProfile.profilePicture}` : genericProfile} alt="profile-picture" roundedCircle/>
+                            <Image className="my-profile-image"src={userProfile.profilePicture ? `${url}/images/${userProfile.profilePicture}` : genericProfile} alt="profile-picture" roundedCircle/>
                         </Col>    
                         <Col>
                             <Row>

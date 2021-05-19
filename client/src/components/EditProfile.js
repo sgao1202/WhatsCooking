@@ -25,7 +25,7 @@ const ProfileEdit = () => {
             setLoading(true);
             try {
                 // Only get the user with their uid
-                const { data } = await axios.get(`${baseUrl}/users/uid/${currentUser.uid}`);
+                const { data } = await axios.get(`${baseUrl}users/uid/${currentUser.uid}`);
                 setProfileInfo(data);
                 setFirstName(data.firstName);
                 setLastName(data.lastName);
@@ -42,7 +42,7 @@ const ProfileEdit = () => {
     const updateUser = async () => {
         console.log('attempted');
         try {
-            const user = await axios.patch(`${baseUrl}/users/${profileInfo._id}`, {
+            const user = await axios.patch(`${baseUrl}users/${profileInfo._id}`, {
                 firstName: firstName,
                 lastName: lastName,
                 aboutMe: aboutMe
