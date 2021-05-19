@@ -22,7 +22,7 @@ function App() {
     <AuthProvider>
       <Router>
           <Navigation></Navigation>
-          <Container className="mt-5">
+          <Container className="my-5">
             <Switch>
                 <Route exact path="/">
                   <Redirect to="/home"></Redirect>
