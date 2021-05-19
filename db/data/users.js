@@ -72,15 +72,15 @@ let exportedMethods = {
         if (!utils.validString(firstName)) throw 'You must provide a valid first name'
         if (!utils.validString(lastName)) throw 'You must provide a valid last name'
         if (!utils.validString(profilePicture)) throw 'You must provide a valid profile picture'
-        // if (!utils.validString(aboutMe)) throw 'You must provide a valid about me'
+        if (!utils.validString(aboutMe)) throw 'You must provide a valid about me'
 
         const userCollection = await users();
         let newUser = {
-            uid: uid,
-            firstName: firstName,
-            lastName: lastName,
+            uid: uid.trim(),
+            firstName: firstName.trim(),
+            lastName: lastName.trim(),
             profilePicture: profilePicture,
-            aboutMe: '',
+            aboutMe: aboutMe.trim(),
             bookmarks: [],
             following: [],
             recipes: []
@@ -198,6 +198,30 @@ let exportedMethods = {
         );
         if (!updateInfo.matchedCount && !updateInfo.modifiedCount)
             throw 'Update failed';
+
+        return await this.getUserById(userId);
+    },
+
+    // POST /users/{userId}/bookmarks/
+    async addRecipeToUser(userId, recipeId) {
+        if (!utils.validString(userId)) throw 'must provide valid userId';
+        if (!utils.validString(recipeId)) throw 'You must provide valid recipeId';
+
+        let user = await this.getUserById(userId);
+        let recipe = await recipeData.getRecipeById(recipeId);
+
+        const userCollection = await users();
+        const updateInfo = await userCollection.updateOne({
+            _id: mongoDB.ObjectID(String(userId))
+        }, {
+            $addToSet: {
+                recipes: String(recipe._id)
+            }
+        });
+
+        if (!updateInfo.matchedCount && !updateInfo.modifiedCount) {
+            throw 'Update failed';
+        }
 
         return await this.getUserById(userId);
     },

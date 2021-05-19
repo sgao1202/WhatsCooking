@@ -4,6 +4,7 @@ const bluebird = require('bluebird');
 const redis = require('redis');
 const data = require('../data');
 const utils = require('../utils/utils');
+const { users } = require('../config/mongoCollections');
 const userData = data.users;
 const recipeData = data.recipes;
 
@@ -104,6 +105,7 @@ router.post('/', async (req, res) => {
         return;
     }
 
+    let user;
     if (!recipeInfo.userId || typeof recipeInfo.userId != "string") {
         res.status(400).json({
             error: 'You must provide a valid userId'
@@ -111,7 +113,7 @@ router.post('/', async (req, res) => {
         return;
     } else {
         try {
-            let user = await userData.getUserById(recipeInfo.userId);
+            user = await userData.getUserById(recipeInfo.userId);
             if (!user) {
                 res.status(400).json({
                     error: 'user does not exist'
@@ -199,6 +201,8 @@ router.post('/', async (req, res) => {
             recipeInfo.ingredients,
             recipeInfo.procedure
         );
+
+        await userData.addRecipeToUser(String(user._id),String(newRecipe._id));
         res.status(200).json(newRecipe);
     } catch (e) {
         res.status(400).json({

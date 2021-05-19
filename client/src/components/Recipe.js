@@ -222,11 +222,11 @@ const Recipe = (props) =>{
                     <Col>
                         <span>
                         <h1 id='recipe-title'>{recipeData.title}
-                        {!bookmarked || !currentUser?<BsBookmark onClick={currentUser? (e)=>toggleBookmarks(e): ()=>redirectToLogin()}></BsBookmark> : <BsFillBookmarkFill className='filled' onClick={currentUser? (e)=>toggleBookmarks(e): ()=>redirectToLogin()}></BsFillBookmarkFill>}</h1>
+                        {!bookmarked || !currentUser?<BsBookmark onClick={currentUser? (e)=>toggleBookmarks(e): ()=>redirectToLogin()}></BsBookmark> : <BsFillBookmarkFill className='bookmarkfilled' onClick={currentUser? (e)=>toggleBookmarks(e): ()=>redirectToLogin()}></BsFillBookmarkFill>}</h1>
                         </span>
                         <h2 id='recipe-chef'>
                             Posted By: 
-                            <Link to={`/users/${userData._id}`}> {userData.firstName} {userData.lastName}</Link>
+                            <Link to={`/users/${userData.uid}`}> {userData.firstName} {userData.lastName}</Link>
                             </h2>
                         <br></br>
                         <p id='recipe-desc'>{recipeData.description}</p>
