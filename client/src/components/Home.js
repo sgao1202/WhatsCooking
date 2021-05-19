@@ -4,6 +4,7 @@ import Search from "./Search";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../firebase/Auth";
 import { Button, ListGroup, Card, Row, Col } from "react-bootstrap";
+import { FaPlusCircle } from 'react-icons/fa';
 import genericProfile from "../img/generic-user-profile.jpeg";
 import {
   CardActionArea,
@@ -206,16 +207,19 @@ const Home = () => {
             {li}
           </Grid>
         </div>
-        <div className={classes.rightElement}>
-          {currentUser ? <Link className="pb-5" to="/newrecipe">
-                          <Button>Create Recipe</Button>
-                        </Link> : ""
+        <div className={`${classes.rightElement}`}>
+    
+          {currentUser ? 
+            <div className="mb-4">
+                <Link className="pb-5" to="/newrecipe">
+                  <Button><FaPlusCircle className="mb-1 mr-2"/>Create a Recipe</Button>
+                </Link>
+            </div> : ""
           }
-          <Card className="mt-5" style={{ width: "18rem" }}>
+          <Card className="mb-5" style={{ width: "18rem" }}>
             <Card.Header>Popular</Card.Header>
             <ListGroup variant="flush" className="shadow">{popularSearches}</ListGroup>
           </Card>
-          <br />
           {currentUser ? (
             <Card style={{ width: "18rem" }}>
               <Card.Header>Bookmarks</Card.Header>

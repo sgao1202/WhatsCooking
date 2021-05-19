@@ -1,11 +1,11 @@
-import { Form, Button, Col, InputGroup } from 'react-bootstrap';
+import { Container, Form, Button, Row, Col, InputGroup } from 'react-bootstrap';
 import React, { useEffect, useState } from 'react';
 import { Redirect, withRouter } from 'react-router-dom';
 import axios from 'axios';
 import { useContext } from 'react'
 import { AuthContext } from '../firebase/Auth'
 import utils from '../lib/Utility';
-import { FaBullseye } from 'react-icons/fa';
+import {FaTrashAlt, FaPlus } from 'react-icons/fa';
 
 function NewRecipe(props){
     const { currentUser } = useContext(AuthContext);
@@ -171,131 +171,138 @@ function NewRecipe(props){
         setFormData(fields);
     }
     return (
-        <div>
-            <h1>Create a Recipe</h1>
+        <Container className="shadow-lg border-50 p-5">
+            <h1 className="border-bottom mb-3 pb-2">Create a Recipe</h1>
             <Form noValidate encType="multipart/form-data" onSubmit={handleSubmit}>
-                <Form.Row>
-                    <Form.Group controlId="recipeName">
-                    <Form.Label>Recipe Name:</Form.Label>
-                    <Form.Control
-                        required
-                        type="text" 
-                        name='title'
-                        onChange={(e) => {handleChange(e) 
-                                        setErrors({...errors, title: false})}}
-                        isValid={!!errors.title}
-                        isInvalid={errors.title}
-                    />
-                    <Form.Control.Feedback type="invalid">Must provide a title!</Form.Control.Feedback>
-                    </Form.Group>
-                    </Form.Row>
-                <Form.Row>
-                    <Form.Group size='lg' controlId="description">
-                    <Form.Label>Description:</Form.Label>
-                    <Form.Control
-                        required
-                        type="text"
-                        name="description"
-                        as='textarea'
-                        rows='5'
-                        onChange={(e) => {handleChange(e) 
-                            setErrors({...errors, description: false})}}
-                        isValid={!!errors.description}
-                        isInvalid={errors.description}
-                    />
-                    <Form.Control.Feedback type="invalid">Must provide a description!</Form.Control.Feedback>
-                    </Form.Group>
+                <Form.Row className="mb-3 border-bottom pb-3">
+                    <Col className="mr-5" md={5} sm={12}>
+                        <Form.Row>
+                            <Form.Group as={Col} controlId="recipeName">
+                                <Form.Label className="h4">Recipe Name</Form.Label>
+                                <Form.Control
+                                    required
+                                    type="text" 
+                                    name='title'
+                                    onChange={(e) => {handleChange(e) 
+                                                    setErrors({...errors, title: false})}}
+                                    isValid={!!errors.title}
+                                    isInvalid={errors.title}
+                                />
+                                <Form.Control.Feedback type="invalid">Must provide a title!</Form.Control.Feedback>
+                            </Form.Group>
+                        </Form.Row>
+                        <Form.Row>
+                            <Form.Group as={Col} controlId='updateImage'>
+                                <Form.Label className="h4">Image</Form.Label>
+                                <Form.File 
+                                    type='file' 
+                                    name='picture' 
+                                    accept="image/*" 
+                                    onChange={(e) => {handleFileChange(e)
+                                        setErrors({...errors, picture : false})
+                                    }}></Form.File>
+                                {errors.picture && submitted && <p className='error'>Must provide an image!</p>}
+                            </Form.Group>
+                        </Form.Row>
+                    </Col>
+                        <Form.Group as={Col} md={6} sm={12} size='lg' controlId="description">
+                            <Form.Label className="h4">Description</Form.Label>
+                            <Form.Control
+                                required
+                                type="text"
+                                name="description"
+                                as='textarea'
+                                rows='5'
+                                onChange={(e) => {handleChange(e) 
+                                    setErrors({...errors, description: false})}}
+                                isValid={!!errors.description}
+                                isInvalid={errors.description}
+                            />
+                            <Form.Control.Feedback type="invalid">Must provide a description!</Form.Control.Feedback>
+                        </Form.Group>
                 </Form.Row>
-                <Form.Row>
-                    <Form.Group controlId='updateImage'>
-                        <Form.Label>Image:</Form.Label>
-                        
-                        <Form.File 
-                            type='file' 
-                            name='picture' 
-                            accept="image/*" 
-                            onChange={(e) => {handleFileChange(e)
-                                setErrors({...errors, picture : false})
-                            }}></Form.File>
-                        {errors.picture && submitted && <p className='error'>Must provide an image!</p>}
-                    </Form.Group>
+                <Form.Row className="border-bottom pb-3 mb-3">
+                    <h4 className="mb-3">Ingredients</h4>
+                    <div className="col-12 pl-0">
+                        {formData.ingredients.map((ingredient, index) => (
+                            <Form.Row className="mb-4" key={index}>                    
+                                <InputGroup as={Col}>
+                                    <InputGroup.Prepend>
+                                        <InputGroup.Text>Name</InputGroup.Text>
+                                    </InputGroup.Prepend>
+                                    <Form.Control required 
+                                            type="text" 
+                                            name="name" 
+                                            onChange={(e) => {handleIngredientChange(e, index)
+                                                            setErrors({...errors, ingredientNames : false})}} 
+                                            isValid={!!errors.ingredientNames} 
+                                            isInvalid={errors.ingredientNames}></Form.Control>
+                                    <Form.Control.Feedback type="invalid">Must provide an ingredient name for all ingredients!</Form.Control.Feedback>
+                                </InputGroup>
+                                <InputGroup as={Col}>
+                                    <InputGroup.Prepend>
+                                        <InputGroup.Text>Portion</InputGroup.Text>
+                                    </InputGroup.Prepend>
+                                    <Form.Control required 
+                                        type="number" 
+                                        name="portion" 
+                                        onChange={(e) => {handleIngredientChange(e, index)
+                                            setErrors({...errors, ingredientPortions : false})}} 
+                                        isValid={!!errors.ingredientPortions} 
+                                        isInvalid={errors.ingredientPortions}></Form.Control>
+                                    <Form.Control.Feedback type="invalid">Must provide a non-negative portion amount for all ingredients!</Form.Control.Feedback>
+                                </InputGroup>
+                                <InputGroup as={Col}>
+                                    <InputGroup.Prepend>
+                                        <InputGroup.Text>Units</InputGroup.Text>
+                                    </InputGroup.Prepend>
+                                    <Form.Control required 
+                                    type="text" 
+                                    name="units" 
+                                    onChange={(e) => {handleIngredientChange(e, index)
+                                        setErrors({...errors, ingredientUnits : false})}} 
+                                    isValid={!!errors.ingredientUnits} 
+                                    isInvalid={errors.ingredientUnits}></Form.Control>
+                                    <Form.Control.Feedback type="invalid">Must provide a unit of measurement for all ingredients!</Form.Control.Feedback>
+                                </InputGroup>
+                                <Button variant="danger" as={Col} xs={1} onClick={(e)=> deleteIngredient(index)}><FaTrashAlt className="mb-1"/></Button>
+                            </Form.Row>
+                        ))}
+                    </div>
+                    <div>
+                        <Button type="button" onClick={() => addIngredient()}><FaPlus className="mb-1 mr-2"/>Add Ingredient</Button>
+                    </div>
                 </Form.Row>
-                            
-                <label>Ingredients:</label>
-                {formData.ingredients.map((ingredient, index) => (
-                    <Form.Row key={index}>
-                    
-                    <InputGroup as={Col}>
-                        <InputGroup.Prepend>
-                            <InputGroup.Text>Name:</InputGroup.Text>
-                        </InputGroup.Prepend>
-                        <Form.Control required 
-                                type="text" 
-                                name="name" 
-                                onChange={(e) => {handleIngredientChange(e, index)
-                                                setErrors({...errors, ingredientNames : false})}} 
-                                isValid={!!errors.ingredientNames} 
-                                isInvalid={errors.ingredientNames}></Form.Control>
-                        <Form.Control.Feedback type="invalid">Must provide an ingredient name for all ingredients!</Form.Control.Feedback>
-                    </InputGroup>
-                    <InputGroup as={Col}>
-                        <InputGroup.Prepend>
-                            <InputGroup.Text>Portion:</InputGroup.Text>
-                        </InputGroup.Prepend>
-                        <Form.Control required 
-                            type="number" 
-                            name="portion" 
-                            onChange={(e) => {handleIngredientChange(e, index)
-                                setErrors({...errors, ingredientPortions : false})}} 
-                            isValid={!!errors.ingredientPortions} 
-                            isInvalid={errors.ingredientPortions}></Form.Control>
-                        <Form.Control.Feedback type="invalid">Must provide a non-negative portion amount for all ingredients!</Form.Control.Feedback>
-                    </InputGroup>
-                    <InputGroup as={Col}>
-                        <InputGroup.Prepend>
-                            <InputGroup.Text>Units:</InputGroup.Text>
-                        </InputGroup.Prepend>
-                        <Form.Control required 
-                        type="text" 
-                        name="units" 
-                        onChange={(e) => {handleIngredientChange(e, index)
-                            setErrors({...errors, ingredientUnits : false})}} 
-                        isValid={!!errors.ingredientUnits} 
-                        isInvalid={errors.ingredientUnits}></Form.Control>
-                        <Form.Control.Feedback type="invalid">Must provide a unit of measurement for all ingredients!</Form.Control.Feedback>
-                    </InputGroup>
-                    <Button variant="danger" as={Col} xs={1} onClick={(e) => deleteIngredient(index)}>X</Button>
+                <Form.Row className="border-bottom pb-3 mb-3">
+                    <h4 className="mb-3">Procedures</h4>
+                    <div className="col-12 pl-0">
+                        {formData.procedure.map((step, index)=>(
+                            <Form.Row className="mb-4" key={index}>
+                                <InputGroup as={Col}>
+                                    <InputGroup.Prepend>
+                                        <InputGroup.Text>{index+1}.</InputGroup.Text>
+                                    </InputGroup.Prepend>
+                                    <Form.Control required 
+                                        as="textarea"
+                                        rows="2" 
+                                        onChange={(e) => {handleProcedureChange(e, index)
+                                            setErrors({...errors, procedure : false})}} 
+                                        isInvalid={errors.procedure}></Form.Control>
+                                    <Form.Control.Feedback type="invalid">Step cannot be empty for all steps!</Form.Control.Feedback>
+                                </InputGroup>
+                                <Button className='del-btn' variant="danger" as={Col} xs={1} onClick={() => deleteStep(index)}><FaTrashAlt className="mt-2"/></Button>
+                            </Form.Row>
+                        ))}
+                    </div>
+                    <div>
+                        <Button onClick={() => addStep()}><FaPlus className="mb-1 mr-2"/>Add Step</Button>
+                    </div>
                 </Form.Row>
-                ))}
-                
-                <br></br>
-                <Button type="button" onClick={() => addIngredient()}>Add Ingredient+</Button>
-                <br></br>
-                <label>Procedure:</label>
-                {formData.procedure.map((step, index)=>(
-                    <Form.Row key={index}>
-                        <InputGroup as={Col}>
-                            <InputGroup.Prepend>
-                                <InputGroup.Text>{index+1}.</InputGroup.Text>
-                            </InputGroup.Prepend>
-                            <Form.Control required 
-                                as="textarea" 
-                                onChange={(e) => {handleProcedureChange(e, index)
-                                    setErrors({...errors, procedure : false})}} 
-                                isInvalid={errors.procedure}></Form.Control>
-                            <Form.Control.Feedback type="invalid">Step cannot be empty for all steps!</Form.Control.Feedback>
-                        </InputGroup>
-                        <Button className='del-btn' variant="danger" as={Col} xs={1} onClick={() => deleteStep(index)}>X</Button>
-                    </Form.Row>
-                    
-                ))}
-                <br></br>
-                <Button onClick={() => addStep()}>Add Step+</Button>
-                <br></br>
-                <br></br>
-                <Button type="submit" onClick={handleSubmit}>Submit</Button>
+                <Form.Row className="mt-3">
+                    <Button type="submit" onClick={handleSubmit}>Create Recipe</Button>
+                </Form.Row>
             </Form>
-        </div>
+        </Container>
     )
 }
 

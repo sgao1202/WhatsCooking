@@ -56,7 +56,7 @@ const MyProfile = () => {
             <Row>
                 <Container>
                     <Link to="/home">
-                        <FaArrowCircleLeft/>
+                        <FaArrowCircleLeft className="mb-1"/>
                         <span className="ml-2">Back to recipes</span>
                     </Link>
                 </Container>

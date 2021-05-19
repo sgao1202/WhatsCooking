@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Route, Redirect, Switch} from 'react-router-do
 import { Container } from 'react-bootstrap';
 import { AuthProvider } from '../firebase/Auth';
 import Navigation from './Navigation';
-// import Landing from './Landing';
 import Login from './Login';
 import MyProfile from './MyProfile';
 import EditProfile from './EditProfile';

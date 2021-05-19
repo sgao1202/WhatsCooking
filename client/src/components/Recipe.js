@@ -5,9 +5,11 @@ import '../App.css';
 import axios from 'axios'
 import { Container, Row, Col, Image, Button, Form, ListGroup } from 'react-bootstrap'
 import { BsFillBookmarkFill, BsBookmark} from 'react-icons/bs'
+import { FaEdit } from 'react-icons/fa'
 import { Rating } from "@material-ui/lab";
 import EditRecipeModal from './EditRecipeModal';
 import Error from './Error';
+
 const Recipe = (props) =>{
    /* Core Features still need to be implemented:
     Updating Recipe Button (only if you are logged in as the owner of the recipe)
@@ -220,66 +222,100 @@ const Recipe = (props) =>{
         return <Error/>
     }
     else{
-        let ingredients = recipeData.ingredients.map((ingredient)=>(
-            <li key={ingredient.name} className='ingredient'>
-                {ingredient.name}: {ingredient.portion} {ingredient.units}
-            </li>
-        ));
-        let procedure = recipeData.procedure.map((step)=>(
-            <li key={step} className='procedure'>
-                {step}
-            </li>
+        let ingredients = recipeData.ingredients.map((ingredient, index) => {
+            return (
+                <ListGroup.Item className="no-bt border-bottom" key={index}>
+                    <Row>
+                        <Col>
+                            <span className="font-weight-bold">{ingredient.name}</span>
+                        </Col>
+                        <Col>
+                            <span className="font-italic">{ingredient.portion} {ingredient.units}</span>
+                        </Col>
+                    </Row>
+                </ListGroup.Item>
+            );
+        });
+
+        let procedure = recipeData.procedure.map((step, index)=>(
+            <ListGroup.Item key={index} className="pb-5 no-bt shadow-sm mb-3 border-50">
+                    <span className="custom-ol-item custom-ol-item-span">{index + 1}.</span>
+                    <p className="custom-ol-item-p">{step}</p>
+            </ListGroup.Item>
+            
         ));
 
         return (
             <Container>
-                <Row>
+                <Row className="shadow border-50 p-4 mb-5">
                     <Col>
                         <span>
-                        <h1 id='recipe-title'>{recipeData.title}
-                        {!bookmarked || !currentUser?<BsBookmark onClick={currentUser? (e)=>toggleBookmarks(e): ()=>redirectToLogin()}></BsBookmark> : <BsFillBookmarkFill className='bookmarkfilled' onClick={currentUser? (e)=>toggleBookmarks(e): ()=>redirectToLogin()}></BsFillBookmarkFill>}</h1>
+                            <h1 id='recipe-title'>{recipeData.title}
+                            {!bookmarked || !currentUser ?<BsBookmark onClick={currentUser? (e)=>toggleBookmarks(e): ()=>redirectToLogin()}></BsBookmark> : <BsFillBookmarkFill className='bookmarkfilled' onClick={currentUser? (e)=>toggleBookmarks(e): ()=>redirectToLogin()}></BsFillBookmarkFill>}</h1>
                         </span>
-                        <h2 id='recipe-chef'>
+                        <h2 id='recipe-chef' className="h6">
                             Posted By: 
                             <Link to={`/users/${userData.uid}`}> {userData.firstName} {userData.lastName}</Link>
-                            </h2>
+                        </h2>
                         <div>
                             <Row>
-                            <Col><Rating name="rating1" value={averageRating} precision={1} readOnly/>
-                            <span className="stats">({totalRatings})</span></Col>
+                                <Col>
+                                    <Rating name="rating1" value={averageRating} precision={1} readOnly/>
+                                    <span className="stats">({totalRatings})</span>
+                                </Col>
                             </Row>
                         </div>
-                        <br></br>
                         <p id='recipe-desc'>{recipeData.description}</p>
                     </Col>
                     {/* check if current user is owner of recipe (ONCE UID IS IMPLEMENTED) */}
                     <Col xs={2}>
-                    {currentUser && currentUser.uid == userData.uid && <div>
-                        <Row>
-                        <Button onClick={updateRecipe}>Update Recipe</Button>
-                        <EditRecipeModal isOpen={showEditModal} data={recipeData} user={userData} closeModal={closeModal} updateModal={updateModal}></EditRecipeModal>
-                        </Row>
-                    </div>}
-                    {currentUser && <Row>
-                        <h5>Rate This Recipe:</h5>
-                        <Rating name="rating" value={userRating} precision={1} onChange={(event, newValue) => handleRating(event, newValue)}/>
-                    </Row>}
+                        { currentUser && currentUser.uid === userData.uid && 
+                            <div className="mb-3">
+                                <Row>
+                                    <Button onClick={updateRecipe}><FaEdit className="mb-1 mr-2"/>Update Recipe</Button>
+                                    <EditRecipeModal isOpen={showEditModal} data={recipeData} user={userData} closeModal={closeModal} updateModal={updateModal}></EditRecipeModal>
+                                </Row>
+                            </div>}
+                        {currentUser && 
+                            <Row>
+                                <h5>Rate This Recipe:</h5>
+                                <Rating name="rating" value={userRating} precision={1} onChange={(event, newValue) => handleRating(event, newValue)}/>
+                            </Row>
+                        }
                     </Col>
                     <Col xs={6} md={4}>
-                        <Image src={`${url}images/${recipeData.picture}`} alt = "noimg" thumbnail="true"></Image>
+                        <Image src={`${url}images/${recipeData.picture}`} alt="noimg" thumbnail="true"></Image>
                     </Col>
                 </Row>
-                <h3>Ingredients:</h3>
-                <ul>
-                    {ingredients}
-                </ul>
-                <br></br>
-                <h3>Procedure:</h3>
-                <ol>
-                    {procedure}
-                </ol>
-                <br></br>
-                <Form>
+                <Row className="mb-3 p-4">
+                    <Container className="border-bottom mb-3">
+                        <h3>Ingredients</h3>
+                    </Container>
+                    <Container>
+                        <Row>
+                            <Col>
+                                <h5>Ingredient Name</h5>
+                            </Col>
+                            <Col>
+                                <h5>Measurements</h5>
+                            </Col>
+                        </Row>
+                        <ListGroup>
+                            {ingredients}
+                        </ListGroup>
+                    </Container>    
+                </Row>
+                <Row className="mb-3 p-4 border-bottom">
+                    <Container className="border-bottom mb-3">
+                        <h3>Procedures</h3>
+                    </Container>
+                    <Container>
+                        <ListGroup>
+                            {procedure}
+                        </ListGroup>
+                    </Container>
+                </Row>
+                <Form className="mb-3">
                     <Form.Group controlId="addComment" onSubmit={handleSubmit}>
                         <Form.Label></Form.Label>
                         <Form.Control name='comment' type="text" value={comment.comment} placeholder="Add a public comment..." onChange={handleChange}/>
@@ -288,28 +324,29 @@ const Recipe = (props) =>{
                     {errors && <p className='error'>{errors}</p>}
                     <Button type='submit' onClick={currentUser? (e)=>handleSubmit(e): ()=>redirectToLogin()}>Comment</Button>
                 </Form>
-                <br></br>
-                <h4>Comments:</h4>
-                <hr></hr>
-                <ListGroup>
-                {commentData.map((comment)=>(
-                    <ListGroup.Item key={comment._id} as="li">
-                        <Container>
-                            <Row>
-                                <span className="user-comment-name">
-                                    <Link to={`/users/${comment.userId}`}>{comment.userName}</Link>
-                                </span>
-                            </Row>
-                            <Row>
-                                <span>{comment.comment}</span>
-                            </Row>
-                        </Container> 
-                    </ListGroup.Item>
-                ))}
-                </ListGroup>
-                <br></br>
-                <br></br>
-                <br></br>
+                <Row>
+                    <Container>
+                        <h3>Comments</h3>
+                    </Container>
+                    <Container>
+                        <ListGroup variant="flush">
+                            {commentData.map((comment)=>(
+                                <ListGroup.Item key={comment._id} as="li">
+                                    <Container>
+                                        <Row>
+                                            <span className="user-comment-name">
+                                                <Link to={`/users/${comment.userId}`}>{comment.userName}</Link>
+                                            </span>
+                                        </Row>
+                                        <Row>
+                                            <span>{comment.comment}</span>
+                                        </Row>
+                                    </Container> 
+                                </ListGroup.Item>
+                            ))}
+                        </ListGroup>
+                    </Container>
+                </Row>
             </Container>
         )
     }

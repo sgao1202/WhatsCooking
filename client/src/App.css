@@ -127,6 +127,10 @@ body {
   max-width: 700px;
 }
 
+.border-50 {
+  border-radius: 50px;
+}
+
 .upload-button {
   border-radius: 25px;
 }
@@ -138,4 +142,24 @@ body {
 .stats {
   color:lightgrey;
   font-size: 14px;
+}
+
+.no-bt {
+  border:none;
+}
+
+.custom-ol-item {
+  position: relative;
+  font: bold italic 45px/1.5 Helvetica, Verdana, sans-serif;
+  margin-bottom: 20px;
+}
+
+.custom-ol-item-p {
+  font: Helvetica, sans-serif;
+  padding-left: 60px;
+  color: #555;
+}
+
+.custom-ol-item-span {
+  position: absolute;
 }
