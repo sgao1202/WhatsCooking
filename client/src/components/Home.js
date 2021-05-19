@@ -144,15 +144,15 @@ const Home = () => {
     popularRecipes.map((s) => {
       return (
         <ListGroup.Item action href={`/recipe/${s._id}`}>
-          {s.title}
+          {s.title} <span className="stats">({s.hits})</span>
         </ListGroup.Item>
       );
     });
 
   const buildCard = (s) => {
     return (
-      <Grid item xs={12} sm={6} md={4} lg={5} xl={2} key={s._id}>
-        <Card className={classes.card} variant="outlined">
+      <Grid item xs={12} sm={6} md={5} lg={5} xl={4} key={s._id}>
+        <Card className={classes.card}>
           <CardActionArea>
             <Link to={`/recipe/${s._id}`}>
               <CardMedia
@@ -170,7 +170,7 @@ const Home = () => {
                 </Typography>
                 <Typography variant="body2" color="textSecondary" component="p">
                   {s.description ? s.description : "No Summary"}
-                  <span>More Info</span>
+                  <span> ...More Info</span>
                 </Typography>
               </CardContent>
             </Link>
