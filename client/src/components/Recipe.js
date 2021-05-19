@@ -37,8 +37,8 @@ const Recipe = (props) =>{
             <input type="submit" value="Submit">
         </form>
      */
-    const { currentUser } = useContext(AuthContext);
-    const url = 'http://localhost:3001/';
+    const { baseUrl, currentUser } = useContext(AuthContext);
+    const url = baseUrl;
     const [loading, setLoading] = useState(true);
     const [recipeData, setRecipeData] = useState();
     const [userData, setUserData] = useState();

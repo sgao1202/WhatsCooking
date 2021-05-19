@@ -17,7 +17,7 @@ const UserProfile = (props) => {
     const [loading, setLoading] = useState(true);
     const [redirect, setRedirect] = useState(false);
     const [hasError, setHasError] = useState(false);
-    const url = 'http://localhost:3001/';
+    const url = baseUrl;
 
     const [following, setFollowing] = useState();
 

@@ -1,8 +1,10 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Col, Image, Button, Form, Modal } from 'react-bootstrap'
+import { AuthContext } from "../firebase/Auth";
 function EditRecipeModal(props) {
-    const url = 'http://localhost:3001/';
+    const { baseUrl } = useContext(AuthContext);
+    const url = baseUrl;
     const [loading, setLoading] = useState(true);
     const [showEditModal, setShowEditModal] = useState(props.isOpen);
     const [validated, setValidated] = useState(false);

@@ -8,7 +8,7 @@ import utils from '../lib/Utility';
 import { FaBullseye } from 'react-icons/fa';
 
 function NewRecipe(props){
-    const { currentUser } = useContext(AuthContext);
+    const { baseUrl, currentUser } = useContext(AuthContext);
     const initialFormData = {
         title: "",
         userId: "",
@@ -17,7 +17,7 @@ function NewRecipe(props){
         ingredients: [{name: "", portion: "", units: ""}],
         procedure: [""]
     }
-    const url = 'http://localhost:3001/';
+    const url = baseUrl;
     const [formData, setFormData] = useState(initialFormData);
     const [errors, setErrors] = useState({
         title: false,
