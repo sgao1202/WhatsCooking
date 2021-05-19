@@ -9,34 +9,7 @@ import { Rating } from "@material-ui/lab";
 import EditRecipeModal from './EditRecipeModal';
 import Error from './Error';
 const Recipe = (props) =>{
-   /* Core Features still need to be implemented:
-    Updating Recipe Button (only if you are logged in as the owner of the recipe)
-    Pull photos from database for page
-   */
 
-  /*Need:
-  users in mongodb
-  photos in database
-  */
-
-    /* Bugs
-    Form validation
-    DB: headers sent to client multiple times
-    */
-
-    /* Ideas:
-    add optional photo field for each ingredient/step?
-    clicking on chef name will bring you to his/her profile page?
-    */
-    
-
-    /**
-     * Image Uploading
-     * <form method="post" enctype="multipart/form-data" action="/uploadImage”>
-            <input type="file" name="file">
-            <input type="submit" value="Submit">
-        </form>
-     */
     const { baseUrl, currentUser } = useContext(AuthContext);
     const url = baseUrl;
     const [loading, setLoading] = useState(true);
@@ -110,7 +83,6 @@ const Recipe = (props) =>{
     
     async function handleSubmit(e){
         e.preventDefault();
-        //REPLACE WITH USER UID WHEN IMPLEMENTED
         if (comment.comment.trim().length === 0) {
             e.preventDefault();
             setErrors("Comment cannot be empty!");
@@ -173,7 +145,7 @@ const Recipe = (props) =>{
                     cUser.data.bookmarks.includes(data._id)? setBookmarked(true) : setBookmarked(false);
                 }
 
-                //get user name for the comment data
+                //get all user names for each comment
                 let recipeComments = comments.data;
                 Promise.all(recipeComments.map(async(comment)=>{
                     try{
@@ -203,11 +175,11 @@ const Recipe = (props) =>{
             getUserRating();
         }
         getAverageRating();
-    }, [props.match.params.id]);
+    }, [props.match.params.id, userRating]);
 
-    useEffect(() =>{
-        getAverageRating();
-    }, [userRating]);
+    // useEffect(() =>{
+    //     getAverageRating();
+    // }, [userRating]);
 
     if (redirect){
         return <Redirect to='/login'></Redirect>
@@ -252,9 +224,9 @@ const Recipe = (props) =>{
                         <br></br>
                         <p id='recipe-desc'>{recipeData.description}</p>
                     </Col>
-                    {/* check if current user is owner of recipe (ONCE UID IS IMPLEMENTED) */}
+                    {/* check if current user is owner of recipe */}
                     <Col xs={2}>
-                    {currentUser && currentUser.uid == userData.uid && <div>
+                    {currentUser && currentUser.uid === userData.uid && <div>
                         <Row>
                         <Button onClick={updateRecipe}>Update Recipe</Button>
                         <EditRecipeModal isOpen={showEditModal} data={recipeData} user={userData} closeModal={closeModal} updateModal={updateModal}></EditRecipeModal>
