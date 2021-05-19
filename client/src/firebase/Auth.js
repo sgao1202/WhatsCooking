@@ -17,7 +17,7 @@ const AuthProvider = ({ children }) => {
             // User signs in 
             if (user) {
                 try {
-                    const { data } = await axios.get(`${baseUrl}/users/uid/${user.uid}`);
+                    const { data } = await axios.get(`${baseUrl}users/uid/${user.uid}`);
                     setCurrentProfile(data);
                 } catch (e) {
                     console.log(e);

@@ -54,7 +54,7 @@ const useStyles = makeStyles({
 const Home = () => {
   const { baseUrl, currentUser, currentProfile } = useContext(AuthContext);
   const classes = useStyles();
-  const url = baseUrl.substring(baseUrl.lastIndexOf("/")+1);;
+  const url = baseUrl.substring(0, baseUrl.lastIndexOf("/"));
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchData, setSearchData] = useState(undefined);
@@ -100,7 +100,7 @@ const Home = () => {
     async function fetchUserBookmarks() {
       try {
         const userBookmarksData = await axios.get(
-          `${baseUrl}/users/uid/${currentUser.uid}`
+          `${url}/users/uid/${currentUser.uid}`
         );
         let userBookmarks = [];
         for (let i = 0; i < userBookmarksData.data.bookmarks.length; i++) {
@@ -158,7 +158,7 @@ const Home = () => {
               <CardMedia
                 className={classes.media}
                 component="img"
-                image={`${baseUrl}/images/${
+                image={`${url}/images/${
                   s.picture ? s.picture : genericProfile
                 }`}
                 title="show image"
