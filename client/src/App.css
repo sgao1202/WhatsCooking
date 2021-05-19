@@ -88,6 +88,10 @@ body {
   color: blue;
 }
 
+.bookmarkfilled{
+  color: #d8ee12;
+}
+
 .success{
   color: green;
   font-style: italic;
