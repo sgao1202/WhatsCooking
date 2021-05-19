@@ -207,12 +207,13 @@ const Home = () => {
           </Grid>
         </div>
         <div className={classes.rightElement}>
-          <Link className="pb-5" to="/newrecipe">
-            <Button>Create Recipe</Button>
-          </Link>
-          <Card style={{ width: "18rem" }}>
+          {currentUser ? <Link className="pb-5" to="/newrecipe">
+                          <Button>Create Recipe</Button>
+                        </Link> : ""
+          }
+          <Card className="mt-5" style={{ width: "18rem" }}>
             <Card.Header>Popular</Card.Header>
-            <ListGroup variant="flush">{popularSearches}</ListGroup>
+            <ListGroup variant="flush" className="shadow">{popularSearches}</ListGroup>
           </Card>
           <br />
           {currentUser ? (

@@ -10,6 +10,7 @@ const ListDisplay = (props) => {
     const { baseUrl } = useContext(AuthContext);
     const [list, setList] = useState(props.list);
     let currentList = null;
+
     const createUserItem = (user) => {
         return (
             <ListGroup.Item key={user._id}>
@@ -30,20 +31,49 @@ const ListDisplay = (props) => {
     const createRecipeItem = (recipe) => {
         return (
             <ListGroup.Item key={recipe._id}>
-                <Link to={`/recipe/${recipe._id}`}>
                     <Row>
-                        <Col md={1}>
+                        <Col md={1} className="mr-3">
                             <Image className="shadow-lg following-user-profile-picture" src={recipe.picture ? `${baseUrl}/images/${recipe.picture}` : genericProfile} alt={`recipe-${recipe.title}`} roundedCircle/>
                         </Col>
                         <Col>
-                            <span>{recipe.title}</span>
+                            <Row>
+                                <Link to={`/recipe/${recipe._id}`}>
+                                    <span>{recipe.title}</span>
+                                </Link>
+                            </Row>
+                            <Row>
+                                <span className="font-italic text-dark">{`Created by: Me`}</span>
+                            </Row>
                         </Col>
                     </Row>
-                </Link>
             </ListGroup.Item>
         );
     };
 
+    const createBookmarkItem = (bookmark) => {
+        return (
+            <ListGroup.Item key={bookmark._id}>
+                    <Row>
+                        <Col md={1} className="mr-3">
+                            <Image className="shadow-lg following-user-profile-picture" src={bookmark.picture ? `${baseUrl}/images/${bookmark.picture}` : genericProfile} alt={`recipe-${bookmark.title}`} roundedCircle/>
+                        </Col>
+                        <Col>
+                            <Row>
+                                <Link to={`/recipe/${bookmark._id}`}>
+                                    <span>{bookmark.title}</span>
+                                </Link>
+                            </Row>
+                            <Row>
+                                <Link to={`/users/${bookmark.userId}`}>
+                                    <span className="font-italic text-dark">{`Created by: ${bookmark.createdBy}`}</span>
+                                </Link>
+                            </Row>
+                        </Col>
+                    </Row>
+            </ListGroup.Item>
+        );
+    };
+    
     const removeItem = (id) => {
         console.log(id);
         // Remove from list and send a post request to update the user's profile
@@ -53,7 +83,7 @@ const ListDisplay = (props) => {
     
     if (props.recipe) currentList = list && list.map((item) => { return createRecipeItem(item); });
     if (props.user) currentList = list && list.map((item) => { return createUserItem(item); });
-
+    if (props.bookmark) currentList = list && list.map((item) => { return createBookmarkItem(item); });
     return (
         <ListGroup variant="flush">
             {currentList}

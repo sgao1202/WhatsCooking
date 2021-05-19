@@ -2,7 +2,7 @@ import React, {useContext, useState, useEffect} from 'react';
 import { AuthContext } from '../firebase/Auth';
 import { Link } from 'react-router-dom';
 import { Container, Row, Col, Nav, Tab, ListGroup, Spinner, Image} from 'react-bootstrap';
-import { FaBookmark, FaCamera, FaRegNewspaper, FaUser, FaUserFriends, FaUtensils } from 'react-icons/fa';
+import { FaArrowCircleLeft, FaBookmark, FaCamera, FaRegNewspaper, FaUser, FaUserFriends, FaUtensils} from 'react-icons/fa';
 import ListDisplay from './ListDisplay';
 import genericProfile from '../img/generic-user-profile.jpeg';
 import axios from 'axios';
@@ -52,7 +52,15 @@ const MyProfile = () => {
         </Container>
     );
     return (
-        <Container>
+        <Container className="pb-5">
+            <Row>
+                <Container>
+                    <Link to="/home">
+                        <FaArrowCircleLeft/>
+                        <span className="ml-2">Back to recipes</span>
+                    </Link>
+                </Container>
+            </Row>
             <Row className="mb-5 border-bottom">
                 <Col className="py-3">
                     <Row>
@@ -160,7 +168,7 @@ const MyProfile = () => {
                             </Nav.Item>
                         </Nav>
                     </Col>
-                    <Col sm={9}>
+                    <Col sm={9} className="mb-5 pb-5">
                         <Tab.Content>
                             <Tab.Pane eventKey="aboutMe">
                                 <div>
@@ -196,7 +204,7 @@ const MyProfile = () => {
                                 </div>
                                 <div>
                                     { bookmarkedRecipes.length === 0 ? <h3>No bookmarks available</h3> : 
-                                        (<ListDisplay recipe list={bookmarkedRecipes}/>)
+                                        (<ListDisplay bookmark list={bookmarkedRecipes}/>)
                                     }
                                 </div>
                             </Tab.Pane>
