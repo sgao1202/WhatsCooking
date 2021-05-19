@@ -144,7 +144,7 @@ const Home = () => {
     popularRecipes.map((s) => {
       return (
         <ListGroup.Item action href={`/recipe/${s._id}`}>
-          {s.title}
+          {s.title} <span className="stats">({s.hits})</span>
         </ListGroup.Item>
       );
     });
@@ -170,7 +170,7 @@ const Home = () => {
                 </Typography>
                 <Typography variant="body2" color="textSecondary" component="p">
                   {s.description ? s.description : "No Summary"}
-                  <span>More Info</span>
+                  <span> ...More Info</span>
                 </Typography>
               </CardContent>
             </Link>

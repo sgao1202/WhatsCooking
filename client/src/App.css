@@ -134,3 +134,8 @@ body {
 .modal-image{
   min-height: 300px;
 }
+
+.stats {
+  color:lightgrey;
+  font-size: 14px;
+}

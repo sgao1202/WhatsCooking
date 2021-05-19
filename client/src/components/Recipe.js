@@ -6,8 +6,8 @@ import axios from 'axios'
 import { Container, Row, Col, Image, Button, Form, ListGroup } from 'react-bootstrap'
 import { BsFillBookmarkFill, BsBookmark} from 'react-icons/bs'
 import { Rating } from "@material-ui/lab";
-import logo from '../img/whats-cooking-logo.png';
 import EditRecipeModal from './EditRecipeModal';
+import Error from './Error';
 const Recipe = (props) =>{
    /* Core Features still need to be implemented:
     Updating Recipe Button (only if you are logged in as the owner of the recipe)
@@ -48,6 +48,8 @@ const Recipe = (props) =>{
     const [userRating, setUserRating] = useState(0);
     const [userRatingId, setUserRatingId] = useState(undefined);
     const [averageRating, setAverageRating] = useState(0);
+    const [totalRatings, setTotalRatings] = useState(0);
+    const [hasError, setHasError] = useState(false);
 
     const [showEditModal, setShowEditModal] = useState(false);
     
@@ -143,12 +145,22 @@ const Recipe = (props) =>{
             return prev + cur.rating;
           }, 0);
         setAverageRating(parseInt(ratingTotal/data.length));
+        setTotalRatings(data.length);
     }
     
     useEffect(() =>{
         async function fetchData(){
             try{
+                let d = null;
+                try{
                 let { data } = await axios.get(`${url}recipes/${props.match.params.id}`); //getRecipeById
+                d = data;
+                } catch(e) {
+                    setHasError(true);
+                    setLoading(false);
+                    return;
+                }
+                let data = d;
                 setRecipeData(data);
                 //get user data associated with recipe
                 let user = await axios.get(`${url}users/${data.userId}`);
@@ -176,7 +188,8 @@ const Recipe = (props) =>{
                     setLoading(false);
                 })
             }catch(e){
-                return (<p>{e.message}</p>)
+                setLoading(false);
+                return <Error/>;
             }
         }
 
@@ -203,6 +216,8 @@ const Recipe = (props) =>{
         return(
             <h1>Loading...</h1>
         )
+    } else if(hasError) {
+        return <Error/>
     }
     else{
         let ingredients = recipeData.ingredients.map((ingredient)=>(
@@ -228,6 +243,12 @@ const Recipe = (props) =>{
                             Posted By: 
                             <Link to={`/users/${userData.uid}`}> {userData.firstName} {userData.lastName}</Link>
                             </h2>
+                        <div>
+                            <Row>
+                            <Col><Rating name="rating1" value={averageRating} precision={1} readOnly/>
+                            <span className="stats">({totalRatings})</span></Col>
+                            </Row>
+                        </div>
                         <br></br>
                         <p id='recipe-desc'>{recipeData.description}</p>
                     </Col>
@@ -240,6 +261,7 @@ const Recipe = (props) =>{
                         </Row>
                     </div>}
                     {currentUser && <Row>
+                        <h5>Rate This Recipe:</h5>
                         <Rating name="rating" value={userRating} precision={1} onChange={(event, newValue) => handleRating(event, newValue)}/>
                     </Row>}
                     </Col>
@@ -247,9 +269,6 @@ const Recipe = (props) =>{
                         <Image src={`${url}images/${recipeData.picture}`} alt = "noimg" thumbnail="true"></Image>
                     </Col>
                 </Row>
-                <h3>Average Rating:</h3>
-                <Rating name="rating1" value={averageRating} precision={1} readOnly/>
-
                 <h3>Ingredients:</h3>
                 <ul>
                     {ingredients}
@@ -288,6 +307,9 @@ const Recipe = (props) =>{
                     </ListGroup.Item>
                 ))}
                 </ListGroup>
+                <br></br>
+                <br></br>
+                <br></br>
             </Container>
         )
     }
