@@ -21,9 +21,9 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        {/* <Switch> */}
-            <Navigation></Navigation>
-            <Container className="mt-5">
+          <Navigation></Navigation>
+          <Container className="mt-5">
+            <Switch>
                 <Route exact path="/">
                   <Redirect to="/home"></Redirect>
                 </Route>
@@ -37,8 +37,8 @@ function App() {
                 <PrivateRoute exact path="/my-profile/edit" component={EditProfile}></PrivateRoute>
                 <PrivateRoute exact path="/my-profile/upload-image" component={UploadImage}></PrivateRoute>
                 <Route component={Error}></Route>
-            </Container>
-        {/* </Switch> */}
+            </Switch>
+          </Container>
       </Router> 
     </AuthProvider>
   );
