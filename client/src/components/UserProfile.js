@@ -31,12 +31,15 @@ const UserProfile = (props) => {
             try {
                 // Get user from database
                 const { data } = await axios.get(`${baseUrl}/users/my-profile/${String(props.match.params.id)}`);
-                let r = await axios.get(`${url}users/uid/${currentUser.uid}`);
                 //let u = r.data;
                 setUserProfile(data.user);
                 setBookmarkedRecipes(data.bookmarkedRecipes);
                 setMyRecipes(data.myRecipes);
-                setFollowing(r.data.following.includes(String(data.user._id)));
+                
+                if (currentUser) {
+                    let r = await axios.get(`${url}users/uid/${currentUser.uid}`);
+                    setFollowing(r.data.following.includes(String(data.user._id)));
+                }
             } catch (e) {
                 alert(e);
             }
@@ -88,7 +91,7 @@ const UserProfile = (props) => {
     );
 
     let followButton = null;
-    if (currentUser.uid != userProfile.uid) {
+    if (currentUser && currentUser.uid != userProfile.uid) {
         if (currentUser && !following) {
             followButton = <FiUserPlus size={40} onClick={currentUser? (e)=>toggleFollowing(e): ()=>redirectToLogin()}></FiUserPlus>;
         } else if (currentUser && following) {

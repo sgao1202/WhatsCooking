@@ -1,5 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { BrowserRouter as Router, Route, Redirect} from 'react-router-dom';
+import { BrowserRouter as Router, Route, Redirect, Switch} from 'react-router-dom';
 import { Container } from 'react-bootstrap';
 import { AuthProvider } from '../firebase/Auth';
 import Navigation from './Navigation';
@@ -14,12 +14,14 @@ import SignUp from './SignUp';
 import Home from './Home';
 import PrivateRoute from './PrivateRoute';
 import UserProfile from './UserProfile';
+import Error from './Error';
 import '../App.css';
 
 function App() {
   return (
     <AuthProvider>
       <Router>
+        {/* <Switch> */}
             <Navigation></Navigation>
             <Container className="mt-5">
                 <Route exact path="/">
@@ -34,7 +36,9 @@ function App() {
                 <PrivateRoute exact path="/my-profile" component={MyProfile}></PrivateRoute>
                 <PrivateRoute exact path="/my-profile/edit" component={EditProfile}></PrivateRoute>
                 <PrivateRoute exact path="/my-profile/upload-image" component={UploadImage}></PrivateRoute>
+                <Route component={Error}></Route>
             </Container>
+        {/* </Switch> */}
       </Router> 
     </AuthProvider>
   );
