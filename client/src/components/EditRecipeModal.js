@@ -1,11 +1,13 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Col, Image, Button, Form, Modal } from 'react-bootstrap'
+import utils from '../lib/Utility';
 function EditRecipeModal(props) {
     const url = 'http://localhost:3001/';
     const [loading, setLoading] = useState(true);
     const [showEditModal, setShowEditModal] = useState(props.isOpen);
-    const [validated, setValidated] = useState(false);
+    const [errors, setErrors] = useState(false);
+    const [newImage, setNewImage] = useState(false);
     const [{src, alt}, setImage] = useState({
         src: props.data.picture,
         alt: "Upload an image"
@@ -48,35 +50,93 @@ function EditRecipeModal(props) {
         formData.procedure[index] = e.target.value.trim();
         setFormData(formData);
     }
+    const handleFileChange = (e) => {
+        setFormData({
+            ...formData, [e.target.name]: e.target.files[0]
+        })
+        console.log(formData)
+        setImage(true);
+    }
+    const validateForm = () =>{
+        const newErrors = {
+            title: !utils.validString(formData.title),
+            description: !utils.validString(formData.description),
+            picture: !formData.picture,
+            ingredientNames: checkIngredientNames(),
+            ingredientPortions: checkIngredientPortions(),
+            ingredientUnits: checkIngredientUnits(),
+            procedure: checkProcedureErrors()
+        }
+
+        console.log(newErrors);
+        setErrors(newErrors);
+        function checkIngredientNames(){
+            let ingredients = formData.ingredients
+            for (let i = 0; i<ingredients.length; i++){
+                if(!utils.validString(ingredients[i].name)){
+                    return true;
+                }
+            }
+            return false;
+        }
+        function checkIngredientPortions(){
+            let ingredients = formData.ingredients
+            console.log(ingredients)
+            for (let i = 0; i<ingredients.length; i++){
+                if(!ingredients[i].portion || ingredients[i].portion < 0){
+                    return true;
+                }
+            }
+            return false;
+        }
+        function checkIngredientUnits(){
+            let ingredients = formData.ingredients
+            for (let i = 0; i<ingredients.length; i++){
+                if(!utils.validString(ingredients[i].units)){
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function checkProcedureErrors(){
+            let procedure = formData.procedure;
+            for (let i = 0; i<procedure.length; i++){
+                if(!utils.validString(procedure[i])){
+                    return true;
+                }
+            }
+            return false;
+        }
+        if (newErrors.title || newErrors.description || newErrors.picture || newErrors.ingredientNames || newErrors.ingredientPortions || newErrors.ingredientUnits || newErrors.procedure) return false;
+        return true;
+    }
+
     const handleModalSubmit = async(e) =>{
         e.preventDefault();
-        const form = e.target;
-        if (form.checkValidity() === false){
-            console.log("invalid form")
-            e.preventDefault();
-            e.stopPropagation();
-        }
-        setValidated(true);
-        console.log(formData)
-        try{
-            const imageData = new FormData();
-            imageData.append("file", formData.picture, formData.picture.name)
-            let picId = await axios.post(`${url}uploadImage`, imageData)
-            console.log(picId)
-            //store the picture in the database as a uid
-            formData.picture = picId.data;
-            console.log(formData)
-            let updatedRecipe = await axios.put(`${url}recipes/${formData.recipeid}`, formData);
-            setFormData(updatedRecipe.data);
-            props.updateModal(formData);
-        
-            handleCloseModal();
-        }catch(e){
-            console.log(e);
-        }
-        setShowEditModal(false);
-        
-        return;
+        if (validateForm()){
+            try{
+                if(newImage){
+                    const imageData = new FormData();
+                    imageData.append("file", formData.picture);
+                    let picId = await axios.post(`${url}uploadImage`, imageData)
+                    console.log(picId)
+                    //store the picture in the database as a uid
+                    formData.picture = picId.data;
+                }
+                console.log(formData)
+                let updatedRecipe = await axios.put(`${url}recipes/${formData.recipeid}`, formData);
+                setFormData(updatedRecipe.data);
+                props.updateModal(formData);
+            
+                handleCloseModal();
+            }catch(e){
+                console.log(e);
+            }
+            setShowEditModal(false);
+        }else{
+            console.log("Modal failed to submit")
+        } 
     }
     const addIngredient = () => {
         let emptyIngredient = {
@@ -104,13 +164,6 @@ function EditRecipeModal(props) {
         setFormData(fields);
     }
 
-    const handleFileChange = (e) => {
-        console.log(e.target.files[0])
-        setFormData({
-            ...formData, [e.target.name]: e.target.files[0]
-        })
-        console.log(formData)
-    }
 
     return(!loading &&
         <Modal show={showEditModal} onHide={handleCloseModal}>
@@ -118,7 +171,7 @@ function EditRecipeModal(props) {
             <Modal.Title>Update {initialFormData.title}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Form noValidate validated={validated} enctype="multipart/form-data" onSubmit={(e) => handleModalSubmit(e)}>
+                <Form noValidate enctype="multipart/form-data" onSubmit={(e) => handleModalSubmit(e)}>
                     <Form.Group controlId='image'>
                         <Form.Label className='modal-subtitle'>Current Image:</Form.Label>
                         <Form.Control className='modal-image' type='image' src={`${url}images/${initialFormData.picture}`} alt='noimg'></Form.Control>
@@ -128,7 +181,12 @@ function EditRecipeModal(props) {
                     </Form.Group>
                     <Form.Group controlId="updateTitle">
                         <Form.Label className='modal-subtitle'>Name:</Form.Label>
-                        <Form.Control required type="text" name='title' defaultValue={formData.title} onChange={handleModalChange}></Form.Control>
+                        <Form.Control required 
+                        type="text" 
+                        name='title' 
+                        defaultValue={formData.title} 
+                        onChange={handleModalChange} 
+                        isInvalid={errors.title}></Form.Control>
                         <Form.Control.Feedback type="invalid">Recipe name cannot be empty!</Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group controlId="displayChef">
@@ -137,7 +195,13 @@ function EditRecipeModal(props) {
                     </Form.Group>
                     <Form.Group controlId="updateDesc">
                         <Form.Label className='modal-subtitle'>Description:</Form.Label>
-                        <Form.Control required type="text" name='description' defaultValue={formData.description} onChange={handleModalChange}></Form.Control>
+                        <Form.Control required 
+                        type="text" 
+                        name='description' 
+                        defaultValue={formData.description} 
+                        onChange={(e) => {handleModalChange(e) 
+                            setErrors({...errors, description: false})}}
+                        isInvalid={errors.description}></Form.Control>
                         <Form.Control.Feedback type="invalid">Description cannot be empty!</Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group controlId="updateIngredients">
@@ -145,16 +209,34 @@ function EditRecipeModal(props) {
                         {formData.ingredients.map((ingredient, index)=>(
                             <Form.Row key={index}>
                                 <Col>
-                                    <Form.Control required type="text" name="name" defaultValue={ingredient.name} onChange={(e) => handleModalIngredientChange(e, index)}></Form.Control>
-                                    <Form.Control.Feedback type="invalid">Must provide an ingredient name!</Form.Control.Feedback>
+                                    <Form.Control required 
+                                    type="text" 
+                                    name="name" 
+                                    defaultValue={ingredient.name} 
+                                    onChange={(e) => {handleModalIngredientChange(e, index)
+                                        setErrors({...errors, ingredientNames : false})}} 
+                                    isInvalid={errors.ingredientNames}></Form.Control>
+                                    <Form.Control.Feedback type="invalid">Must provide an ingredient name for all ingredients!</Form.Control.Feedback>
                                 </Col>
                                 <Col>
-                                    <Form.Control required type="number" name="portion" min="0" step=".1" onInput={() => "validity.valid||(value='')"} defaultValue={ingredient.portion} onChange={(e) => handleModalIngredientChange(e,index)}></Form.Control>
-                                    <Form.Control.Feedback type="invalid">Must provide a non-negative portion amount!</Form.Control.Feedback>
+                                    <Form.Control required 
+                                    type="number" 
+                                    name="portion" 
+                                    defaultValue={ingredient.portion} 
+                                    onChange={(e) => {handleModalIngredientChange(e, index)
+                                        setErrors({...errors, ingredientPortions : false})}} 
+                                    isInvalid={errors.ingredientPortions}></Form.Control>
+                                    <Form.Control.Feedback type="invalid">Must provide a non-negative portion amount for all ingredients!</Form.Control.Feedback>
                                 </Col>
                                 <Col>
-                                    <Form.Control required type="text" name="units" defaultValue={ingredient.units} onChange={(e) => handleModalIngredientChange(e,index)}></Form.Control>
-                                    <Form.Control.Feedback type="invalid">Must provide a unit of measurement!</Form.Control.Feedback>
+                                    <Form.Control required 
+                                    type="text" 
+                                    name="units" 
+                                    defaultValue={ingredient.units} 
+                                    onChange={(e) => {handleModalIngredientChange(e, index)
+                                        setErrors({...errors, ingredientUnits : false})}} 
+                                    isInvalid={errors.ingredientUnits}></Form.Control>
+                                    <Form.Control.Feedback type="invalid">Must provide a unit of measurement for all ingredients!</Form.Control.Feedback>
                                 </Col>
                                 <Col xs={1}>
                                     <Button className='ingredient-del-btn' variant="danger" onClick={()=> deleteIngredient(index)}>X</Button>
@@ -169,8 +251,14 @@ function EditRecipeModal(props) {
                         {formData.procedure.map((step, index)=>(
                             <Form.Row key={index}>
                                 <Col>
-                                    <Form.Control required as='textarea' defaultValue={step} rows={4} onChange={(e)=>handleModalProcedureChange(e, index)}></Form.Control>
-                                    <Form.Control.Feedback type="invalid">Step cannot be empty!</Form.Control.Feedback>
+                                    <Form.Control 
+                                    required 
+                                    as='textarea' 
+                                    defaultValue={step} 
+                                    rows={4} 
+                                    onChange={(e)=>handleModalProcedureChange(e, index)} 
+                                    isInvalid={errors.procedure}></Form.Control>
+                                    <Form.Control.Feedback type="invalid">All steps cannot be empty!</Form.Control.Feedback>
                                 </Col>
                                 <Col xs={1}>
                                     <Button variant="danger" onClick={()=> deleteStep(index)}>X</Button>

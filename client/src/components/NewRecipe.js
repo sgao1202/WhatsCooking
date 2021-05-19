@@ -77,14 +77,6 @@ function NewRecipe(props){
     
 
     const validateForm = () =>{
-        let procedureErrors = checkProcedureErrors();
-        // const newErrors = {
-        //     title: !utils.validString(formData.title),
-        //     description: !utils.validString(formData.description),
-        //     picture: !formData.picture,
-        //     ingredients: ingredientErrors,
-        //     procedure: procedureErrors
-        // }
         const newErrors = {
             title: !utils.validString(formData.title),
             description: !utils.validString(formData.description),
@@ -270,7 +262,7 @@ function NewRecipe(props){
                             setErrors({...errors, ingredientUnits : false})}} 
                         isValid={!!errors.ingredientUnits} 
                         isInvalid={errors.ingredientUnits}></Form.Control>
-                        <Form.Control.Feedback type="invalid">Must provide a unit of measurement for all ingredients!!</Form.Control.Feedback>
+                        <Form.Control.Feedback type="invalid">Must provide a unit of measurement for all ingredients!</Form.Control.Feedback>
                     </InputGroup>
                     <Button variant="danger" as={Col} xs={1} onClick={(e) => deleteIngredient(index)}>X</Button>
                 </Form.Row>
