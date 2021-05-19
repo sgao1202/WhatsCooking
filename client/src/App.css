@@ -1,5 +1,5 @@
 body {
-  /* background: #1C8EF9 !important; */
+  /* background: !important; */
   font-weight: 400;
 }
 
@@ -89,7 +89,8 @@ body {
 }
 
 .bookmarkfilled{
-  color: #d8ee12;
+  /* color: #d8ee12; */
+  color: #00E676;
 }
 
 .success{
@@ -140,7 +141,7 @@ body {
 }
 
 .stats {
-  color:lightgrey;
+  /* color:lightgrey; */
   font-size: 14px;
 }
 

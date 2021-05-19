@@ -208,7 +208,6 @@ const Home = () => {
           </Grid>
         </div>
         <div className={`${classes.rightElement}`}>
-    
           {currentUser ? 
             <div className="mb-4">
                 <Link className="pb-5" to="/newrecipe">
@@ -217,12 +216,12 @@ const Home = () => {
             </div> : ""
           }
           <Card className="mb-5" style={{ width: "18rem" }}>
-            <Card.Header>Popular</Card.Header>
+            <Card.Header className="h3">Popular</Card.Header>
             <ListGroup variant="flush" className="shadow">{popularSearches}</ListGroup>
           </Card>
           {currentUser ? (
             <Card style={{ width: "18rem" }}>
-              <Card.Header>Bookmarks</Card.Header>
+              <Card.Header className="h3">Bookmarks</Card.Header>
               <ListGroup variant="flush">{bookmarks}</ListGroup>
             </Card>
           ) : (

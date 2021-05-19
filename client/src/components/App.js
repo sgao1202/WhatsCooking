@@ -1,4 +1,4 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
+import '../styles/App.scss';
 import { BrowserRouter as Router, Route, Redirect, Switch} from 'react-router-dom';
 import { Container } from 'react-bootstrap';
 import { AuthProvider } from '../firebase/Auth';
