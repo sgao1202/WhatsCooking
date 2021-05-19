@@ -88,6 +88,10 @@ body {
   color: blue;
 }
 
+.bookmarkfilled{
+  color: #d8ee12;
+}
+
 .success{
   color: green;
   font-style: italic;
@@ -129,4 +133,9 @@ body {
 
 .modal-image{
   min-height: 300px;
+}
+
+.stats {
+  color:lightgrey;
+  font-size: 14px;
 }

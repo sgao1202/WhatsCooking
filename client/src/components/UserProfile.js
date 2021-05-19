@@ -7,7 +7,7 @@ import {FaUserMinus, FaBookmark, FaCamera, FaRegNewspaper, FaUser, FaUserFriends
 import genericProfile from '../img/generic-user-profile.jpeg';
 import axios from 'axios';
 import ListDisplay from './ListDisplay';
-
+import Error from './Error'
 
 const UserProfile = (props) => {
     const { currentUser, baseUrl } = useContext(AuthContext);
@@ -16,6 +16,7 @@ const UserProfile = (props) => {
     const [myRecipes, setMyRecipes] = useState(undefined);
     const [loading, setLoading] = useState(true);
     const [redirect, setRedirect] = useState(false);
+    const [hasError, setHasError] = useState(false);
     const url = 'http://localhost:3001/';
 
     const [following, setFollowing] = useState();
@@ -28,10 +29,19 @@ const UserProfile = (props) => {
         // Fetch data from db
         async function fetchData() {
             setLoading(true);
+            let u = null;
             try {
                 // Get user from database
                 const { data } = await axios.get(`${baseUrl}/users/my-profile/${String(props.match.params.id)}`);
+                u = data;
                 //let u = r.data;
+            } catch (e) {
+                console.log(e)
+                setHasError(true);
+                setLoading(false);
+                return;
+            }
+            let data = u;
                 setUserProfile(data.user);
                 setBookmarkedRecipes(data.bookmarkedRecipes);
                 setMyRecipes(data.myRecipes);
@@ -40,9 +50,6 @@ const UserProfile = (props) => {
                     let r = await axios.get(`${url}users/uid/${currentUser.uid}`);
                     setFollowing(r.data.following.includes(String(data.user._id)));
                 }
-            } catch (e) {
-                alert(e);
-            }
             setLoading(false);
         }
         fetchData();
@@ -84,11 +91,15 @@ const UserProfile = (props) => {
         About Me
         My Recipes
     */
-    if (loading) return (
+    if (loading) {
+        return (
         <Container className="text-center">
             <Spinner animation="border"></Spinner>
         </Container>
-    );
+        );
+    } else if(hasError) {
+        return <Error/>
+    }
 
     let followButton = null;
     if (currentUser && currentUser.uid != userProfile.uid) {
