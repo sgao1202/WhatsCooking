@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { Col, Image, Button, Form, Modal } from 'react-bootstrap'
+import { Col, Button, Form, Modal } from 'react-bootstrap'
 import utils from '../lib/Utility';
 function EditRecipeModal(props) {
     const url = 'http://localhost:3001/';
@@ -8,18 +8,14 @@ function EditRecipeModal(props) {
     const [showEditModal, setShowEditModal] = useState(props.isOpen);
     const [errors, setErrors] = useState(false);
     const [newImage, setNewImage] = useState(false);
-    const [{src, alt}, setImage] = useState({
-        src: props.data.picture,
-        alt: "Upload an image"
-    })
+
     useEffect(()=>{
         setShowEditModal(props.isOpen);
         setLoading(false);
     },[props.data, props.isOpen])
 
-
     const initialFormData = Object.freeze({
-        recipeid: props.data._id,
+        _id: props.data._id,
         title: props.data.title,
         userId: props.user._id,
         picture: props.data.picture,
@@ -54,8 +50,7 @@ function EditRecipeModal(props) {
         setFormData({
             ...formData, [e.target.name]: e.target.files[0]
         })
-        console.log(formData)
-        setImage(true);
+        setNewImage(true);
     }
     const validateForm = () =>{
         const newErrors = {
@@ -115,6 +110,7 @@ function EditRecipeModal(props) {
     const handleModalSubmit = async(e) =>{
         e.preventDefault();
         if (validateForm()){
+            handleCloseModal();
             try{
                 if(newImage){
                     const imageData = new FormData();
@@ -125,11 +121,12 @@ function EditRecipeModal(props) {
                     formData.picture = picId.data;
                 }
                 console.log(formData)
-                let updatedRecipe = await axios.put(`${url}recipes/${formData.recipeid}`, formData);
+                let updatedRecipe = await axios.put(`${url}recipes/${formData._id}`, formData);
                 setFormData(updatedRecipe.data);
                 props.updateModal(formData);
             
-                handleCloseModal();
+                
+                setNewImage(false);
             }catch(e){
                 console.log(e);
             }
@@ -168,10 +165,10 @@ function EditRecipeModal(props) {
     return(!loading &&
         <Modal show={showEditModal} onHide={handleCloseModal}>
             <Modal.Header closeButton>
-            <Modal.Title>Update {initialFormData.title}</Modal.Title>
+            <Modal.Title>Update "{initialFormData.title}"</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Form noValidate enctype="multipart/form-data" onSubmit={(e) => handleModalSubmit(e)}>
+                <Form noValidate encType="multipart/form-data" onSubmit={(e) => handleModalSubmit(e)}>
                     <Form.Group controlId='image'>
                         <Form.Label className='modal-subtitle'>Current Image:</Form.Label>
                         <Form.Control className='modal-image' type='image' src={`${url}images/${initialFormData.picture}`} alt='noimg'></Form.Control>
@@ -204,7 +201,7 @@ function EditRecipeModal(props) {
                         isInvalid={errors.description}></Form.Control>
                         <Form.Control.Feedback type="invalid">Description cannot be empty!</Form.Control.Feedback>
                     </Form.Group>
-                    <Form.Group controlId="updateIngredients">
+                    <Form.Group>
                         <Form.Label className='modal-subtitle'>Ingredients:</Form.Label>
                         {formData.ingredients.map((ingredient, index)=>(
                             <Form.Row key={index}>
@@ -245,7 +242,7 @@ function EditRecipeModal(props) {
                         ))}
                         <Button onClick={addIngredient}>Add +</Button>
                     </Form.Group>
-                    <Form.Group controlId="updateProcedure">
+                    <Form.Group>
                         <Form.Label className='modal-subtitle'>Procedure:</Form.Label>
                         <br></br>
                         {formData.procedure.map((step, index)=>(
