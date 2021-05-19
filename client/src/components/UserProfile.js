@@ -17,7 +17,7 @@ const UserProfile = (props) => {
     const [loading, setLoading] = useState(true);
     const [redirect, setRedirect] = useState(false);
     const [hasError, setHasError] = useState(false);
-    const url = baseUrl;
+    const url = baseUrl.substring(baseUrl.lastIndexOf("/")+1);
 
     const [following, setFollowing] = useState();
 

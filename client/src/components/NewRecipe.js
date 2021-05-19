@@ -17,7 +17,7 @@ function NewRecipe(props){
         ingredients: [{name: "", portion: "", units: ""}],
         procedure: [""]
     }
-    const url = baseUrl;
+    const url = baseUrl.substring(baseUrl.lastIndexOf("/")+1);
     const [formData, setFormData] = useState(initialFormData);
     const [errors, setErrors] = useState({
         title: false,

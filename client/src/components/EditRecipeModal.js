@@ -4,7 +4,7 @@ import { Col, Image, Button, Form, Modal } from 'react-bootstrap'
 import { AuthContext } from "../firebase/Auth";
 function EditRecipeModal(props) {
     const { baseUrl } = useContext(AuthContext);
-    const url = baseUrl;
+    const url = baseUrl.substring(baseUrl.lastIndexOf("/")+1);
     const [loading, setLoading] = useState(true);
     const [showEditModal, setShowEditModal] = useState(props.isOpen);
     const [validated, setValidated] = useState(false);

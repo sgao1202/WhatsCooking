@@ -38,7 +38,7 @@ const Recipe = (props) =>{
         </form>
      */
     const { baseUrl, currentUser } = useContext(AuthContext);
-    const url = baseUrl;
+    const url = baseUrl.substring(baseUrl.lastIndexOf("/")+1);
     const [loading, setLoading] = useState(true);
     const [recipeData, setRecipeData] = useState();
     const [userData, setUserData] = useState();

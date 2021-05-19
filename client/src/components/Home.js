@@ -54,7 +54,7 @@ const useStyles = makeStyles({
 const Home = () => {
   const { baseUrl, currentUser, currentProfile } = useContext(AuthContext);
   const classes = useStyles();
-  const url = baseUrl;
+  const url = baseUrl.substring(baseUrl.lastIndexOf("/")+1);;
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchData, setSearchData] = useState(undefined);
