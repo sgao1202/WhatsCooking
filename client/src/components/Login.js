@@ -60,10 +60,6 @@ const Login = () => {
         
     // };
 
-    const validForm = () => {
-        return email.length > 0 && password.length > 0;
-    };
-
     if (currentUser) return <Redirect to="/home"></Redirect>
     return (
         <Container className="Login edit-container shadow-lg">
@@ -113,7 +109,7 @@ const Login = () => {
                         Please enter a valid password.
                     </Form.Control.Feedback>
                 </Form.Group>
-                <Button block size="lg" variant="primary" type="submit" disabled={!validForm()}>
+                <Button block size="lg" variant="primary" type="submit">
                     Login
                 </Button>
                 <Container className="pr-0 mt-2 right-align">

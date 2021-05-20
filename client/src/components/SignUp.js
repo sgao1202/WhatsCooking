@@ -66,8 +66,6 @@ const SignUp = () => {
         if (validateForm()) createUser();
         setLoading(false);
     };
-
-    const validForm = () => {return email.length > 0 && password.length > 0 && firstName.length > 0 && lastName.length > 0 && aboutMe.length > 0;};
     
     if (loading) return (
         <Container className="text-center">
@@ -186,7 +184,7 @@ const SignUp = () => {
                         Please enter a valid about me section
                     </Form.Control.Feedback>
                 </Form.Group>
-                <Button block size="lg" variant="primary" type="submit" disabled={!validForm()}>
+                <Button block size="lg" variant="primary" type="submit">
                     {loading ? 'Loading...' : 'Sign Up'}
                 </Button>
                 <Container className="pr-0 mt-2 right-align">
