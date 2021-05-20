@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
-import SocialSignIn from './SocialSignIn'
 import { Redirect, Link } from 'react-router-dom';
-import { Alert, Button, Form } from 'react-bootstrap';
+import { Alert, Button, Container, Form } from 'react-bootstrap';
 import { AuthContext } from '../firebase/Auth';
-import { doSignInWithEmailAndPassword, doPasswordReset } from '../firebase/FirebaseFunctions';
+import { doSignInWithEmailAndPassword } from '../firebase/FirebaseFunctions';
 import utils from '../lib/Utility';
 
 const Login = () => {
@@ -61,13 +60,10 @@ const Login = () => {
         
     // };
 
-    const validForm = () => {
-        return email.length > 0 && password.length > 0;
-    };
-
     if (currentUser) return <Redirect to="/home"></Redirect>
     return (
-        <div className="Login">
+        <Container className="Login edit-container shadow-lg">
+            <h2 className="border-bottom pb-3 mb-4 mx-5">Login</h2>
             { userNotFound && 
                 <Alert variant="danger" className="login-error pb-0 mb-3">
                     <p>{tooManyRequests ? 'Too many attempts':'Email or password is incorrect'}</p>
@@ -94,7 +90,7 @@ const Login = () => {
                         Please enter a valid email.
                     </Form.Control.Feedback>
                 </Form.Group>
-                <Form.Group className="mb-0" size="lg" controlId="password">
+                <Form.Group className="mb-3" size="lg" controlId="password">
                     <Form.Label>Password</Form.Label>
                     <Form.Control 
                         required
@@ -113,16 +109,17 @@ const Login = () => {
                         Please enter a valid password.
                     </Form.Control.Feedback>
                 </Form.Group>
-                <div className="my-2 forgot-password">
-                    {/* <Link to="/">
-                        <small>Forgot password?</small>
-                    </Link> */}
-                </div>
-                <Button block size="lg" variant="primary" type="submit" disabled={!validForm()}>
+                <Button block size="lg" variant="primary" type="submit">
                     Login
                 </Button>
+                <Container className="pr-0 mt-2 right-align">
+                    <small>
+                        New to WhatsCooking?
+                        <Link className="ml-1" to="/signup">Sign up</Link>
+                    </small>
+                </Container>
             </Form>
-        </div>
+        </Container>
     );
 };
 

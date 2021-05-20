@@ -3,7 +3,7 @@ import { AuthContext } from '../firebase/Auth';
 import { Link, Redirect } from 'react-router-dom';
 import { Container, Row, Col, Nav, Tab, ListGroup, Spinner, Image} from 'react-bootstrap';
 import {FiUserPlus} from 'react-icons/fi';
-import {FaUserMinus, FaBookmark, FaCamera, FaRegNewspaper, FaUser, FaUserFriends, FaUtensils } from 'react-icons/fa';
+import {FaUserMinus, FaBookmark, FaUser, FaUserFriends, FaUtensils } from 'react-icons/fa';
 import genericProfile from '../img/generic-user-profile.jpeg';
 import axios from 'axios';
 import ListDisplay from './ListDisplay';
@@ -102,7 +102,7 @@ const UserProfile = (props) => {
     }
 
     let followButton = null;
-    if (currentUser && currentUser.uid != userProfile.uid) {
+    if (currentUser && currentUser.uid !== userProfile.uid) {
         if (currentUser && !following) {
             followButton = <FiUserPlus size={40} onClick={currentUser? (e)=>toggleFollowing(e): ()=>redirectToLogin()}></FiUserPlus>;
         } else if (currentUser && following) {
@@ -202,7 +202,7 @@ const UserProfile = (props) => {
                         <Tab.Content>
                             <Tab.Pane eventKey="aboutMe">
                                 <div>
-                                    <h2 className="pb-2 border-bottom text-primary">About Me</h2>
+                                    <h2 className="pb-2 border-bottom text-primary">{`About ${userProfile.firstName}`}</h2>
                                 </div>
                                 <div>
                                     {userProfile.aboutMe ? userProfile.aboutMe : <h3>Nothing to display</h3>}
@@ -234,7 +234,7 @@ const UserProfile = (props) => {
                                 </div>
                                 <div>
                                     { bookmarkedRecipes.length === 0 ? <h3>No bookmarks available</h3> : 
-                                        (<ListDisplay recipe list={bookmarkedRecipes}/>)
+                                        (<ListDisplay bookmark list={bookmarkedRecipes}/>)
                                     }
                                 </div>
                             </Tab.Pane>

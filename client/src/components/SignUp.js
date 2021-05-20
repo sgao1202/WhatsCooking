@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Redirect } from 'react-router-dom';
+import { Redirect, Link } from 'react-router-dom';
 import { Alert, Button, Container, Form, Spinner } from 'react-bootstrap';
 import { AuthContext } from '../firebase/Auth';
 import { doCreateUserWithEmailAndPassword } from '../firebase/FirebaseFunctions';
@@ -34,10 +34,11 @@ const SignUp = () => {
             firstName: !utils.validString(firstName),
             lastName: !utils.validString(lastName),
             email: !utils.validString(email) || !email.includes('@'),
-            password: !utils.validString(password) || password.length < 6
+            password: !utils.validString(password) || password.length < 6,
+            aboutMe: !utils.validString(aboutMe)
         };
         setErrors(newErrors);
-        if (newErrors.firstName || newErrors.lastName || newErrors.email || newErrors.password) return false;
+        if (newErrors.firstName || newErrors.lastName || newErrors.email || newErrors.password || newErrors.aboutMe) return false;
         return true;
     };
     
@@ -65,8 +66,6 @@ const SignUp = () => {
         if (validateForm()) createUser();
         setLoading(false);
     };
-
-    const validForm = () => {return email.length > 0 && password.length > 0 && firstName.length > 0 && lastName.length > 0;};
     
     if (loading) return (
         <Container className="text-center">
@@ -76,7 +75,8 @@ const SignUp = () => {
 
     if (currentProfile && !loading) return <Redirect to='/home'></Redirect>
     return (
-        <div className="Login">
+        <Container className="Login edit-container shadow-lg">
+            <h1 className="h2 border-bottom pb-3 mb-4 mx-5">Sign Up</h1>
             {   userAlreadyExists &&
                 <Alert variant="danger" className="login-error pb-0 mb-3">
                     <p>Email is already in use</p>
@@ -178,18 +178,23 @@ const SignUp = () => {
                                 aboutMe: false
                             });
                         }}
-                        isValid = {!!errors.aboutMe}
                         isInvalid = {errors.aboutMe}
                     />
                     <Form.Control.Feedback type="invalid">
                         Please enter a valid about me section
                     </Form.Control.Feedback>
                 </Form.Group>
-                <Button block size="lg" variant="primary" type="submit" disabled={!validForm()}>
+                <Button block size="lg" variant="primary" type="submit">
                     {loading ? 'Loading...' : 'Sign Up'}
                 </Button>
+                <Container className="pr-0 mt-2 right-align">
+                    <small>
+                        Already signed up?
+                        <Link className="ml-1" to="/login">Log in</Link>
+                    </small>
+                </Container>
             </Form>
-        </div>
+        </Container>
     );
 };
 

@@ -11,6 +11,7 @@ const UploadImage = () => {
     const [loading, setLoading] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [invalid, setInvalid] = useState(false);
+    const validTypes = new Set(['png', 'jpg', 'jpeg']);
 
     useEffect(() => {
         bsCustomFileInput.init();
@@ -18,7 +19,10 @@ const UploadImage = () => {
 
     // Check file type
     const validateFile = () => {
-        const validTypes = new Set(['png', 'jpg', 'jpeg']);
+        if (!file) {
+            setInvalid(true);
+            return false;
+        }
         let fileType = file.type;
         let extensionIndex = fileType.search('/');
         let extensionType = fileType.slice(extensionIndex + 1);
@@ -56,9 +60,6 @@ const UploadImage = () => {
         setFile(event.target.files[0]);
     };
 
-    console.log('currentUser', currentUser);
-    console.log('userProfile', currentProfile);
-
     if (loading) return (
         <Container className="text-center">
             <Spinner animation="border"></Spinner>
@@ -81,10 +82,10 @@ const UploadImage = () => {
                     </Form.Control.Feedback>
                 </Form.File>
                 <Form.Group>
-                    <Button variant="secondary" className="upload-button" type="submit" disabled={!file}>
+                    <Button className="upload-button" type="submit">
                         Upload
                     </Button>
-                    <Link className="text-secondary ml-3" to="/my-profile"><span>Cancel</span></Link>
+                    <Link className="ml-3" to="/my-profile"><span>Cancel</span></Link>
                 </Form.Group>
             </Form>
         </Container>

@@ -1,9 +1,8 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
+import '../styles/App.scss';
 import { BrowserRouter as Router, Route, Redirect, Switch} from 'react-router-dom';
 import { Container } from 'react-bootstrap';
 import { AuthProvider } from '../firebase/Auth';
 import Navigation from './Navigation';
-// import Landing from './Landing';
 import Login from './Login';
 import MyProfile from './MyProfile';
 import EditProfile from './EditProfile';
@@ -22,7 +21,7 @@ function App() {
     <AuthProvider>
       <Router>
           <Navigation></Navigation>
-          <Container className="mt-5">
+          <Container className="my-5">
             <Switch>
                 <Route exact path="/">
                   <Redirect to="/home"></Redirect>
