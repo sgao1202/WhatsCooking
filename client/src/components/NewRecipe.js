@@ -6,6 +6,7 @@ import { useContext } from 'react'
 import { AuthContext } from '../firebase/Auth'
 import utils from '../lib/Utility';
 import { FaBullseye } from 'react-icons/fa';
+const { v4: uuidv4 } = require('uuid');
 
 function NewRecipe(props){
     const { baseUrl, currentUser } = useContext(AuthContext);
@@ -139,6 +140,7 @@ function NewRecipe(props){
     }
     const handleProcedureChange = (e, index) => {
         formData.procedure[index] = e.target.value.trim();
+        console.log( e.target.value.trim())
         setFormData(formData);
     }
 
@@ -223,7 +225,7 @@ function NewRecipe(props){
                             
                 <label>Ingredients:</label>
                 {formData.ingredients.map((ingredient, index) => (
-                    <Form.Row key={index}>
+                    <Form.Row key={String(uuidv4())}>
                     
                     <InputGroup as={Col}>
                         <InputGroup.Prepend>
@@ -232,10 +234,10 @@ function NewRecipe(props){
                         <Form.Control required 
                                 type="text" 
                                 name="name" 
-                                onChange={(e) => {handleIngredientChange(e, index)
+                                onBlur={(e) => {handleIngredientChange(e, index)
                                                 setErrors({...errors, ingredientNames : false})}} 
                                 isValid={!!errors.ingredientNames} 
-                                isInvalid={errors.ingredientNames}></Form.Control>
+                                isInvalid={errors.ingredientNames} defaultValue={formData.ingredients[index]["name"]}></Form.Control>
                         <Form.Control.Feedback type="invalid">Must provide an ingredient name for all ingredients!</Form.Control.Feedback>
                     </InputGroup>
                     <InputGroup as={Col}>
@@ -245,10 +247,10 @@ function NewRecipe(props){
                         <Form.Control required 
                             type="number" 
                             name="portion" 
-                            onChange={(e) => {handleIngredientChange(e, index)
+                            onBlur={(e) => {handleIngredientChange(e, index)
                                 setErrors({...errors, ingredientPortions : false})}} 
                             isValid={!!errors.ingredientPortions} 
-                            isInvalid={errors.ingredientPortions}></Form.Control>
+                            isInvalid={errors.ingredientPortions} defaultValue={formData.ingredients[index]["portion"]}></Form.Control>
                         <Form.Control.Feedback type="invalid">Must provide a non-negative portion amount for all ingredients!</Form.Control.Feedback>
                     </InputGroup>
                     <InputGroup as={Col}>
@@ -258,10 +260,10 @@ function NewRecipe(props){
                         <Form.Control required 
                         type="text" 
                         name="units" 
-                        onChange={(e) => {handleIngredientChange(e, index)
+                        onBlur={(e) => {handleIngredientChange(e, index)
                             setErrors({...errors, ingredientUnits : false})}} 
                         isValid={!!errors.ingredientUnits} 
-                        isInvalid={errors.ingredientUnits}></Form.Control>
+                        isInvalid={errors.ingredientUnits} defaultValue={formData.ingredients[index]["units"]}></Form.Control>
                         <Form.Control.Feedback type="invalid">Must provide a unit of measurement for all ingredients!</Form.Control.Feedback>
                     </InputGroup>
                     <Button variant="danger" as={Col} xs={1} onClick={(e) => deleteIngredient(index)}>X</Button>
@@ -273,16 +275,18 @@ function NewRecipe(props){
                 <br></br>
                 <label>Procedure:</label>
                 {formData.procedure.map((step, index)=>(
-                    <Form.Row key={index}>
+                    <Form.Row key={String(uuidv4())}>
                         <InputGroup as={Col}>
                             <InputGroup.Prepend>
                                 <InputGroup.Text>{index+1}.</InputGroup.Text>
                             </InputGroup.Prepend>
                             <Form.Control required 
                                 as="textarea" 
-                                onChange={(e) => {handleProcedureChange(e, index)
+                                onBlur={(e) => {handleProcedureChange(e, index)
                                     setErrors({...errors, procedure : false})}} 
-                                isInvalid={errors.procedure}></Form.Control>
+                                isInvalid={errors.procedure} defaultValue={formData.procedure[index]}>
+                                    
+                                </Form.Control>
                             <Form.Control.Feedback type="invalid">Step cannot be empty for all steps!</Form.Control.Feedback>
                         </InputGroup>
                         <Button className='del-btn' variant="danger" as={Col} xs={1} onClick={() => deleteStep(index)}>X</Button>

@@ -3,6 +3,7 @@ import React, { useEffect, useState,useContext } from 'react';
 import { Col, Image, Button, Form, Modal } from 'react-bootstrap'
 import utils from '../lib/Utility';
 import { AuthContext } from "../firebase/Auth";
+const { v4: uuidv4 } = require('uuid');
 
 function EditRecipeModal(props) {
     const { baseUrl } = useContext(AuthContext);
@@ -46,8 +47,9 @@ function EditRecipeModal(props) {
         setFormData(formData);
     }
     const handleModalProcedureChange = (e, index) => {
-        formData.procedure[index] = e.target.value.trim();
-        setFormData(formData);
+        let fields = {...formData};
+        fields.procedure[index] = e.target.value.trim();
+        setFormData(fields);
     }
     const handleFileChange = (e) => {
         setFormData({
@@ -118,19 +120,20 @@ function EditRecipeModal(props) {
                 if(newImage){
                     const imageData = new FormData();
                     imageData.append("file", formData.picture);
-                    let picId = await axios.post(`${url}uploadImage`, imageData)
+                    let picId = await axios.post(`${url}/uploadImage`, imageData)
                     console.log(picId)
                     //store the picture in the database as a uid
                     formData.picture = picId.data;
                 }
-                console.log(formData)
-                let updatedRecipe = await axios.put(`${url}recipes/${formData._id}`, formData);
-                setFormData(updatedRecipe.data);
+                let updatedRecipe = await axios.put(`${url}/recipes/${formData._id}`, formData);
+                // setFormData(updatedRecipe.data);
+                console.log('put passed')
                 props.updateModal(formData);
             
                 
                 setNewImage(false);
             }catch(e){
+                console.log('error occured')
                 console.log(e);
             }
             setShowEditModal(false);
@@ -150,7 +153,10 @@ function EditRecipeModal(props) {
     }
     const deleteIngredient = (index) => {
         const fields = {...formData};
+        console.log('printing ingredients')
+        console.log(fields.ingredients)
         fields.ingredients.splice(index,1);
+        console.log(fields.ingredients)
         setFormData(fields);
     }
     const addStep = () => {
@@ -207,13 +213,13 @@ function EditRecipeModal(props) {
                     <Form.Group>
                         <Form.Label className='modal-subtitle'>Ingredients:</Form.Label>
                         {formData.ingredients.map((ingredient, index)=>(
-                            <Form.Row key={index}>
+                            <Form.Row key={String(uuidv4())}>
                                 <Col>
                                     <Form.Control required 
                                     type="text" 
                                     name="name" 
                                     defaultValue={ingredient.name} 
-                                    onChange={(e) => {handleModalIngredientChange(e, index)
+                                    onBlur={(e) => {handleModalIngredientChange(e, index)
                                         setErrors({...errors, ingredientNames : false})}} 
                                     isInvalid={errors.ingredientNames}></Form.Control>
                                     <Form.Control.Feedback type="invalid">Must provide an ingredient name for all ingredients!</Form.Control.Feedback>
@@ -223,7 +229,7 @@ function EditRecipeModal(props) {
                                     type="number" 
                                     name="portion" 
                                     defaultValue={ingredient.portion} 
-                                    onChange={(e) => {handleModalIngredientChange(e, index)
+                                    onBlur={(e) => {handleModalIngredientChange(e, index)
                                         setErrors({...errors, ingredientPortions : false})}} 
                                     isInvalid={errors.ingredientPortions}></Form.Control>
                                     <Form.Control.Feedback type="invalid">Must provide a non-negative portion amount for all ingredients!</Form.Control.Feedback>
@@ -233,13 +239,16 @@ function EditRecipeModal(props) {
                                     type="text" 
                                     name="units" 
                                     defaultValue={ingredient.units} 
-                                    onChange={(e) => {handleModalIngredientChange(e, index)
+                                    onBlur={(e) => {handleModalIngredientChange(e, index)
                                         setErrors({...errors, ingredientUnits : false})}} 
                                     isInvalid={errors.ingredientUnits}></Form.Control>
                                     <Form.Control.Feedback type="invalid">Must provide a unit of measurement for all ingredients!</Form.Control.Feedback>
                                 </Col>
                                 <Col xs={1}>
-                                    <Button className='ingredient-del-btn' variant="danger" onClick={()=> deleteIngredient(index)}>X</Button>
+                                    <Button className='ingredient-del-btn' variant="danger" onClick={()=> {
+                                        console.log('index added')
+                                        console.log(index)
+                                        deleteIngredient(index)}}>X</Button>
                                 </Col>
                             </Form.Row>
                         ))}
@@ -249,14 +258,14 @@ function EditRecipeModal(props) {
                         <Form.Label className='modal-subtitle'>Procedure:</Form.Label>
                         <br></br>
                         {formData.procedure.map((step, index)=>(
-                            <Form.Row key={index}>
+                            <Form.Row key={String(uuidv4())}>
                                 <Col>
                                     <Form.Control 
                                     required 
                                     as='textarea' 
                                     defaultValue={step} 
                                     rows={4} 
-                                    onChange={(e)=>handleModalProcedureChange(e, index)} 
+                                    onBlur={(e)=>handleModalProcedureChange(e, index)} 
                                     isInvalid={errors.procedure}></Form.Control>
                                     <Form.Control.Feedback type="invalid">All steps cannot be empty!</Form.Control.Feedback>
                                 </Col>

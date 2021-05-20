@@ -229,7 +229,7 @@ const Recipe = (props) =>{
                     {currentUser && currentUser.uid === userData.uid && <div>
                         <Row>
                         <Button onClick={updateRecipe}>Update Recipe</Button>
-                        <EditRecipeModal isOpen={showEditModal} data={recipeData} user={userData} closeModal={closeModal} updateModal={updateModal}></EditRecipeModal>
+                        <EditRecipeModal isOpen={showEditModal} data={{...recipeData}} user={userData} closeModal={closeModal} updateModal={updateModal}></EditRecipeModal>
                         </Row>
                     </div>}
                     {currentUser && <Row>
