@@ -6,7 +6,8 @@ WhatsCooking is a web application designed for people to share their culinary sk
 - The root directory of the project has a docker-compose.yaml, which lists the image names, versions, ports for Elasticsearch, Redis, and MongoDB
 - cd to this root directory and run the command docker-compose up
 
-## Running the server and client
+## Running the seed file, server, and client
 1. Run 'npm install' on the command line in both the 'client' folder and 'db' folder.
-2. Then run 'npm start' in the root of the 'db' folder and the root of the 'client'.
-3. The client application should then run on 'http://localhost:3000/' and the server should run on 'http://localhost:3001/'.
+2. Then run the seed file by accessing into the root directory for the 'db' folder and run the command 'npm run seed.'
+3. Run 'npm start' in the root of the 'db' folder and the root of the 'client'.
+4. The client application should then run on 'http://localhost:3000/' and the server should run on 'http://localhost:3001/'.
