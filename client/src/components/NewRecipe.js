@@ -222,7 +222,7 @@ function NewRecipe(props){
                         </Form.Group>
                 </Form.Row>
                 <Form.Row className="border-bottom pb-3 mb-3">
-                    <h4 className="mb-3">Ingredients</h4>
+                    <h2 className="h4 mb-3">Ingredients</h2>
                     <div className="col-12 pl-0">
                         {formData.ingredients.map((ingredient, index) => (
                             <Form.Row className="mb-4" key={index}>                    
@@ -230,13 +230,16 @@ function NewRecipe(props){
                                     <InputGroup.Prepend>
                                         <InputGroup.Text>Name</InputGroup.Text>
                                     </InputGroup.Prepend>
-                                    <Form.Control required 
-                                            type="text" 
-                                            name="name" 
-                                            onChange={(e) => {handleIngredientChange(e, index)
-                                                            setErrors({...errors, ingredientNames : false})}} 
-                                            isValid={!!errors.ingredientNames} 
-                                            isInvalid={errors.ingredientNames}></Form.Control>
+                                    <Form.Label></Form.Label>
+                                    <Form.Control 
+                                        required 
+                                        type="text" 
+                                        name="name" 
+                                        onChange={(e) => {handleIngredientChange(e, index)
+                                                        setErrors({...errors, ingredientNames : false})}} 
+                                        isValid={!!errors.ingredientNames} 
+                                        isInvalid={errors.ingredientNames}>
+                                    </Form.Control>
                                     <Form.Control.Feedback type="invalid">Must provide an ingredient name for all ingredients!</Form.Control.Feedback>
                                 </InputGroup>
                                 <InputGroup as={Col}>
@@ -274,7 +277,7 @@ function NewRecipe(props){
                     </div>
                 </Form.Row>
                 <Form.Row className="border-bottom pb-3 mb-3">
-                    <h4 className="mb-3">Procedures</h4>
+                    <h2 className="h4 mb-3">Procedures</h2>
                     <div className="col-12 pl-0">
                         {formData.procedure.map((step, index)=>(
                             <Form.Row className="mb-4" key={index}>

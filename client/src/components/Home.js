@@ -3,7 +3,7 @@ import axios from "axios";
 import Search from "./Search";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../firebase/Auth";
-import { Button, ListGroup, Card, Row, Col } from "react-bootstrap";
+import { Button, Container, ListGroup, Card, Row, Col } from "react-bootstrap";
 import { FaPlusCircle } from 'react-icons/fa';
 import genericProfile from "../img/generic-user-profile.jpeg";
 import {
@@ -166,7 +166,7 @@ const Home = () => {
               />
 
               <CardContent>
-                <Typography gutterBottom variant="h6" component="h3">
+                <Typography gutterBottom variant="h6" component="h1">
                   {s.title}
                 </Typography>
                 <Typography variant="body2" color="textSecondary" component="p">
@@ -198,37 +198,39 @@ const Home = () => {
     return <div>loading...</div>;
   } else {
     return (
-      <div>
-        <Search searchValue={searchValue}></Search>
-        <div className={classes.leftElement}>
-          <br />
-          <br />
-          <Grid container className={classes.grid} spacing={5}>
-            {li}
-          </Grid>
-        </div>
-        <div className={`${classes.rightElement}`}>
-          {currentUser ? 
-            <div className="mb-4">
-                <Link className="pb-5" to="/newrecipe">
-                  <Button><FaPlusCircle className="mb-1 mr-2"/>Create a Recipe</Button>
-                </Link>
-            </div> : ""
-          }
-          <Card className="mb-5" style={{ width: "18rem" }}>
-            <Card.Header className="h3">Popular</Card.Header>
-            <ListGroup variant="flush" className="shadow">{popularSearches}</ListGroup>
-          </Card>
-          {currentUser ? (
-            <Card style={{ width: "18rem" }}>
-              <Card.Header className="h3">Bookmarks</Card.Header>
-              <ListGroup variant="flush">{bookmarks}</ListGroup>
+      <Container className="p-0">
+        <Row className="mb-4">
+          <Search searchValue={searchValue}></Search>
+        </Row>
+        <Row>
+          <Col className="pl-0 mb-5">
+            <Grid container className={classes.grid} spacing={5}>
+              {li}
+            </Grid>
+          </Col>
+          <Col className="pl-5" md={3}>
+            {currentUser ? 
+              <div className="mb-4">
+                  <Link className="pb-5" to="/newrecipe">
+                    <Button><FaPlusCircle className="mb-1 mr-2"/>Create a Recipe</Button>
+                  </Link>
+              </div> : ""
+            }
+            <Card className="mb-5" style={{ width: "18rem" }}>
+              <Card.Header className="h3">Popular</Card.Header>
+              <ListGroup variant="flush" className="shadow">{popularSearches}</ListGroup>
             </Card>
-          ) : (
-            ""
-          )}
-        </div>
-      </div>
+            {currentUser ? (
+              <Card style={{ width: "18rem" }}>
+                <Card.Header className="h3">Bookmarks</Card.Header>
+                <ListGroup variant="flush">{bookmarks}</ListGroup>
+              </Card>
+            ) : (
+              ""
+            )}
+          </Col>
+        </Row>
+      </Container>
     );
   }
 };
