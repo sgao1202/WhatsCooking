@@ -14,6 +14,7 @@ const UserProfile = (props) => {
     const [userProfile, setUserProfile] = useState(undefined);
     const [bookmarkedRecipes, setBookmarkedRecipes] = useState(undefined);
     const [myRecipes, setMyRecipes] = useState(undefined);
+    const [followingUsers, setFollowingUsers] = useState(undefined);
     const [loading, setLoading] = useState(true);
     const [redirect, setRedirect] = useState(false);
     const [hasError, setHasError] = useState(false);
@@ -45,6 +46,7 @@ const UserProfile = (props) => {
                 setUserProfile(data.user);
                 setBookmarkedRecipes(data.bookmarkedRecipes);
                 setMyRecipes(data.myRecipes);
+                setFollowingUsers(data.following);
                 
                 if (currentUser) {
                     let r = await axios.get(`${url}/users/uid/${currentUser.uid}`);
@@ -223,8 +225,8 @@ const UserProfile = (props) => {
                                     <h2 className="pb-2 border-bottom text-primary">Following</h2>
                                 </div>
                                 <div>
-                                    {userProfile.following.length === 0 ? <h3>No followers available</h3> : 
-                                        (<ListDisplay user list={following}/>)
+                                    {followingUsers.length === 0 ? <h3>No followers available</h3> : 
+                                        (<ListDisplay user list={followingUsers}/>)
                                     }
                                 </div>
                             </Tab.Pane>

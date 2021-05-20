@@ -245,7 +245,7 @@ const Recipe = (props) =>{
                             <div className="mb-3">
                                 <Row>
                                     <Button onClick={updateRecipe}><FaEdit className="mb-1 mr-2"/>Update Recipe</Button>
-                                    <EditRecipeModal isOpen={showEditModal} data={recipeData} user={userData} closeModal={closeModal} updateModal={updateModal}></EditRecipeModal>
+                                    <EditRecipeModal isOpen={showEditModal} data={{...recipeData}} user={userData} closeModal={closeModal} updateModal={updateModal}></EditRecipeModal>
                                 </Row>
                             </div>}
                         {currentUser && 
@@ -307,7 +307,7 @@ const Recipe = (props) =>{
                                     <Container>
                                         <Row>
                                             <span className="user-comment-name">
-                                                <Link to={`/users/${comment.userId}`}>{comment.userName}</Link>
+                                                {comment.userName}
                                             </span>
                                         </Row>
                                         <Row>

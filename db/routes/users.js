@@ -81,7 +81,10 @@ router.get('/my-profile/:uid', async (req, res) => {
                 aboutMe: currentUser.aboutMe
             });
         }
-
+        for(myRecipe of myRecipes) {
+            let tempUser = await userData.getUserById(myRecipe.userId);
+            myRecipe.name = tempUser.firstName +" " +tempUser.lastName;
+        }
         res.json({
             user: user,
             bookmarkedRecipes: bookmarkedRecipes,

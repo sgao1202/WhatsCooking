@@ -7,7 +7,7 @@ import genericProfile from '../img/generic-user-profile.jpeg';
 
 // Props must have recipe or user prop supplied
 const ListDisplay = (props) => {
-    const { baseUrl } = useContext(AuthContext);
+    const { baseUrl, currentUser } = useContext(AuthContext);
     const [list, setList] = useState(props.list);
     let currentList = null;
 
@@ -42,7 +42,7 @@ const ListDisplay = (props) => {
                                 </Link>
                             </Row>
                             <Row>
-                                <span className="font-italic text-dark">{`Created by: Me`}</span>
+                                <span className="font-italic text-dark">{`Created by: ` + recipe.name}</span>
                             </Row>
                         </Col>
                     </Row>
@@ -55,7 +55,7 @@ const ListDisplay = (props) => {
             <ListGroup.Item key={bookmark._id}>
                     <Row>
                         <Col md={1} className="mr-3">
-                            <Image className="shadow-lg following-user-profile-picture" src={bookmark.picture ? `${baseUrl}/images/${bookmark.picture}` : genericProfile} alt={`recipe-${bookmark.title}`} roundedCircle/>
+                            <Image className="shadow-lg following-user-profile-picture" src={bookmark.picture ? `${baseUrl}images/${bookmark.picture}` : genericProfile} alt={`recipe-${bookmark.title}`} roundedCircle/>
                         </Col>
                         <Col>
                             <Row>
