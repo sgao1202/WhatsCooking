@@ -46,7 +46,7 @@ const SignUp = () => {
         try {
             const user = await doCreateUserWithEmailAndPassword(email, password, `${firstName} ${lastName}`);
             // Give the user a default profile picture
-            const { data } = await axios.post(`${baseUrl}/users`, {
+            const { data } = await axios.post(`${baseUrl}users`, {
                uid: user.uid,
                firstName: firstName,
                lastName: lastName,

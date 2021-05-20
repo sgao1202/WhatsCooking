@@ -42,9 +42,9 @@ const UploadImage = () => {
                 const formData = new FormData();
                 formData.append("file", file, file.name);
                 // Post image to backend
-                const imageId = await axios.post(`${baseUrl}/uploadImage`, formData);
+                const imageId = await axios.post(`${baseUrl}uploadImage`, formData);
                 // Update user's profilePicture field
-                const updateUser = await axios.patch(`${baseUrl}/users/${currentProfile._id}`, {
+                const updateUser = await axios.patch(`${baseUrl}users/${currentProfile._id}`, {
                     profilePicture: imageId.data
                 });
                 updateProfile(updateUser.data);

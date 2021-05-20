@@ -8,7 +8,7 @@ import utils from '../lib/Utility';
 import {FaTrashAlt, FaPlus } from 'react-icons/fa';
 
 function NewRecipe(props){
-    const { currentUser } = useContext(AuthContext);
+    const { baseUrl, currentUser } = useContext(AuthContext);
     const initialFormData = {
         title: "",
         userId: "",
@@ -17,7 +17,7 @@ function NewRecipe(props){
         ingredients: [{name: "", portion: "", units: ""}],
         procedure: [""]
     }
-    const url = 'http://localhost:3001/';
+    const url = baseUrl.substring(0, baseUrl.lastIndexOf("/"));
     const [formData, setFormData] = useState(initialFormData);
     const [errors, setErrors] = useState({
         title: false,
@@ -29,7 +29,7 @@ function NewRecipe(props){
 
     useEffect(()=>{
         async function fetchData(){
-            let user = await axios.get(`${url}users/uid/${currentUser.uid}`);
+            let user = await axios.get(`${url}/users/uid/${currentUser.uid}`);
             setFormData({
                 ...formData, userId : user.data._id
             })
@@ -57,11 +57,11 @@ function NewRecipe(props){
                 const imageData = new FormData();
                 console.log(formData.picture)
                 imageData.append("file", formData.picture)
-                let picId = await axios.post(`${url}uploadImage`, imageData)
+                let picId = await axios.post(`${url}/uploadImage`, imageData)
 
                 //store the picture in the database as a uid
                 formData.picture = picId.data;
-                let newRecipe = await axios.post(`${url}recipes`, formData)
+                let newRecipe = await axios.post(`${url}/recipes`, formData)
                 
                 // redirect to new page after recipe created
                 props.history.push(`/recipe/${newRecipe.data._id}`)

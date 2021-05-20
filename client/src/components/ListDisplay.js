@@ -17,7 +17,7 @@ const ListDisplay = (props) => {
                 <Link to={`/users/${user._id}`}>
                     <Row>
                         <Col md={1}>
-                            <Image className="shadow-lg following-user-profile-picture" src={user.profilePicture ? `${baseUrl}/images/${user.profilePicture}` : genericProfile} alt={`profile-${user._id}`} roundedCircle/>
+                            <Image className="shadow-lg following-user-profile-picture" src={user.profilePicture ? `${baseUrl}images/${user.profilePicture}` : genericProfile} alt={`profile-${user._id}`} roundedCircle/>
                         </Col>
                         <Col>
                             <span>{`${user.firstName} ${user.lastName.charAt(0)}`}</span>
@@ -33,7 +33,7 @@ const ListDisplay = (props) => {
             <ListGroup.Item key={recipe._id}>
                     <Row>
                         <Col md={1} className="mr-3">
-                            <Image className="shadow-lg following-user-profile-picture" src={recipe.picture ? `${baseUrl}/images/${recipe.picture}` : genericProfile} alt={`recipe-${recipe.title}`} roundedCircle/>
+                            <Image className="shadow-lg following-user-profile-picture" src={recipe.picture ? `${baseUrl}images/${recipe.picture}` : genericProfile} alt={`recipe-${recipe.title}`} roundedCircle/>
                         </Col>
                         <Col>
                             <Row>

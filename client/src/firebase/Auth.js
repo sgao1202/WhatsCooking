@@ -4,7 +4,7 @@ import { Container, Spinner } from 'react-bootstrap';
 import axios from 'axios';
 
 const AuthContext = React.createContext();
-const baseUrl = 'http://localhost:3001'
+const baseUrl = 'http://3.235.242.32:3001/'
 
 const AuthProvider = ({ children }) => {
     const [currentUser, setCurrentUser] = useState(null);
@@ -17,7 +17,7 @@ const AuthProvider = ({ children }) => {
             // User signs in 
             if (user) {
                 try {
-                    const { data } = await axios.get(`${baseUrl}/users/uid/${user.uid}`);
+                    const { data } = await axios.get(`${baseUrl}users/uid/${user.uid}`);
                     setCurrentProfile(data);
                 } catch (e) {
                     console.log(e);

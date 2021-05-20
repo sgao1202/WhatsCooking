@@ -55,7 +55,7 @@ const useStyles = makeStyles({
 const Home = () => {
   const { baseUrl, currentUser, currentProfile } = useContext(AuthContext);
   const classes = useStyles();
-  const url = "http://localhost:3001";
+  const url = baseUrl.substring(0, baseUrl.lastIndexOf("/"));
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchData, setSearchData] = useState(undefined);
@@ -101,7 +101,7 @@ const Home = () => {
     async function fetchUserBookmarks() {
       try {
         const userBookmarksData = await axios.get(
-          `${baseUrl}/users/uid/${currentUser.uid}`
+          `${url}/users/uid/${currentUser.uid}`
         );
         let userBookmarks = [];
         for (let i = 0; i < userBookmarksData.data.bookmarks.length; i++) {
@@ -152,14 +152,14 @@ const Home = () => {
 
   const buildCard = (s) => {
     return (
-      <Grid item xs={12} sm={6} md={4} lg={5} xl={2} key={s._id}>
-        <Card className={classes.card} variant="outlined">
+      <Grid item xs={12} sm={6} md={5} lg={5} xl={4} key={s._id}>
+        <Card className={classes.card}>
           <CardActionArea>
             <Link to={`/recipe/${s._id}`}>
               <CardMedia
                 className={classes.media}
                 component="img"
-                image={`${baseUrl}/images/${
+                image={`${url}/images/${
                   s.picture ? s.picture : genericProfile
                 }`}
                 title="show image"
