@@ -50,7 +50,8 @@ const SignUp = () => {
                uid: user.uid,
                firstName: firstName,
                lastName: lastName,
-               profilePicture: "generic-user-profile.jpg"
+               profilePicture: "generic-user-profile.jpg",
+               aboutMe: aboutMe
             });
             updateProfile(data);
             setUserAlreadyExists(false);
@@ -171,6 +172,7 @@ const SignUp = () => {
                         rows="5"
                         placeholder="Tell us a little bit about yourself. Maybe some of your favorite cuisines, popular chefs, or even some of your favorite dishes!"
                         type="text" 
+                        value={aboutMe}
                         onChange={(e) => {
                             setAboutMe(e.target.value);
                             setErrors({
