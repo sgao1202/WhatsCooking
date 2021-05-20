@@ -236,7 +236,7 @@ module.exports = [
         uid: '1TjTuT3EYnS5GMGTemUNOpvbxIm1',
         username: 'achen',
         password: '$2a$16$TR0iphtk84k/wLVRaqEYm.npNn4K0esPRfeg9O7nvYw4o4fCCIS3W',
-        profilePicture: 'no-image.jpeg',
+        profilePicture: '20b3f083-a589-457e-9a81-16a2366f469c',
         aboutMe: 'an inspiring chef',
         recipes: [
             {

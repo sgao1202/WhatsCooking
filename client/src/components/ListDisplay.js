@@ -14,7 +14,7 @@ const ListDisplay = (props) => {
     const createUserItem = (user) => {
         return (
             <ListGroup.Item key={user._id}>
-                <Link to={`/users/${user._id}`}>
+                <Link to={`/users/${user.uid}`}>
                     <Row>
                         <Col md={1}>
                             <Image className="shadow-lg following-user-profile-picture" src={user.profilePicture ? `${baseUrl}images/${user.profilePicture}` : genericProfile} alt={`profile-${user._id}`} roundedCircle/>

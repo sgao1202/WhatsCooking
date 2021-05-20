@@ -78,7 +78,8 @@ router.get('/my-profile/:uid', async (req, res) => {
                 firstName: currentUser.firstName,
                 lastName: currentUser.lastName,
                 profilePicture: currentUser.profilePicture,
-                aboutMe: currentUser.aboutMe
+                aboutMe: currentUser.aboutMe,
+                uid: currentUser.uid
             });
         }
         for(myRecipe of myRecipes) {
