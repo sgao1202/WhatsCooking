@@ -74,12 +74,12 @@ const ListDisplay = (props) => {
         );
     };
     
-    const removeItem = (id) => {
-        console.log(id);
-        // Remove from list and send a post request to update the user's profile
-        const newList = list.filter((item) => item._id !== id);
-        setList(newList);
-    };
+    // const removeItem = (id) => {
+    //     console.log(id);
+    //     // Remove from list and send a post request to update the user's profile
+    //     const newList = list.filter((item) => item._id !== id);
+    //     setList(newList);
+    // };
     
     if (props.recipe) currentList = list && list.map((item) => { return createRecipeItem(item); });
     if (props.user) currentList = list && list.map((item) => { return createUserItem(item); });
